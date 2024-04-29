@@ -13,7 +13,7 @@
 
 
 
-<title>wjl&#39;sblog</title>
+<title>开源RISCV core | wjl&#39;sblog</title>
 
 
 
@@ -193,7 +193,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title"></h1>
+            <h1 class="post-title">开源RISCV core</h1>
             
                 <div class="post-meta">
                     
@@ -202,16 +202,23 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">2024- 4- 29&nbsp;&nbsp;10:27:12</a>
+                        Date: <a href="#">2024- 2- 7&nbsp;&nbsp;00:00:00</a>
                         </span>
                     
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/RISCV/">RISCV</a>
+                            
+                        </span>
                     
                 </div>
             
         </header>
 
         <div class="post-content">
-            <h1 id="开源RISCV-core"><a href="#开源RISCV-core" class="headerlink" title="开源RISCV core"></a>开源RISCV core</h1><h2 id="1、Ibex"><a href="#1、Ibex" class="headerlink" title="1、Ibex"></a>1、<strong>Ibex</strong></h2><p>提到开源RISC-V就不能不提Riscy系列了，尤其是zero-riscy，使用很广泛。Ibex是脱胎于zero-riscy的core，支持RV32IMC及一些Z系列指令，由LowRISC维护。Ibex小巧精悍，文档详实，学习资料丰富，支持verilator， 可以使用verilator+openOCD+GDB 仿真时debug。对于我这样的重度Verilator依赖者来说非常友好。</p>
+            <h1 id=""><a href="#" class="headerlink" title=""></a></h1><h2 id="1、Ibex"><a href="#1、Ibex" class="headerlink" title="1、Ibex"></a>1、<strong>Ibex</strong></h2><p>提到开源RISC-V就不能不提Riscy系列了，尤其是zero-riscy，使用很广泛。Ibex是脱胎于zero-riscy的core，支持RV32IMC及一些Z系列指令，由LowRISC维护。Ibex小巧精悍，文档详实，学习资料丰富，支持verilator， 可以使用verilator+openOCD+GDB 仿真时debug。对于我这样的重度Verilator依赖者来说非常友好。</p>
 <p>Ibex支持machine mode和user mode两种privilege mode，可以实现比单machine mode更加丰富的功能。Ibex采用system verilog开发，对于传统的IC工程师是个好消息。Ibex现在也支持了指令cache了，提高了performance，但装了cache会让core变得臃肿很多，对于学习cache controller的设计是个好事情。</p>
 <p>Ibex使用类TLUL的自定义接口，官方的SoC是PULP。Google的OpenTitan项目也是基于Ibex。相关的设计学习资料算是相当多了。</p>
 <p>github: <a target="_blank" rel="noopener" href="https://github.com/lowRISC/ibex">https://github.com/lowRISC/ibex</a></p>
@@ -253,7 +260,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://urwjl.github.io/2024/04/29/%E5%BC%80%E6%BA%90RISCV%20core/">http://urwjl.github.io/2024/04/29/%E5%BC%80%E6%BA%90RISCV%20core/</a></span>
+                        <span><a href="http://urwjl.github.io/2024/02/07/%E5%BC%80%E6%BA%90RISCV%20core/">http://urwjl.github.io/2024/02/07/%E5%BC%80%E6%BA%90RISCV%20core/</a></span>
                     </p>
                 
                 
@@ -276,6 +283,12 @@
                 <span>Tag(s):</span>
                 <span class="tag">
                     
+                    
+                        <a href="/tags/RISCV/"># RISCV</a>
+                    
+                        <a href="/tags/core/"># core</a>
+                    
+                        
                 </span>
             </div>
             <div>
@@ -286,8 +299,8 @@
         </section>
         <section class="post-nav">
             
+                <a class="prev" rel="prev" href="/2024/02/07/RISCV%E9%80%9A%E8%AF%86/">RISCV通识</a>
             
-            <a class="next" rel="next" href="/2024/04/29/RISCV%E9%80%9A%E8%AF%86/"></a>
             
         </section>
 
