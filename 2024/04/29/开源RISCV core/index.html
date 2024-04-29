@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Wu jinlin">
+
+
+
+
+
+<title>wjl&#39;sblog</title>
+
+
+
+    <link rel="icon" href="/restaurant_hot_drink_tea_cafe_icon_226132.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">WJL&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">WJL&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title"></h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Wu jinlin</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">2024- 4- 29&nbsp;&nbsp;10:27:12</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="开源RISCV-core"><a href="#开源RISCV-core" class="headerlink" title="开源RISCV core"></a>开源RISCV core</h1><h2 id="1、Ibex"><a href="#1、Ibex" class="headerlink" title="1、Ibex"></a>1、<strong>Ibex</strong></h2><p>提到开源RISC-V就不能不提Riscy系列了，尤其是zero-riscy，使用很广泛。Ibex是脱胎于zero-riscy的core，支持RV32IMC及一些Z系列指令，由LowRISC维护。Ibex小巧精悍，文档详实，学习资料丰富，支持verilator， 可以使用verilator+openOCD+GDB 仿真时debug。对于我这样的重度Verilator依赖者来说非常友好。</p>
+<p>Ibex支持machine mode和user mode两种privilege mode，可以实现比单machine mode更加丰富的功能。Ibex采用system verilog开发，对于传统的IC工程师是个好消息。Ibex现在也支持了指令cache了，提高了performance，但装了cache会让core变得臃肿很多，对于学习cache controller的设计是个好事情。</p>
+<p>Ibex使用类TLUL的自定义接口，官方的SoC是PULP。Google的OpenTitan项目也是基于Ibex。相关的设计学习资料算是相当多了。</p>
+<p>github: <a target="_blank" rel="noopener" href="https://github.com/lowRISC/ibex">https://github.com/lowRISC/ibex</a></p>
+<p>文档：<a target="_blank" rel="noopener" href="https://ibex-core.readthedocs.io/en/latest/introduction.html">https://ibex-core.readthedocs.io/en/latest/introduction.html</a></p>
+<h2 id="2、SweRV-EH1"><a href="#2、SweRV-EH1" class="headerlink" title="2、SweRV EH1"></a>2、<strong>SweRV EH1</strong></h2><p>SweRV EH1是WD开发的其中一款RISC-V core，支持RV32IMC，双发射，单线程，9级流水，性能应该说是相当不错，28nm可以跑到1GHz。而且还有份详细的文档，不愧是大厂出品。</p>
+<p>SweRV是使用Verilog&#x2F;System Verilog开发，使用AXI接口，对熟悉AMBA且不想去学Chisel及Scala的同学来说是相当友好了。而且支持verilator，必须点赞。值得一提的是SweRV带指令cache，且实现了丰富的cache maintenance自定义指令，非常值得学习。</p>
+<p>一句话点评：<strong>大厂出品，进阶学习佳作。</strong></p>
+<p>github: <a target="_blank" rel="noopener" href="https://github.com/chipsalliance/Cores-SweRV">https://github.com/chipsalliance/Cores-SweRV</a></p>
+<h2 id="3、Hammingbird-E203"><a href="#3、Hammingbird-E203" class="headerlink" title="3、Hammingbird E203"></a>3、<strong>Hammingbird E203</strong></h2><p>蜂鸟处理器是在国内RISC-V社区大名鼎鼎的芯来科技开发的RISC-V MCU系列。E203是其开源的一款单privilege mode，两级流水（不严格说法）的MCU，主打小面积、低功耗。使用Verilog开发。麻雀虽小，五脏俱全，也包括debug module，代码严谨优美，用来学习设计没得说。官方文档不算多，但是市面上可以买到胡振波大牛写的两本书，也算是学习资料丰富了。</p>
+<p>开源的E203在github上其实是一个SoC平台。E203使用自定义的类AXI接口，支持debug spec 0.11。唯一的缺憾是没有官方的verilator环境，如果使用verilator的话得自己搭个环境了。像我这种在家用不了商业仿真软件（也不愿意装D版）的硅农，只能用意念仿真了，目前还是看看代码，等有时间的话Port一个verilator仿真环境过去。开源蜂鸟E203支持Icarus Verilog开源仿真工具，这个仿真工具不知道还有没有人维护，就我以前使用而言，几乎只能仿纯verilog，对于很多不可综合的写法也不支持，使用非常受限，就更别提把GDB接入到仿真了。</p>
+<p>这里值得是说一下胡振波大牛写的《手把手教你设计CPU——RISC-V处理器篇》，还是很不错的设计入门之作，里面有很多干货，是本让初学者受益良多、让熟手硅农深有共鸣的好书。另一本貌似是嵌入式开发，目前还没有拜读。</p>
+<p>一句话点评：<strong>初学者学习RISC-V处理器设计首选。</strong><br>github: <a target="_blank" rel="noopener" href="https://github.com/SI-RISCV/e200_opensource">https://github.com/SI-RISCV/e200_opensource</a></p>
+<h2 id="4、Rocket，BOOM"><a href="#4、Rocket，BOOM" class="headerlink" title="4、Rocket，BOOM"></a>4、<strong>Rocket，BOOM</strong></h2><p>很多RISC-V开发者，无论硬件还是软件，首次接触的CPU core就是Rocket。Rocket Chip Generator可以生成包括Rocket core的一整套SoC，各种参数统统可配置。Rocket Chip是用Chisel开发的，初学者（CPU设计开发的数字前端初学者，尤其是只懂Verilog的初学者）要去看Rocket的代码还是会有些吃力的，对初学者不太友好。不过正因为其面世较早，又有Berkeley的纯正血统，粉丝众多，很多paper都是基于Rocket Chip做的，资料也很好找，但似乎没有详细的官方文档。</p>
+<p>Rocket chip带MMU，支持操作系统，所以在上面跑Linux是没有问题的。Rocket chip使用Tilelink总线，支持缓存一致性的一款总线。支持Verilator+OpenOCD+GDB仿真。</p>
+<p>Rocket是64位CPU core（也是今天介绍的几款处理器中唯一一款64位的），采用经典五级流水，顺序执行，单发射，还支持各种分支预测。BOOM（Berkeley Out-of-Order Machine）基于Rocket，乱序执行，BOOM有还算比较详细的文档。这两个用来学习还是很不错的。而且Rocket还是比较成熟的，基于Rocket core已经有很多ASIC产品了。只是Chisel是道坎，CPU设计还没开始学就跳进Chisel的坑里去了！</p>
+<p>一句话总结：<strong>Berkeley纯正血统，但欲学本core，必先入Chisel之坑。</strong></p>
+<p>Rocket Chip github：<a target="_blank" rel="noopener" href="https://github.com/chipsalliance/rocket-chip">https://github.com/chipsalliance/rocket-chip</a></p>
+<p>BOOM github: <a target="_blank" rel="noopener" href="https://github.com/riscv-boom/riscv-boom">https://github.com/riscv-boom/riscv-boom</a></p>
+<p>##5、<strong>CVA6 RISC-V CPU</strong></p>
+<p>CVA6 是一款 6 级、单次、有序 CPU，实现 64 位 RISC-V 指令集。它完全实现了第 I 卷：用户级 ISA V 2.3 中指定的 I、M、A 和 C 扩展以及草案权限扩展 1.10。它实现了三个权限级别M、S、U，以完全支持类Unix操作系统。此外，它还符合外部调试规范草案 0.13。</p>
+<p>它具有可配置的大小、独立的 TLB、硬件 PTW 和分支预测（分支目标缓冲区和分支历史表）。主要设计目标是减少关键路径长度。</p>
+<p>github:<a target="_blank" rel="noopener" href="https://github.com/openhwgroup/cva6">https://github.com/openhwgroup/cva6</a></p>
+<h2 id="6、香山开源高性能处理器"><a href="#6、香山开源高性能处理器" class="headerlink" title="6、香山开源高性能处理器"></a>6、<strong>香山开源高性能处理器</strong></h2><p>“香山”基于Chisel语言开发，支持多核，采用乱序执行、11级流水、6发射。采用28nm台积电工艺预计达到1.3Ghz主频，采用中芯国际14nm工艺预计达到2Ghz主频。性能评估为7&#x2F;Ghz(SEPC2006)，换言之，第一版的雁栖湖架构对标的是ARM A72&#x2F;A73。</p>
+<p>github:<a target="_blank" rel="noopener" href="https://github.com/OpenXiangShan/XiangShan">https://github.com/OpenXiangShan/XiangShan</a></p>
+<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a target="_blank" rel="noopener" href="https://www.riscv-mcu.com/article-article-show-id-329.html">简评几款开源RISC-V处理器</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.pulp-platform.org/">https://www.pulp-platform.org/</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/pulp-platform/axi">https://github.com/pulp-platform/axi</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Wu jinlin</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://urwjl.github.io/2024/04/29/%E5%BC%80%E6%BA%90RISCV%20core/">http://urwjl.github.io/2024/04/29/%E5%BC%80%E6%BA%90RISCV%20core/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2024/04/29/RISCV%E9%80%9A%E8%AF%86/"></a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Wu jinlin | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+    <div class="beian">
+        <span>备案号：7758258 </span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

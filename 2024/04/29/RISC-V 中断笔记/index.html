@@ -13,7 +13,7 @@
 
 
 
-<title>Hello World | wjl&#39;sblog</title>
+<title>wjl&#39;sblog</title>
 
 
 
@@ -193,7 +193,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Hello World</h1>
+            <h1 class="post-title"></h1>
             
                 <div class="post-meta">
                     
@@ -202,7 +202,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">2024- 2- 7&nbsp;&nbsp;09:12:14</a>
+                        Date: <a href="#">2024- 4- 29&nbsp;&nbsp;10:26:53</a>
                         </span>
                     
                     
@@ -211,19 +211,100 @@
         </header>
 
         <div class="post-content">
-            <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+            <h1 id="RISC-V中断"><a href="#RISC-V中断" class="headerlink" title="RISC-V中断"></a>RISC-V中断</h1><p>在riscv中一共定义了4种状态中断，对于hart层面，hart包含<em>local</em>中断源和<em>global</em>中断源</p>
+<ul>
+<li>而<em>local</em>中断只有<strong>Timer</strong>和<strong>Software</strong>中断两种  (CLINT) 每个hart有只属于自己的中断</li>
+<li>而<em>global</em>中断则称为<strong>extended  interrupts</strong>   (PLIC) 可以分配给任意一个hart</li>
+<li>还有调试中断<strong>Debug Interrupt</strong>（暂不介绍）</li>
+</ul>
+<p>硬件上不支持中断嵌套：<strong>RISC-V中不存在高优先级中断可以打断低优先级中断的硬件支持</strong></p>
+<p><strong>RISC-V中规定进入和退出异常机制中没有硬件自动保存和恢复上下文的操作，软件需要明确地使用指令进行上下文的保存和恢复</strong></p>
+<p>当工作在M态时可以通过<code>SRET</code>指令跳到S态，<strong>xRET 将 pc 设置为存储在 xepc 寄存器中的值</strong>。</p>
+<h2 id="1-中断相关CSR"><a href="#1-中断相关CSR" class="headerlink" title="1 中断相关CSR"></a>1 中断相关CSR</h2><h3 id="1-1-M级别csr"><a href="#1-1-M级别csr" class="headerlink" title="1.1 M级别csr"></a>1.1 M级别csr</h3><p>八个控制状态寄存器（CSR）是机器模式下异常处理的必要部分：</p>
+<ol>
+<li>mtvec（Machine Trap-Vector Base-Address）它保存发生异常时处理器需要跳转到的地址。&#x3D;&#x3D;中断或异常处理函数的入口&#x3D;&#x3D; </li>
+<li>mepc（Machine Exception PC）它<strong>指向</strong>发生异常的指令。&#x3D;&#x3D;对于中断而言，退出时会跳到mepc的下一条尚未执行的指令&#x3D;&#x3D;</li>
+<li>mcause（Machine Exception Cause）它指示发生异常的种类。</li>
+<li>mie（Machine Interrupt Enable）它指出处理器目前能处理和忽略的中断。</li>
+<li>mip（Machine Interrupt Pending）它列出目前正准备处理的中断。 &#x3D;&#x3D;硬件上PLIC输出的信号会体现到mip相应寄存器D端&#x3D;&#x3D;</li>
+<li>mtval（Machine Trap Value）它保存了陷入（trap）的附加信息：地址例外中出错 的地址、发生非法指令例外的指令本身，对于其他异常，它的值为 0。 </li>
+<li>mscratch（Machine Scratch）它暂时存放一个字大小的数据。&#x3D;&#x3D;为异常或中断子程序提供临时变量空间&#x3D;&#x3D; </li>
+<li>mstatus（Machine Status）它保存全局中断使能，以及许多其他的状态</li>
+</ol>
+<p>两个中断异常委托寄存器只在实现S模式时有效</p>
+<ol>
+<li>medeleg 委托同步异常</li>
+<li>mideleg 委托异步异常：中断</li>
+</ol>
+<h3 id="1-2-S级别csr"><a href="#1-2-S级别csr" class="headerlink" title="1.2 S级别csr"></a>1.2 S级别csr</h3><p>当一个陷阱被委托到S模式时:</p>
+<ul>
+<li><code>scause</code>写入陷阱原因;</li>
+<li><code>sepc</code>寄存器写入产生陷阱的指令的虚拟地址;</li>
+<li><code>stval</code>寄存器写入使用特定于异常的数据;</li>
+<li><code>mstatus.SPP</code>字段写入发生trap时所处的特权模式;</li>
+<li><code>mstatus.SPIE</code>字段写入发生trap时<code>mstatus.SIE</code>的值;</li>
+<li>并且<code>mstatus.SIE</code>字段被清除。</li>
+<li><code>mcause</code>、<code>mepc</code>和<code>mtval</code>寄存器以及<code>mstatus</code>的MPP和MPIE字段不被写。</li>
+</ul>
+<h3 id="1-3"><a href="#1-3" class="headerlink" title="1.3"></a>1.3</h3><h2 id="2-中断处理流程"><a href="#2-中断处理流程" class="headerlink" title="2 中断处理流程"></a>2 中断处理流程</h2><img src="RISC-V 中断笔记/image-20220612180146138.png" alt="img" style="zoom:80%;" />
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<h3 id="2-1-M级中断处理流程"><a href="#2-1-M级中断处理流程" class="headerlink" title="2.1 M级中断处理流程"></a>2.1 M级中断处理流程</h3><p>首先<strong>软件</strong>需要初始化CSR寄存器：</p>
+<ol>
+<li>mie：使能相应的中断</li>
+<li>mtvec：配置中断函数入口地址</li>
+<li>mstatus：使能全局中断</li>
+</ol>
+<p>然后当<strong>硬件</strong>收到一个有效的中断信号后：</p>
+<ol>
+<li>更新mepc、mcause、mstatus的值，（可能会更新mtval）</li>
+<li>PC跳转到mtvec配置的地址，进入中断处理函数</li>
+</ol>
+<p><strong>中断处理函数</strong>需要：</p>
+<ol>
+<li>保存上下文</li>
+<li>读mcause判断是什么中断然后进行跳转到相应的处理函数</li>
+<li>处理完后恢复上下文</li>
+<li>执行<code>MRET</code>指令退出中断</li>
+</ol>
+<p><strong>硬件</strong>执行<code>MRET</code>指令</p>
+<ol>
+<li>更新mstatus的值</li>
+<li>更新PC为mepc的值，并跳转</li>
+</ol>
+<h3 id="2-2-S级中断处理流程"><a href="#2-2-S级中断处理流程" class="headerlink" title="2.2 S级中断处理流程"></a>2.2 S级中断处理流程</h3><blockquote>
+<p>默认情况下，所有的中断、异常处理都需要trap到M模式进行处理，但是在Linux环境下，大多数的中断都是在内核处理，也就是S态，所以需要将中断直接委托到S态进行处理，减少M-&gt;S-&gt;M的2次特权切换操作</p>
+</blockquote>
+<p>软件初始化</p>
+<ol>
+<li>需要额外配置mideleg和medeleg，将中断或异常委托到S级</li>
+<li>sie：使能相应中断</li>
+<li>stvec：配置中断函数入口地址</li>
+<li>sstatus：使能全局中断</li>
+</ol>
+<p>然后当<strong>硬件</strong>工作在<strong>S或者U模式下</strong>并收到一个被委托到S级的有效的中断信号后：</p>
+<ol>
+<li>更新sepc、scause、sstatus的值，（可能会更新stval）</li>
+<li>PC跳转到stvec配置的地址，进入中断处理函数</li>
+</ol>
+<p><strong>中断处理函数</strong>需要：</p>
+<ol>
+<li>保存上下文</li>
+<li>读是cause判断是什么中断然后进行跳转到相应的处理函数</li>
+<li>处理完后恢复上下文</li>
+<li>执行<code>SRET</code>指令退出中断</li>
+</ol>
+<p><strong>硬件</strong>执行<code>SRET</code>指令</p>
+<ol>
+<li>更新sstatus的值</li>
+<li>更新PC为sepc的值，并跳转</li>
+</ol>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://tinylab.org/riscv-irq-pipeline-introduction/">RISC-V 异常处理流程介绍</a></li>
+<li><a target="_blank" rel="noopener" href="https://rcore-os.cn/rCore-Tutorial-Book-v3/chapter2/4trap-handling.html">实现特权级的切换 rCore-Tutorial-Book 第三版</a></li>
+<li><a target="_blank" rel="noopener" href="https://dingfen.github.io/risc-v/2020/08/05/riscv-privileged.html">RISC- V 特权架构介绍</a></li>
+<li><a target="_blank" rel="noopener" href="https://rcore-os.cn/rCore-Tutorial-deploy/docs/lab-1/guide/part-2.html">RISC-V 与中断相关的寄存器和指令</a></li>
+<li><a target="_blank" rel="noopener" href="https://five-embeddev.com/quickref/interrupts.html">Interrupt Quick Reference</a></li>
+</ul>
 
         </div>
 
@@ -238,7 +319,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://urwjl.github.io/2024/02/07/hello-world/">http://urwjl.github.io/2024/02/07/hello-world/</a></span>
+                        <span><a href="http://urwjl.github.io/2024/04/29/RISC-V%20%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/">http://urwjl.github.io/2024/04/29/RISC-V%20%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/</a></span>
                     </p>
                 
                 
@@ -271,10 +352,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2024/02/08/Note/">Note</a>
+                <a class="prev" rel="prev" href="/2024/04/29/RISCV%E9%80%9A%E8%AF%86/"></a>
             
             
-            <a class="next" rel="next" href="/2024/02/07/Centos(Linux)%E5%8D%87%E7%BA%A7git%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC/">Centos(Linux)升级git最新版本</a>
+            <a class="next" rel="next" href="/2024/04/29/EMACS_Verilog_mode/"></a>
             
         </section>
 
