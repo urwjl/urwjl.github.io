@@ -296,8 +296,8 @@
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">#0099ff</span>&gt;</span>color #0099ff<span class="tag">&lt;/<span class="name">font</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">red</span>&gt;</span>红色<span class="tag">&lt;/<span class="name">font</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>效果：</p>
-<p><font color=#0099ff>color #0099ff</font></p>
-<p><font color=red>红色</font></p>
+<p><font color="#0099ff">color #0099ff</font></p>
+<p><font color="red">红色</font></p>
 <h2 id="磁盘读写"><a href="#磁盘读写" class="headerlink" title="磁盘读写"></a>磁盘读写</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#将/dev/sda4 复制到/dev/null，测读速</span></span><br><span class="line">sudo time <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/sda4 of=/dev/null bs=4k count=800000</span><br><span class="line"></span><br><span class="line"><span class="comment">#将/dev/zero复制到/volume1/test.dbf，测写速</span></span><br><span class="line">sudo time <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=/volume1/test.dbf bs=4k count=400000</span><br></pre></td></tr></table></figure>
 
 <h2 id="html-表格"><a href="#html-表格" class="headerlink" title="html 表格"></a>html 表格</h2><p>代码：</p>
