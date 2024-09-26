@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="note.md群晖网桥123ovs-vsctl del-br ovs_eth1ovs-vsctl add-port ovs_eth0 eth1ovs-vsctl show    批量替换关键字1234567891011121314151617find -name &quot;*.v&quot; | xargs sed -i &quot;s&#x2F;xxxxx&#x2F;yyyyy&#x2F;g&quot;#把xxxxx替换成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="note">
+<meta property="og:url" content="http://example.com/2024/08/08/note/index.html">
+<meta property="og:site_name" content="WJL&#39;s Blog">
+<meta property="og:description" content="note.md群晖网桥123ovs-vsctl del-br ovs_eth1ovs-vsctl add-port ovs_eth0 eth1ovs-vsctl show    批量替换关键字1234567891011121314151617find -name &quot;*.v&quot; | xargs sed -i &quot;s&#x2F;xxxxx&#x2F;yyyyy&#x2F;g&quot;#把xxxxx替换成">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-08-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-08-08T08:18:10.096Z">
+<meta property="article:author" content="Wu JInlin">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/08/08/note/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/08/08/note/","path":"2024/08/08/note/","title":"note"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>note | WJL's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">WJL's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#note-md"><span class="nav-number">1.</span> <span class="nav-text">note.md</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BE%A4%E6%99%96%E7%BD%91%E6%A1%A5"><span class="nav-number">1.1.</span> <span class="nav-text">群晖网桥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E6%9B%BF%E6%8D%A2%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">1.2.</span> <span class="nav-text">批量替换关键字</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VIM-%E6%8E%92%E5%BA%8F%E5%8E%BB%E9%87%8D"><span class="nav-number">1.3.</span> <span class="nav-text">VIM 排序去重</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mount-%E5%91%BD%E4%BB%A4%E7%A4%BA%E6%84%8F"><span class="nav-number">1.4.</span> <span class="nav-text">mount 命令示意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Markdown-%E9%A2%9C%E8%89%B2%E8%AF%AD%E6%B3%95"><span class="nav-number">1.5.</span> <span class="nav-text">Markdown 颜色语法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%AF%BB%E5%86%99"><span class="nav-number">1.6.</span> <span class="nav-text">磁盘读写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#html-%E8%A1%A8%E6%A0%BC"><span class="nav-number">1.7.</span> <span class="nav-text">html 表格</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#N1-debain-%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE"><span class="nav-number">1.8.</span> <span class="nav-text">N1 debain 网卡配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%89%E9%BB%91ssh-IP"><span class="nav-number">1.9.</span> <span class="nav-text">拉黑ssh IP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VPS%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC"><span class="nav-number">1.10.</span> <span class="nav-text">VPS测试脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99"><span class="nav-number">1.11.</span> <span class="nav-text">python静态网站</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#centos7-%E8%AE%BE%E7%BD%AE%E9%9D%99%E6%80%81IP%E5%9C%B0%E5%9D%80"><span class="nav-number">1.12.</span> <span class="nav-text">centos7 设置静态IP地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#centos7-firewall-%E6%89%93%E5%BC%80%E7%AB%AF%E5%8F%A3"><span class="nav-number">1.13.</span> <span class="nav-text">centos7 firewall 打开端口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E6%9F%A5%E7%9C%8B%E9%98%B2%E7%81%AB%E5%A2%99%E7%8A%B6%E6%80%81-%E5%8F%8A%E7%AB%AF%E5%8F%A3%E5%88%97%E8%A1%A8"><span class="nav-number">1.13.1.</span> <span class="nav-text">1、查看防火墙状态,及端口列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E5%BC%80%E5%90%AF%E7%AB%AF%E5%8F%A3%E5%B9%B6%E8%BD%BD%E5%85%A5%E9%85%8D%E7%BD%AE"><span class="nav-number">1.13.2.</span> <span class="nav-text">2、开启端口并载入配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E5%85%B3%E9%97%AD%E9%98%B2%E7%81%AB%E5%A2%99"><span class="nav-number">1.13.3.</span> <span class="nav-text">3、关闭防火墙</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81%E5%BC%80%E5%90%AF%E7%AB%AF%E5%8F%A3"><span class="nav-number">1.13.4.</span> <span class="nav-text">4、开启端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.13.5.</span> <span class="nav-text">5、常用命令介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%E3%80%81%E6%9B%BF%E6%8D%A2%E6%88%90iptables"><span class="nav-number">1.13.6.</span> <span class="nav-text">6、替换成iptables</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#a%E3%80%81%E7%9B%B4%E6%8E%A5%E5%85%B3%E9%97%AD%E9%98%B2%E7%81%AB%E5%A2%99"><span class="nav-number">1.13.6.1.</span> <span class="nav-text">a、直接关闭防火墙</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#b%E3%80%81%E8%AE%BE%E7%BD%AE-iptables-service"><span class="nav-number">1.13.6.2.</span> <span class="nav-text">b、设置 iptables service</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-%E6%9F%A5%E7%9C%8B%E8%8A%82%E6%8B%8D%E7%8E%87"><span class="nav-number">1.14.</span> <span class="nav-text">Linux 查看节拍率</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3%E8%8A%82%E6%8B%8D%E7%8E%87"><span class="nav-number">1.14.0.1.</span> <span class="nav-text">了解节拍率</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-%E6%9F%A5%E7%9C%8B%E7%AB%AF%E5%8F%A3%E5%8D%A0%E7%94%A8"><span class="nav-number">1.15.</span> <span class="nav-text">Linux 查看端口占用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#netstat-%E5%91%BD%E4%BB%A4"><span class="nav-number">1.15.1.</span> <span class="nav-text">**netstat **命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.15.1.1.</span> <span class="nav-text">实例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lsof%E5%91%BD%E4%BB%A4"><span class="nav-number">1.15.2.</span> <span class="nav-text">lsof命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ubuntu2204"><span class="nav-number">1.16.</span> <span class="nav-text">Ubuntu2204</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%90%AF%E5%90%8E%E8%8E%B7%E5%8F%96%E4%B8%8D%E4%BA%86DNS"><span class="nav-number">1.16.1.</span> <span class="nav-text">重启后获取不了DNS</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Wu JInlin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/08/08/note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="note | WJL's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          note
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-08-08 00:00:00 / 修改时间：16:18:10" itemprop="dateCreated datePublished" datetime="2024-08-08T00:00:00+08:00">2024-08-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="note-md"><a href="#note-md" class="headerlink" title="note.md"></a>note.md</h1><h2 id="群晖网桥"><a href="#群晖网桥" class="headerlink" title="群晖网桥"></a>群晖网桥</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ovs-vsctl del-br ovs_eth1</span><br><span class="line">ovs-vsctl add-port ovs_eth0 eth1</span><br><span class="line">ovs-vsctl show</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="批量替换关键字"><a href="#批量替换关键字" class="headerlink" title="批量替换关键字"></a>批量替换关键字</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">find -name &quot;*.v&quot; | xargs sed -i &quot;s/xxxxx/yyyyy/g&quot;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">把xxxxx替换成yyyyy</span></span><br><span class="line"></span><br><span class="line">find -name &quot;*.v&quot; | xargs sed -i &quot;/xxxxx/d&quot;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">删掉 包含xxxxx 的行</span></span><br><span class="line"></span><br><span class="line">find  .   -regex    &#x27;.*\.[s]?v&#x27;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">find同时匹配.sv和.v文件</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">将文件中的指定的字符串全部进行替换</span></span><br><span class="line">sed ‘/指定的字符串/ s/要替换的字符串/替换后的字符串/‘ 文件名</span><br><span class="line"></span><br><span class="line">grep -rn &quot;^[ ]*input&quot; --include &quot;*.v&quot;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">寻找以 input开头的行</span></span><br><span class="line"></span><br><span class="line">grep -rnE &quot;^[ ]*(in|out)put&quot; </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">寻找以 input 或者 output开头的行</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="VIM-排序去重"><a href="#VIM-排序去重" class="headerlink" title="VIM 排序去重"></a>VIM 排序去重</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">:<span class="built_in">sort</span>                         //直接排序</span><br><span class="line">:g/^\(.*\)$\n\1$/d                   //去除重复行</span><br><span class="line">:g/\%(^\1$\n\)\@&lt;=\(.*\)$/d          //功能同上，也是去除重复行</span><br><span class="line">:g/\%(^\1\&gt;.*$\n\)\@&lt;=\(\k\+\).*$/d  //功能同上，也是去除重复行</span><br><span class="line">:s/\(.*\)=\(.*\);/\2=\1;/g</span><br><span class="line"> <span class="comment">#其中s/ / /g为搜索并替换的语法。\2,\1是引用用正则表达匹配到的分组。\( \)括起来的是正则表达式分组匹配项，我这里将“=”之前的内容设为\1，将“=”号好“;&quot;之间的内容设为\2</span></span><br><span class="line"></span><br><span class="line">:%s/\d\+/\=submatch(0)+1/</span><br><span class="line">:%s/\d\+/\=submatch(0)-1/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">vim 列对齐</span><br><span class="line">:n,m!column -t</span><br><span class="line">调用column命令对齐n到m列</span><br><span class="line"></span><br><span class="line">:n,m!<span class="built_in">uniq</span></span><br><span class="line">调用<span class="built_in">uniq</span>对n到m列进行去重</span><br><span class="line">:%!<span class="built_in">uniq</span></span><br><span class="line">对全文进行去重</span><br><span class="line"></span><br><span class="line">:g/^/j</span><br><span class="line">合并奇偶行</span><br><span class="line"></span><br><span class="line">vim g+f 跳转到新文件，Ctrl+6 跳回去</span><br><span class="line"></span><br><span class="line">正则 <span class="string">&quot;\/[a-zA-Z0-9_]*\/D &quot;</span></span><br><span class="line">可以匹配寄存器路径上最后一级到D端</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="mount-命令示意"><a href="#mount-命令示意" class="headerlink" title="mount 命令示意"></a>mount 命令示意</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo mount -o uid=your_user,gid=your_group,username=username /dev/source /mnt/mount_point</span><br><span class="line">mount -t cifs -o uid=gitea,gid=gitea,username=gitea_bk,password=XXX //192.168.2.56/home/  /home/gitea/backup_dump/nas_bk/</span><br></pre></td></tr></table></figure>
+
+<p>要实现开机自动挂载SMB（Server Message Block）共享，你可以编辑 <code>/etc/fstab</code> 文件，并添加一个挂载SMB共享的条目。以下是一般步骤：</p>
+<ol>
+<li><p><strong>确定共享的详细信息：</strong> 你需要知道要挂载的SMB共享的位置（例如IP地址或主机名、共享名称）、共享的凭据（如果需要用户名和密码访问）以及要将共享挂载到的本地目录。</p>
+</li>
+<li><p><strong>创建一个本地目录：</strong> 如果尚不存在，创建一个用于挂载SMB共享的本地目录。例如：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> /mnt/myshare</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>安全地存储凭据：</strong> 如果需要用户名和密码来访问共享，你应该安全地存储这些凭据。一个常见的方法是创建一个凭据文件，只允许root用户访问，并且只有用于挂载SMB共享的凭据：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> nano /etc/smbcredentials</span><br></pre></td></tr></table></figure>
+
+<p>在文件中添加以下内容（将 <code>username</code> 和 <code>password</code> 替换为实际的用户名和密码）：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">username=my_username</span><br><span class="line">password=my_password</span><br></pre></td></tr></table></figure>
+
+<p>然后保存并关闭文件，并确保只有root用户可以读取这个文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">chmod</span> 600 /etc/smbcredentials</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>编辑 <code>/etc/fstab</code> 文件：</strong> 使用你喜欢的文本编辑器，以管理员权限打开 <code>/etc/fstab</code> 文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> nano /etc/fstab</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>添加SMB共享的挂载条目：</strong> 在文件的末尾添加一个类似下面的条目（确保替换 <code>&lt;smb_share&gt;</code>、<code>&lt;local_mount_point&gt;</code> 和 <code>&lt;options&gt;</code> 为实际的共享路径、本地挂载点和选项）：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&lt;smb_server&gt;/&lt;smb_share&gt;  &lt;local_mount_point&gt;  cifs  credentials=/etc/smbcredentials,uid=&lt;local_user_id&gt;,gid=&lt;local_group_id&gt;,file_mode=0777,dir_mode=0777  0  0</span><br></pre></td></tr></table></figure>
+
+
+
+<p>debian12 下使用的命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//192.168.2.56/home/  /home/gitea/backup_dump/nas_bk/  cifs  credentials=/etc/smbcredentials,uid=gitea,gid=gitea,vers=3.0,iocharset=utf8,file_mode=0777,dir_mode=0777  0  0</span><br></pre></td></tr></table></figure>
+
+
+
+<p>其中：</p>
+<ul>
+<li><code>&lt;smb_server&gt;</code> 是SMB服务器的IP地址或主机名。</li>
+<li><code>&lt;smb_share&gt;</code> 是要挂载的SMB共享的名称。</li>
+<li><code>&lt;local_mount_point&gt;</code> 是共享将挂载到的本地目录的路径。</li>
+<li><code>cifs</code> 是文件系统类型。</li>
+<li><code>credentials=/etc/smbcredentials</code> 指定了存储凭据的文件的位置。</li>
+<li><code>uid=&lt;local_user_id&gt;</code> 和 <code>gid=&lt;local_group_id&gt;</code> 分别是指定挂载的共享所有者和组的本地用户ID和组ID。如果不确定，请使用<code>id</code>命令查找。</li>
+<li><code>file_mode=0777</code> 和 <code>dir_mode=0777</code> 分别是设置挂载的文件和目录的权限。在这个示例中，设置为所有权限。</li>
+</ul>
+</li>
+<li><p><strong>保存并关闭文件。</strong></p>
+</li>
+<li><p><strong>测试挂载：</strong> 你可以使用以下命令来测试挂载是否成功：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> mount -a</span><br></pre></td></tr></table></figure>
+
+<p>如果没有错误，没有输出，那么挂载应该成功了。</p>
+</li>
+</ol>
+<p>完成上述步骤后，SMB共享应该在系统启动时自动挂载到指定的本地目录。</p>
+<ol start="8">
+<li>如果debian12下挂载不成功，可以试下安装<code>cifs-utils</code></li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install cifs-utils <span class="comment"># debian/ubuntu</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Markdown-颜色语法"><a href="#Markdown-颜色语法" class="headerlink" title="Markdown 颜色语法"></a>Markdown 颜色语法</h2><p>代码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">#0099ff</span>&gt;</span>color #0099ff<span class="tag">&lt;/<span class="name">font</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">red</span>&gt;</span>红色<span class="tag">&lt;/<span class="name">font</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>效果：</p>
+<p><font color=#0099ff>color #0099ff</font></p>
+<p><font color=red>红色</font></p>
+<h2 id="磁盘读写"><a href="#磁盘读写" class="headerlink" title="磁盘读写"></a>磁盘读写</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#将/dev/sda4 复制到/dev/null，测读速</span></span><br><span class="line"><span class="built_in">sudo</span> time <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/sda4 of=/dev/null bs=4k count=800000</span><br><span class="line"></span><br><span class="line"><span class="comment">#将/dev/zero复制到/volume1/test.dbf，测写速</span></span><br><span class="line"><span class="built_in">sudo</span> time <span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=/volume1/test.dbf bs=4k count=400000</span><br></pre></td></tr></table></figure>
+
+<h2 id="html-表格"><a href="#html-表格" class="headerlink" title="html 表格"></a>html 表格</h2><p>代码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">table</span> <span class="attr">border</span>=<span class="string">&quot;1&quot;</span> <span class="attr">align</span>=<span class="string">&quot;center&quot;</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">th</span>&gt;</span>Month<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">th</span>&gt;</span>Savings<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">td</span>&gt;</span>January<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">td</span> <span class="attr">align</span>=<span class="string">&quot;center&quot;</span>&gt;</span>200<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">td</span>&gt;</span>February<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">td</span> <span class="attr">align</span>=<span class="string">&quot;right&quot;</span>&gt;</span>180<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>效果：</p>
+<table border="1" align="center">
+ <tr>
+ <th>Month</th>
+ <th>Savings</th>
+ </tr>
+ <tr>
+ <td>January</td>
+ <td align="center">200</td>
+ </tr>
+ <tr>
+ <td>February</td>
+ <td align="right">180</td>
+ </tr>
+</table>
+
+
+<h2 id="N1-debain-网卡配置"><a href="#N1-debain-网卡配置" class="headerlink" title="N1 debain 网卡配置"></a>N1 debain 网卡配置</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> nano /etc/network/interfaces</span><br><span class="line"></span><br><span class="line">auto eth0</span><br><span class="line">iface eth0 inet static</span><br><span class="line">address 192.168.2.250</span><br><span class="line">netmask 255.255.255.0</span><br><span class="line">gateway 192.168.2.3</span><br><span class="line">dns-nameservers 192.168.2.3 180.76.76.76</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">systemctl restart network.service</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="拉黑ssh-IP"><a href="#拉黑ssh-IP" class="headerlink" title="拉黑ssh IP"></a>拉黑ssh IP</h2><p>在root目录下建立banip.sh，输入一下内容</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取列表</span></span><br><span class="line">iplist=$(/bin/lastb -n300 |awk <span class="string">&#x27;&#123;print $3&#125;&#x27;</span>|<span class="built_in">sort</span>|<span class="built_in">uniq</span> -c|awk <span class="string">&#x27;&#123;if ($1&gt;3) print $2&#125;&#x27;</span>)</span><br><span class="line"><span class="comment"># 追加到黑名单并清空登录日志</span></span><br><span class="line"><span class="keyword">for</span> ip <span class="keyword">in</span> <span class="variable">$&#123;iplist&#125;</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        <span class="built_in">echo</span> ALL: <span class="variable">$&#123;ip&#125;</span> &gt;&gt; /etc/hosts.deny</span><br><span class="line">        <span class="built_in">echo</span> &gt; /var/log/btmp</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<p>添加执行权限</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x banip.sh</span><br></pre></td></tr></table></figure>
+
+<p>设置定时运行</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">crontab -e</span><br><span class="line"><span class="comment">#在末尾加上</span></span><br><span class="line">* */1 * * * sh /root/banip.sh 2&gt;&amp;1 &gt; /dev/null</span><br></pre></td></tr></table></figure>
+
+<h2 id="VPS测试脚本"><a href="#VPS测试脚本" class="headerlink" title="VPS测试脚本"></a>VPS测试脚本</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">wget -qO- bench.sh | bash</span><br><span class="line"><span class="comment">#或者</span></span><br><span class="line">curl -Lso- bench.sh | bash</span><br><span class="line"><span class="comment">#或者</span></span><br><span class="line">wget -qO- 86.re/bench.sh | bash</span><br><span class="line"><span class="comment">#或者</span></span><br><span class="line">curl -so- 86.re/bench.sh | bash</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h2 id="python静态网站"><a href="#python静态网站" class="headerlink" title="python静态网站"></a>python静态网站</h2><p>先cd 到cgi-test目录</p>
+<p>然后执行下面的代码</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m http.server --cgi 8000</span><br></pre></td></tr></table></figure>
+
+<h2 id="centos7-设置静态IP地址"><a href="#centos7-设置静态IP地址" class="headerlink" title="centos7 设置静态IP地址"></a>centos7 设置静态IP地址</h2><p>1、打开配置网口文件</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sysconfig/network-scripts/ifcfg-ens33</span><br></pre></td></tr></table></figure>
+
+<p>2、修改以下内容</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">BOOTPROTO=static</span><br><span class="line">DNBOOT=<span class="built_in">yes</span></span><br><span class="line">IPADDR=192.168.152.11</span><br><span class="line">NETMASK=255.255.255.0</span><br><span class="line">GATEWAY=192.168.152.2</span><br><span class="line">DNS1=8.8.8.8</span><br></pre></td></tr></table></figure>
+
+<p>3、重启网络</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service network restart</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="centos7-firewall-打开端口"><a href="#centos7-firewall-打开端口" class="headerlink" title="centos7 firewall 打开端口"></a>centos7 firewall 打开端口</h2><h3 id="1、查看防火墙状态-及端口列表"><a href="#1、查看防火墙状态-及端口列表" class="headerlink" title="1、查看防火墙状态,及端口列表"></a>1、查看防火墙状态,及端口列表</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --state</span><br><span class="line"></span><br><span class="line">firewall-cmd --list-all</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、开启端口并载入配置"><a href="#2、开启端口并载入配置" class="headerlink" title="2、开启端口并载入配置"></a>2、开启端口并载入配置</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> firewall-cmd --zone=public --add-port=11400/tcp --permanent      <span class="comment">#开启11400端口</span></span><br><span class="line"><span class="built_in">sudo</span> firewall-cmd --zone=public --add-port=11400-11410/tcp --permanent     <span class="comment">#开启11400至11410端口段</span></span><br><span class="line"><span class="built_in">sudo</span> firewall-cmd --reload     <span class="comment">#载入防火墙配置</span></span><br></pre></td></tr></table></figure>
+
+<p>使用方法如下：</p>
+<h3 id="3、关闭防火墙"><a href="#3、关闭防火墙" class="headerlink" title="3、关闭防火墙"></a>3、关闭防火墙</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop firewalld.service             <span class="comment">#停止firewall</span></span><br><span class="line">systemctl <span class="built_in">disable</span> firewalld.service          <span class="comment">#禁止firewall开机启动</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4、开启端口"><a href="#4、开启端口" class="headerlink" title="4、开启端口"></a>4、开启端口</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --zone=public --add-port=80/tcp --permanent</span><br><span class="line"><span class="comment"># 命令含义：</span></span><br><span class="line">--zone <span class="comment">#作用域</span></span><br><span class="line">--add-port=80/tcp <span class="comment">#添加端口，格式为：端口/通讯协议</span></span><br><span class="line">--permanent <span class="comment">#永久生效，没有此参数重启后失效</span></span><br><span class="line"><span class="comment">#重启防火墙</span></span><br><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>
+
+<h3 id="5、常用命令介绍"><a href="#5、常用命令介绍" class="headerlink" title="5、常用命令介绍"></a>5、常用命令介绍</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --state                           <span class="comment">##查看防火墙状态，是否是running</span></span><br><span class="line">firewall-cmd --reload                          <span class="comment">##重新载入配置，比如添加规则之后，需要执行此命令</span></span><br><span class="line">firewall-cmd --get-zones                       <span class="comment">##列出支持的zone</span></span><br><span class="line">firewall-cmd --get-services                    <span class="comment">##列出支持的服务，在列表中的服务是放行的</span></span><br><span class="line">firewall-cmd --query-service ftp               <span class="comment">##查看ftp服务是否支持，返回yes或者no</span></span><br><span class="line">firewall-cmd --add-service=ftp                 <span class="comment">##临时开放ftp服务</span></span><br><span class="line">firewall-cmd --add-service=ftp --permanent     <span class="comment">##永久开放ftp服务</span></span><br><span class="line">firewall-cmd --remove-service=ftp --permanent  <span class="comment">##永久移除ftp服务</span></span><br><span class="line">firewall-cmd --add-port=80/tcp --permanent     <span class="comment">##永久添加80端口 </span></span><br><span class="line">iptables -L -n                                 <span class="comment">##查看规则，这个命令是和iptables的相同的</span></span><br><span class="line">man firewall-cmd                               <span class="comment">##查看帮助</span></span><br></pre></td></tr></table></figure>
+
+<p>更多命令，使用  <code>firewall-cmd --help</code> 查看帮助文件</p>
+<p>重新开启防火墙：Failed to start firewalld.service: Unit firewalld.service is masked <a target="_blank" rel="noopener" href="https://blog.csdn.net/Joe68227597/article/details/75207859">问题解决</a></p>
+<h3 id="6、替换成iptables"><a href="#6、替换成iptables" class="headerlink" title="6、替换成iptables"></a>6、替换成iptables</h3><p>CentOS 7.0默认使用的是firewall作为防火墙，使用iptables必须重新设置一下</p>
+<h4 id="a、直接关闭防火墙"><a href="#a、直接关闭防火墙" class="headerlink" title="a、直接关闭防火墙"></a>a、直接关闭防火墙</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop firewalld.service           <span class="comment">#停止firewall</span></span><br><span class="line">systemctl <span class="built_in">disable</span> firewalld.service     <span class="comment">#禁止firewall开机启动</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="b、设置-iptables-service"><a href="#b、设置-iptables-service" class="headerlink" title="b、设置 iptables service"></a>b、设置 iptables service</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install iptables-services</span><br></pre></td></tr></table></figure>
+
+<p>如果要修改防火墙配置，如增加防火墙端口3306</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/sysconfig/iptables </span><br></pre></td></tr></table></figure>
+
+<p>增加规则</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT</span><br></pre></td></tr></table></figure>
+
+<p>保存退出后</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart iptables.service <span class="comment">#重启防火墙使配置生效</span></span><br><span class="line">systemctl <span class="built_in">enable</span> iptables.service <span class="comment">#设置防火墙开机启动</span></span><br></pre></td></tr></table></figure>
+
+<p>最后重启系统使设置生效即可。</p>
+<h2 id="Linux-查看节拍率"><a href="#Linux-查看节拍率" class="headerlink" title="Linux 查看节拍率"></a>Linux 查看节拍率</h2><h4 id="了解节拍率"><a href="#了解节拍率" class="headerlink" title="了解节拍率"></a>了解节拍率</h4><ul>
+<li>为了维护 CPU 时间，Linux 通过事先定义的节拍率（内核中表示为 <strong>HZ</strong>），<strong>触发时间中断</strong>，并使用全局变量 <strong>Jiffies</strong> 记录了开机以来的节拍数</li>
+<li>每发生一次时间中断，Jiffies 的值 就加 1。</li>
+<li>节拍率 HZ 是<strong>内核的可配选项</strong>，可以设置为 100、250、1000 等</li>
+<li>不同的系统可能设置不同数值，你可以通过查询 &#x2F;boot&#x2F;config 内核选项来查看它的配置值</li>
+<li>比如在我的系统中， 节拍率设置成了 1000，也就是每秒钟触发 1000 次时间中断。</li>
+</ul>
+<p>使用以下命令查看系统的节拍率</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep &#x27;CONFIG_HZ=&#x27; /boot/config-$(uname -r)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Linux-查看端口占用"><a href="#Linux-查看端口占用" class="headerlink" title="Linux 查看端口占用"></a>Linux 查看端口占用</h2><h3 id="netstat-命令"><a href="#netstat-命令" class="headerlink" title="**netstat **命令"></a>**netstat **命令</h3><p>Linux netstat 命令用于显示网络状态。<br>利用 netstat 指令可让你得知整个 Linux 系统的网络情况。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat [-acCeFghilMnNoprstuvVwx][-A&lt;网络类型&gt;][--ip]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#参数说明</span></span><br><span class="line">-a或--all 显示所有连线中的Socket。</span><br><span class="line">-A&lt;网络类型&gt;或--&lt;网络类型&gt; 列出该网络类型连线中的相关地址。</span><br><span class="line">-c或--continuous 持续列出网络状态。</span><br><span class="line">-C或--cache 显示路由器配置的快取信息。</span><br><span class="line">-e或--extend 显示网络其他相关信息。</span><br><span class="line">-F或--fib 显示路由缓存。</span><br><span class="line">-g或--<span class="built_in">groups</span> 显示多重广播功能群组组员名单。</span><br><span class="line">-h或--<span class="built_in">help</span> 在线帮助。</span><br><span class="line">-i或--interfaces 显示网络界面信息表单。</span><br><span class="line">-l或--listening 显示监控中的服务器的Socket。</span><br><span class="line">-M或--masquerade 显示伪装的网络连线。</span><br><span class="line">-n或--numeric 直接使用IP地址，而不通过域名服务器。</span><br><span class="line">-N或--netlink或--symbolic 显示网络硬件外围设备的符号连接名称。</span><br><span class="line">-o或--timers 显示计时器。</span><br><span class="line">-p或--programs 显示正在使用Socket的程序识别码和程序名称。</span><br><span class="line">-r或--route 显示Routing Table。</span><br><span class="line">-s或--statistics 显示网络工作信息统计表。</span><br><span class="line">-t或--tcp 显示TCP传输协议的连线状况。</span><br><span class="line">-u或--udp 显示UDP传输协议的连线状况。</span><br><span class="line">-v或--verbose 显示指令执行过程。</span><br><span class="line">-V或--version 显示版本信息。</span><br><span class="line">-w或--raw 显示RAW传输协议的连线状况。</span><br><span class="line">-x或--unix 此参数的效果和指定<span class="string">&quot;-A unix&quot;</span>参数相同。</span><br><span class="line">--ip或--inet 此参数的效果和指定<span class="string">&quot;-A inet&quot;</span>参数相同。</span><br></pre></td></tr></table></figure>
+
+<h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><p>显示详细的网络状况</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -a</span><br></pre></td></tr></table></figure>
+
+<p>显示当前户籍UDP连接状况</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -nu</span><br></pre></td></tr></table></figure>
+
+<p>显示网卡列表</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -i</span><br></pre></td></tr></table></figure>
+
+<p>查看端口占用</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -tunlp</span><br></pre></td></tr></table></figure>
+
+<h3 id="lsof命令"><a href="#lsof命令" class="headerlink" title="lsof命令"></a>lsof命令</h3><p>lsof显示单个端口占用</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof -i:80 <span class="comment">#查看80端口占用情况</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Ubuntu2204"><a href="#Ubuntu2204" class="headerlink" title="Ubuntu2204"></a>Ubuntu2204</h2><h3 id="重启后获取不了DNS"><a href="#重启后获取不了DNS" class="headerlink" title="重启后获取不了DNS"></a>重启后获取不了DNS</h3><p><a target="_blank" rel="noopener" href="https://netplan.io/">Netplan</a>是Ubuntu 22.04的默认网络管理工具</p>
+<p>使用vim打开配置文件</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/netplan/01-network-manager-all.yaml</span><br></pre></td></tr></table></figure>
+
+<p>添加如下代码并保存</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Let NetworkManager manage all devices on this system</span></span><br><span class="line">network:</span><br><span class="line">  ethernets:</span><br><span class="line">    ens160:                    <span class="comment">## network card name</span></span><br><span class="line">        dhcp4: <span class="literal">false</span></span><br><span class="line">        addresses:</span><br><span class="line">          - 192.168.2.101/24   <span class="comment">## set static IP</span></span><br><span class="line">        routes:</span><br><span class="line">          - to: default</span><br><span class="line">            via: 192.168.2.3  <span class="comment">## gateway</span></span><br><span class="line">        nameservers:</span><br><span class="line">          addresses: [180.76.76.76,223.6.6.6,192.168.2.3]</span><br><span class="line">  version: 2</span><br><span class="line">  renderer: NetworkManager</span><br></pre></td></tr></table></figure>
+
+<p>重新应用配置</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> netplan apply</span><br></pre></td></tr></table></figure>
+
+<p>开启 systemd-networkd服务（可选）</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl start systemd-networkd</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/08/03/CentOS7-update-git/" rel="prev" title="CentOS7-update-git">
+                  <i class="fa fa-angle-left"></i> CentOS7-update-git
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/09/13/win10-server/" rel="next" title="win10-server">
+                  win10-server <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu JInlin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
