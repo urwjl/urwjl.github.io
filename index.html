@@ -126,12 +126,12 @@
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -185,9 +185,24 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2024-09-24 13:06:12 / 修改时间：13:08:06" itemprop="dateCreated datePublished" datetime="2024-09-24T13:06:12+08:00">2024-09-24</time>
+      <time title="创建时间：2024-09-24 13:06:12" itemprop="dateCreated datePublished" datetime="2024-09-24T13:06:12+08:00">2024-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-26 13:45:01" itemprop="dateModified" datetime="2024-09-26T13:45:01+08:00">2024-09-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/PCIe/" itemprop="url" rel="index"><span itemprop="name">PCIe</span></a>
+        </span>
     </span>
 
   
@@ -200,8 +215,40 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="PCIe"><a href="#PCIe" class="headerlink" title="PCIe"></a>PCIe</h2><h2 id="PCIe结构"><a href="#PCIe结构" class="headerlink" title="PCIe结构"></a>PCIe结构</h2><p>PCIe是基于PCI总线进一步演进出来的点对点，高速串行总线</p>
-<h2 id="配置空间"><a href="#配置空间" class="headerlink" title="配置空间"></a>配置空间</h2>
+          <h2 id="PCIe简介"><a href="#PCIe简介" class="headerlink" title="PCIe简介"></a>PCIe简介</h2><p>PCIe是基于PCI总线进一步演进出来的点对点，高速串行总线协议（使用SerDes）</p>
+<p>PCIe根据实现 分为事务层、数据链路层、物理层3个层次</p>
+<p>PCIe的架构主要由五个部分组成：Root Complex，PCIe Bus，Endpoint，Port and Bridge，Switch。其整体架构呈现一个树状结构，如下图所示：</p>
+<img src="/2024/09/24/PCIe/1727155307697.jpg" class="" width="1727155307697">
+
+<blockquote>
+<p>设计主要关注RC、switch、EP，目前市面上 对于控制器IP有单独的RC&#x2F;EP，也有可配置的IP（同一个IP可以配置成RC或EP），需要结合serdes使用。</p>
+<p>USB、SATA物理层也是使用serdes，有些serdes IP可以共用</p>
+</blockquote>
+<h2 id="事务层请求"><a href="#事务层请求" class="headerlink" title="事务层请求"></a>事务层请求</h2><p>事务层产生四种不同的TLP请求：</p>
+<ol>
+<li><strong>Memory</strong></li>
+<li><strong>IO</strong></li>
+<li><strong>Configuration</strong></li>
+<li><strong>Message</strong></li>
+</ol>
+<p>前三种分别用于访问内存空间、IO空间、配置空间，这三种请求在PCI或者PCI-X时代就有了；最后的Message请求是PCIe新加的。在PCI或者PCI-X时代，像中断、错误以及电源管理相关信息，都是通过边带信号（sideband signal）进行传输的，但PCIe干掉了这些边带信号线，所有的通讯都是走带内信号，即通过Packet传输，因此，过去一些由边带信号线传输的数据，比如中断信息、错误信息等，现在就交由Message来传输了。</p>
+<img src="/2024/09/24/PCIe/image-20240924144216635.png" class="" title="image-20240924144216635">
+
+<p>Posted 不需要返回应答包</p>
+<p>Non-Posted 需要返回应答包</p>
+<img src="/2024/09/24/PCIe/image-20240924144233256.png" class="" title="image-20240924144233256">
+
+
+
+
+
+<h3 id="内存空间"><a href="#内存空间" class="headerlink" title="内存空间"></a>内存空间</h3><p>设备可能有自己的内存，比如独立显卡都有独立的显存；核显会调用host的内存当做显存来用。</p>
+<p>设备的物理空间，可以通过内存映射（Memory map）的方式映射到Host的主存，有些空间还可以映射到Host的IO空间（如果Host存在IO空间的话）。但新的PCIe设备（区别于Legacy PCIe设备）只支持内存映射，之所以还存在访问IO空间的TLP，完全是为了照顾那些老设备。以后IO映射的方式会逐渐取消，为减轻学习压力，我们以后看到IO 相关的东西，大可或略之</p>
+<h3 id="配置空间"><a href="#配置空间" class="headerlink" title="配置空间"></a>配置空间</h3><p>PCIe的RC、switch和EP设备都有配置空间，也是通过mmap映射到host的内存空间</p>
+<p>所有的配置空间（Configuration）的访问，都是Host发起的，确切的说是RC发起的，往往只在上电枚举和配置阶段会发起Configuration的访问</p>
+<h3 id="IO空间"><a href="#IO空间" class="headerlink" title="IO空间"></a>IO空间</h3><p>x86有专门的IO指令去访问IO空间，Arm和RISC-V只能通过mmap的方式将IO空间统一映射到host的内存空间，后面也不需要IO空间了</p>
+<h2 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h2><p>流控是在传输层实现的</p>
+
       
     </div>
 
@@ -263,7 +310,24 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-09-23 10:51:24" itemprop="dateModified" datetime="2024-09-23T10:51:24+08:00">2024-09-23</time>
+      <time title="修改时间：2024-09-26 13:46:07" itemprop="dateModified" datetime="2024-09-26T13:46:07+08:00">2024-09-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/intel/" itemprop="url" rel="index"><span itemprop="name">intel</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/intel/DSA/" itemprop="url" rel="index"><span itemprop="name">DSA</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/intel/DSA/PCIe/" itemprop="url" rel="index"><span itemprop="name">PCIe</span></a>
+        </span>
     </span>
 
   
@@ -290,7 +354,7 @@
 <li>重复数据删除：用于比较内存页面是否相等以支持内存重复数据删除。</li>
 <li>VM 迁移和快速检查点：VM 快速检查点和 VM 迁移流程需要 VMM 识别 VM 的已修改页面并有效地将它们发送到目标计算机，同时将网络流量和延迟降至最低。 Intel DSA 增量操作生成页面差异，使 VMM 能够仅将修改后的数据发送到目标，从而减少网络流量。</li>
 <li>对等设备之间的数据移动：可用于对等加速器设备与主机内存之间或两个对等设备之间的数据移动，以从此类基础设施工作中释放 CPU 周期。</li>
-<li>虚拟机之间的数据移动：释放 CPU 核心以执行常规基础架构任务，包括在虚拟机、容器和裸机主机之间移动数据</li>
+<li>虚拟机之间的数据移动：释放 CPU 核心以执行常规基础架构任务，包括在虚拟机、容器和裸机主机之间移动数据。</li>
 </ul>
 <h2 id="2-2-英特尔®-DSA-特性"><a href="#2-2-英特尔®-DSA-特性" class="headerlink" title="2.2 英特尔® DSA 特性"></a>2.2 英特尔® DSA 特性</h2><p>英特尔 DSA 功能包括 </p>
 <ol>
@@ -443,7 +507,7 @@
   </tbody>
 </table>
 
-<h3 id="2-2-3-控制操作"><a href="#2-2-3-控制操作" class="headerlink" title="2.2.3 控制操作"></a>2.2.3 控制操作</h3><p>Intel DSA 支持以下控制操作。其中一些命令使用描述符发出，一些使用命令寄存器发出。有关详细信息，请参阅第 9.2.12 节和第 8.3 节。</p>
+<h3 id="2-2-3-控制操作"><a href="#2-2-3-控制操作" class="headerlink" title="2.2.3 控制操作"></a>2.2.3 控制操作</h3><p>Intel DSA 支持以下控制操作。其中一些命令使用<strong>描述符</strong>发出，一些使用<strong>命令寄存器</strong>发出。有关详细信息，请参阅第 9.2.12 节和第 8.3 节。</p>
 <table border="1" cellpadding="5" cellspacing="0">
   <thead>
     <tr>
@@ -489,7 +553,29 @@
 </table>
 <h5 align = "center" >Table 2-2: Intel® DSA Control Operations</h5>
 
-<h1 id="3-英特尔®-数据流加速器架构"><a href="#3-英特尔®-数据流加速器架构" class="headerlink" title="3 英特尔® 数据流加速器架构"></a>3 英特尔® 数据流加速器架构</h1><p>本章详细介绍了英特尔 DSA 架构。每个 SoC 可能支持任意数量的英特尔 DSA 设备实例。多插槽服务器平台可能支持多个这样的 SoC。从软件角度来看，每个实例都作为单个根复合体集成端点公开。每个实例都属于 DMA 重映射硬件单元（也称为 IOMMU）的范围。每个英特尔 DSA 实例都位于单个 DMA 重映射硬件单元后面，但根据 SoC 设计，不同的设备实例可以位于相同或不同的 DMA 重映射硬件单元后面。</p>
+<h1 id="3-英特尔®-数据流加速器架构"><a href="#3-英特尔®-数据流加速器架构" class="headerlink" title="3 英特尔® 数据流加速器架构"></a>3 英特尔® 数据流加速器架构</h1><p>本章详细介绍了英特尔 DSA 架构。每个 SoC 可能支持任意数量的英特尔 DSA 设备实例。多插槽服务器平台可能支持多个这样的 SoC。从软件角度来看，每个实例都作为 单个 <code>根复合体集成端点</code>  (<strong>RCiEP</strong>) 公开。每个实例都属于 DMA 重映射硬件单元（也称为 IOMMU）的范围。每个英特尔 DSA 实例都位于单个 DMA 重映射硬件单元后面，但根据 SoC 设计，不同的设备实例可以位于相同或不同的 DMA 重映射硬件单元后面。</p>
+<hr>
+<p>Root Complex Integrated Endpoint 规则</p>
+<p>RCiEP 的应用场景是集成在RC内部，专门用于访问存储器。</p>
+<ul>
+<li>Root Complex Integrated Endpoint (RCiEP) 在包含Root Port的RC的内部逻辑上实现。</li>
+<li>RCiEP 必须是具有Type 00h Configuration Space header的一个Function。</li>
+<li>RCiEP 作为Completer必须支持Configuration Requests。</li>
+<li>RCiEP 不得通过 BAR 声明的 I&#x2F;O 资源。</li>
+<li>RCiEP 不得生成 I&#x2F;O 请求。</li>
+<li>RCiEP 作为Completer不支持Locked Requests或作为Requester生成它们。 必须编写符合 PCI Express 的软件驱动程序和应用程序，以防止在访问 RCiEP 时使用lock语义。</li>
+<li>RCiEP 作为Memory Transaction Requester需要能够生成不小于主机作为Completer处理的地址。</li>
+<li>如果请求中断资源，则需要 RCiEP 来支持 MSI 或 MSI-X 或两者。 如果实施了 MSI，则允许 RCiEP 支持 MSI Capability结构的 32 位或 64 位Message Address版本。</li>
+<li>RCiEP 支持请求内存资源的Base Address Registers的 32 位寻址。</li>
+<li>RCiEP 不得在 PCI Express Extended Capability中实现Link Capabilities, Link Status, Link Control, Link Capabilities 2, Link Status 2,和Link Control 2 registers。</li>
+<li>如果 RCiEP 与可选的 Root Complex Event Collector相关联，它必须通过 Root Complex Event Collector通知 PME 和 错误条件。</li>
+<li>一个RCiEP 不得与多个Root Complex Event Collector相关联。</li>
+<li>RCiEP 不实施Active State Power Management。</li>
+<li>RCiEP 不能独立于整个Root Complex进行热插拔。</li>
+<li>RCiEP 不得出现在Root Complex公开的任何层次结构域中。</li>
+<li>RCiEP 不得出现在Switch中。</li>
+</ul>
+<hr>
 <p>Intel DSA 支持地址转换缓存 (<strong>ATC</strong>)，并使用 PCI-SIG 定义的地址转换服务 (<strong>ATS</strong>)、进程地址空间 ID (<strong>PASID</strong>) 和页面请求服务 (<strong>PRS</strong>) 功能与 DMA 重映射硬件交互。PASID TLP 前缀添加到上游请求以支持共享虚拟内存 (<strong>SVM</strong>) 和 Intel 可扩展 I&#x2F;O 虚拟化 (<strong>Intel 可扩展 IOV</strong>)。该设备利用 DMA 重映射硬件将 DMA 地址转换为主机物理地址。根据用途，DMA 地址可以是主机虚拟地址 (HVA)、客户机虚拟地址 (GVA)、客户机物理地址 (GPA) 或 I&#x2F;O 虚拟地址 (IOVA)。Intel DSA 支持其他 PCI Express 功能，包括高级错误报告 (<strong>AER</strong>) 和 <strong>MSI-X</strong>。</p>
 <p>Intel DSA 架构旨在支持 Intel 可扩展 I&#x2F;O 虚拟化。该设备可以以安全且隔离的方式直接与多个 VM 共享，以实现高吞吐量。第 3.16 节和第 7.3 节更详细地描述了虚拟化功能。</p>
 <p>图 3-1 从概念层面说明了 Intel DSA 设备中的高级模块。</p>
@@ -497,17 +583,22 @@
 <p><strong>WQ configuration</strong> 允许软件将每个 WQ 配置为可由多个软件组件共享的共享工作队列 (SWQ)，或配置为每次分配给单个软件组件的专用工作队列 (DWQ)。该配置还允许软件控制哪些 WQ 馈送到哪些引擎以及馈送到每个引擎的 WQ 的相对优先级。</p>
 <img src="/2024/09/13/Intel-DSA-spec/QQ_1726210851924.png" class="" title="QQ_1726210851924">
 
+
+
+<img src="/2024/09/13/Intel-DSA-spec/image-20240415193624263-0.png" class="" title="图像-20240415193624263">
+
 <h2 id="3-1-寄存器和软件编程接口"><a href="#3-1-寄存器和软件编程接口" class="headerlink" title="3.1 寄存器和软件编程接口"></a>3.1 寄存器和软件编程接口</h2><p>Intel DSA 在软件上与标准 PCI Express 配置机制兼容，并在其配置映射寄存器组中实现了 PCI 头和扩展空间。</p>
 <p>内存映射 I&#x2F;O 寄存器提供设备操作的状态和控制。</p>
 <p>功能、配置和工作提交寄存器（portals）可通过第 9.1.1 节中描述的 BAR0 和 BAR2 寄存器定义的 MMIO 区域访问。</p>
 <p>每个通道都在单独的 4K 页面上，因此可以使用 CPU 页表将它们独立映射到不同的地址空间（客户端）</p>
 <h2 id="3-2-描述符"><a href="#3-2-描述符" class="headerlink" title="3.2 描述符"></a>3.2 描述符</h2><p>软件使用描述符为设备指定工作。描述符指定设备要执行的操作类型、数据和状态缓冲区的地址、立即操作数、完成属性等。<br>有关描述符格式和详细信息，请参阅第 8 章。完成属性指定写入完成记录的地址，以及生成完成中断所需的信息（可选）。</p>
 <p>Intel DSA 避免在设备上维护客户端特定状态。处理描述符的所有信息都来自描述符本身。这提高了设备在用户模式应用程序之间以及虚拟化系统中不同虚拟机或机器容器之间的可共享性。</p>
-<p>描述符可能包含操作和相关参数（称为工作描述符），也可以包含工作描述符数组的地址（称为批处理描述符）。软件在内存中准备描述符，并将描述符提交给设备的工作队列 (WQ)。设备将描述符从工作队列分派到引擎进行处理。当引擎完成描述符或遇到导致中止的某些故障或错误时，它会通过在<strong>主机内存中写入完成记录</strong>、<strong>发出中断</strong>或两者来通知主机软件。</p>
+<p>描述符可能包含操作和相关参数（称为工作描述符），也可以包含工作描述符数组的地址（称为批处理描述符）。软件在内存中准备描述符，并将描述符提交给设备的工作队列 (WQ)。设备将描述符从工作队列分派到引擎进行处理。</p>
+<p>当引擎<strong>完成描述符</strong>或遇到导致中止的某些<strong>故障或错误</strong>时，它会通过在<strong>主机内存中写入完成记录</strong>、<strong>发出中断</strong>或两者来通知主机软件。</p>
 <h2 id="3-3-工作队列"><a href="#3-3-工作队列" class="headerlink" title="3.3 工作队列"></a>3.3 工作队列</h2><p>工作队列 (WQs) 是<strong>设备上的存储空间</strong>，用于<strong>保存已提交给设备的描述符</strong>。 </p>
-<p>WQ Capability 寄存器指示工作队列的数量以及设备上可用的工作队列存储空间。软件配置启用的工作队列数量，并在活动 WQ 之间分配可用的 WQ 空间。</p>
+<p><strong>WQ <code>Capability 寄存器</code>指示工作队列的数量以及设备上可用的工作队列存储空间</strong>。软件配置启用的工作队列数量，并在活动 WQ 之间分配可用的 WQ 空间。</p>
 <p><strong><code>WQ 配置表</code>用于配置 WQ</strong>。在启用设备之前，软件会配置每个 WQ 的大小。未使用的 WQ 的大小为 0。每个 WQ 的其他参数可以在启用 WQ 之前稍后配置。在某些配置中，WQ 大小和 WQ 配置的其他方面是只读的。有关配置 WQ 的更多详细信息，请参阅第 9.2.24 节。</p>
-<p><strong>每个工作队列都可以配置为以两种模式之一运行</strong>，即专用或共享。<strong>WQ Capability 寄存器</strong>指示对专用和共享模式的支持。<code>WQ 配置表</code>允许软件配置每个 WQ 的模式。 <u><strong>只有在 WQ 被禁用时才能更改 WQ 的模式</strong></u> 。</p>
+<p><strong>每个工作队列都可以配置为以两种模式之一运行</strong>，即专用或共享。**WQ <code>Capability 寄存器</code>**指示对专用和共享模式的支持。<code>WQ 配置表</code>允许软件配置每个 WQ 的模式。 <u><strong>只有在 WQ 被禁用时才能更改 WQ 的模式</strong></u> 。</p>
 <p>有关配置和启用工作队列的详细信息，请参阅第 9.2 节中 WQ 功能寄存器、WQ 配置表和命令寄存器的规范。</p>
 <p>描述符通过称为 <code>portals</code> 的特殊寄存器提交到工作队列。每个 <code>portals</code> 位于设备 MMIO 空间中单独的 4 KB 页面中。每个 WQ 有四个<code>portals</code>：</p>
 <ul>
@@ -535,9 +626,9 @@
 <p>尽管英特尔 DSA 架构在配置工作队列、组和引擎方面具有极大的灵活性，但硬件的设计意图是用于特定配置。示例配置如图 3-2 和 3-3 所示。</p>
 <p>在图 3-2 所示的配置中，<strong>硬件使用组中的任一引擎来处理来自组中任何工作队列的描述符</strong>。如果一个引擎由于高延迟内存地址转换或页面错误而停顿，另一个引擎可以继续运行并最大化整个设备的吞吐量。</p>
 <p>图 3-2 显示了两个组的示例流量类别 (TC) 值。在组 0 中，两个 TC 值均为 0，而在组 1 中，TC-B 为 1。当组 0 仅用于访问 DRAM 的操作，而组 1 用于访问 DRAM 和持久内存的操作时，可以使用此示例配置。提交给组 1 的描述符中的 TC 选择器标志指示描述符中的每个地址是指 DRAM 还是持久内存。有关流量类别及其如何用于控制 QoS 的信息，请参阅第 4 章。</p>
-<p>图 3-2 中每组有两个工作队列，但实际数量可以是任意的，直至达到所支持的最大 WQ 数量。组中的 WQ 可以是具有不同优先级的共享 WQ，也可以是一个共享 WQ 和其它专用 WQ，还可以是多个具有相同或不同优先级的专用 WQ。</p>
 <img src="/2024/09/13/Intel-DSA-spec/QQ_1726211241453.png" class="" title="QQ_1726211241453">
 
+<p>图 3-2 中每组有两个工作队列，但实际数量可以是任意的，直至达到所支持的最大 WQ 数量。组中的 WQ 可以是具有不同优先级的共享 WQ，也可以是一个共享 WQ 和其它专用 WQ，还可以是多个具有相同或不同优先级的专用 WQ。</p>
 <p>图 3-3 显示了另一个示例配置，其中每个引擎都放置在单独的组中。<br>当软件想要降低延迟敏感操作被其他操作阻塞的可能性时，可以选择此配置。在此配置中，软件将延迟敏感操作提交到连接到一个引擎的工作队列，将其他操作提交到连接到另一个引擎的工作队列。如果在提交描述符时用于延迟敏感操作的组处于空闲状态，则将立即将该描述符分派给引擎。</p>
 <img src="/2024/09/13/Intel-DSA-spec/QQ_1726211265893.png" class="" title="QQ_1726211265893">
 
@@ -681,7 +772,7 @@
 <h2 id="3-9-排序和隔离"><a href="#3-9-排序和隔离" class="headerlink" title="3.9 排序和隔离"></a>3.9 排序和隔离</h2><p>设备通常可以按任意顺序处理描述符。但是，当满足以下所有条件时，可以保证按照设备接收的顺序执行描述符：</p>
 <ul>
 <li>描述符提交给只有一个引擎的组。</li>
-<li>所有描述符都使用相同的通道地址提交给同一个 WQ。</li>
+<li>所有描述符都使用相同的门户地址提交给同一个 WQ。</li>
 <li>所有描述符都是批处理描述符，或者它们都不是批处理描述符。</li>
 <li>所有描述符都使用相同的目标 TC 选择器。</li>
 </ul>
@@ -693,7 +784,7 @@
 <li>使用 Drain 描述符或 Drain 命令等待前面的描述符完成，然后提交后面的描述符。</li>
 <li>在批处理中使用 Fence 标志。</li>
 </ul>
-<p>强制排序可能会增加提交描述符所用的 CPU 时间以及描述符在设备内开始执行的延迟。</p>
+<p><strong>强制排序可能会增加提交描述符所用的 CPU 时间以及描述符在设备内开始执行的延迟。</strong></p>
 <p>为了控制由批次描述符指定的批次中描述符的排序，每个工作描述符都有一个 Fence 标志。设置后，Fence 可确保在同一批次中的所有先前描述符完成之前不会开始处理该描述符。这允许具有 Fence 的描述符使用同一批次中先前描述符生成的数据。使用批次中先前描述符数据的描述符应使用与生成数据的描述符相同的流量类别。如果软件无法确保这一点，则软件必须在生成数据的描述符中设置目标读回标志，以确保所需的排序。</p>
 <p>如果批处理中的任何描述符完成时状态不等于成功（例如，如果由于页面错误而部分完成），则 Fence 标志等于 1 的后续描述符以及批处理中的任何后续描述符都将被放弃。用于提交批处理的批处理描述符的完成记录指示在 Fence 之前处理了多少个描述符。</p>
 <p>如果满足以下条件，则描述符的完成记录写入将在该描述符生成的所有数据写入之后进行：</p>
@@ -732,7 +823,8 @@
 <p>对于 Drain 而言，在操作生成的所有写入都全局可观察之后完成前一个描述符；在目标读回之后（如果请求）；在对完成记录的写入全局可观察之后（如果需要）；以及在生成完成中断之后（如果请求）。为确保这一点，在 Drain 描述符完成之前，硬件通常使用硬件确定的地址为每个支持的流量类发出隐式读回。隐式读回确保之前对根复合体的所有写入都已完成。</p>
 <p>软件可以通过在 Drain 描述符中设置读回标志来控制默认行为，这些标志可用于抑制隐式读回和&#x2F;或请求对软件控制的地址进行显式读回。<br>之前对对等设备（即非根复合体）的写入可能无法通过 Drain 描述符隐式读回刷新，但可以使用显式读回刷新。Drain 描述符允许软件在描述符中指定最多 2 个显式读回地址。如果指定，硬件将使用描述符中相应 TC 选择器标志指定的流量类向每个显式读回地址发出读回。<br>有关 Drain 描述符的详细信息，请参阅第 8.3.3 节。</p>
 <h2 id="3-13-地址转换"><a href="#3-13-地址转换" class="headerlink" title="3.13 地址转换"></a>3.13 地址转换</h2><p>Intel DSA 支持使用物理或虚拟地址。与 CPU 上运行的进程共享的虚拟地址的使用称为共享虚拟内存 (SVM)。为了支持 SVM，设备在执行地址转换时提供 PASID，并处理当地址没有转换时发生的页面错误。但是，设备本身并不区分虚拟地址和物理地址；这种区别由 IOMMU 的编程控制。</p>
-<p>I<strong>ntel DSA 支持 PCI Express 地址转换服务 (ATS) 和页面请求服务 (PRS) 功能。</strong>ATS 描述了地址转换期间的设备行为。当描述符进入描述符处理单元时，设备会请求对描述符中的地址进行转换。如果地址转换缓存中有命中，设备将使用相应的 HPA。如果出现未命中或权限错误，设备将向 IOMMU 发送地址转换请求以进行转换。IOMMU 通过遍历适当的页表来找到转换，并返回包含转换地址和有效权限的地址转换响应。设备将转换存储在地址转换缓存中，并使用相应的 HPA 进行操作。如果 IOMMU 在页表中找不到转换，它会返回地址转换响应，表示没有可用的转换。当 IOMMU 响应指示没有转换或指示有效权限不包含操作所需的权限时，则被视为页面错误。</p>
+<p><strong>Intel DSA 支持 PCI Express 地址转换服务 (ATS) 和页面请求服务 (PRS) 功能。</strong></p>
+<p>ATS 描述了地址转换期间的设备行为。当描述符进入描述符处理单元时，设备会请求对描述符中的地址进行转换。如果地址转换缓存中有命中，设备将使用相应的 HPA。如果出现未命中或权限错误，设备将向 IOMMU 发送地址转换请求以进行转换。IOMMU 通过遍历适当的页表来找到转换，并返回包含转换地址和有效权限的地址转换响应。设备将转换存储在地址转换缓存中，并使用相应的 HPA 进行操作。如果 IOMMU 在页表中找不到转换，它会返回地址转换响应，表示没有可用的转换。当 IOMMU 响应指示没有转换或指示有效权限不包含操作所需的权限时，则被视为页面错误。</p>
 <h3 id="3-13-1-工作队列地址转换控制"><a href="#3-13-1-工作队列地址转换控制" class="headerlink" title="3.13.1 工作队列地址转换控制"></a>3.13.1 工作队列地址转换控制</h3><p>某些实现支持控制设备中每个启用的工作队列的 ATS 和 PRS 功能。WQCAP 中的 WQ ATS 支持和 WQ PRS 支持字段指示对工作队列细粒度 ATS 和 PRS 控制的支持。如果支持，软件可以使用 WQCFG 中的 WQ ATS 禁用和 WQ PRS 禁用控制来禁用每个工作队列的相应功能。对于提交到工作队列的描述符，如果其中任何一个功能被禁用，设备操作与相应的 PCI Express 控制为 0 时相同。</p>
 <p>如果 ATS 被禁用（无论是通过 PCIe ATS 控制寄存器还是 WQCFG 中的 WQ ATS 禁用标志），英特尔 DSA 不会收到任何有关内存写入事务的地址转换故障的通知。即使写入事务发生页面错误，操作的完成记录也可能指示成功。如果 ATS 被禁用，软件应确保描述符访问的任何内存地址都不会导致页面错误。软件可以使用目标读回标志来检测写入目标地址的一些错误。</p>
 <h3 id="3-13-2-启用-PRS-的页面错误处理"><a href="#3-13-2-启用-PRS-的页面错误处理" class="headerlink" title="3.13.2 启用 PRS 的页面错误处理"></a>3.13.2 启用 PRS 的页面错误处理</h3><p>当 PCI Express PRS 启用控制为 1 并且 WQCAP 中的 WQ PRS 支持为 0 或 WQCFG 中的 WQ PRS 禁用为 0 时，PRS 处于启用状态。此外，每个描述符都有一个 Block On Fault 标志，用于指定是否为描述符中的源和目标缓冲区地址启用 PRS。</p>
@@ -1324,8 +1416,12 @@
 
 <p>通用描述符格式</p>
 <h3 id="8-1-1-可信字段"><a href="#8-1-1-可信字段" class="headerlink" title="8.1.1 可信字段"></a>8.1.1 可信字段</h3><p><strong>偏移量：0；大小：4 字节（32 位）</strong></p>
-<p>当将描述符提交给 SWQ 时，这些字段携带提交描述符的软件实体的特权和 PASID。当将描述符提交给 DWQ 时，将忽略描述符中的这些字段；设备使用 WQCFG 寄存器的 WQ Priv 和 WQ PASID 字段。</p>
-<p>在 Intel CPU 上，当软件使用 ENQCMD 将描述符提交给 SWQ 时，源描述符中的这些字段被保留。IA32_PASID MSR 的值放在 PASID 字段中，并且在将描述符发送到设备之前将 Priv 字段设置为 0。当软件使用 ENQCMDS 时，必须由软件适当地初始化源描述符中的这些字段。如果 PCI Express PASID 功能的特权模式启用字段为 0，则 Priv 字段必须为 0。</p>
+<ul>
+<li>当将描述符提交给 SWQ 时，这些字段携带提交描述符的软件实体的特权和 PASID。</li>
+<li>当将描述符提交给 DWQ 时，将忽略描述符中的这些字段；设备使用 WQCFG 寄存器的 WQ Priv 和 WQ PASID 字段。</li>
+</ul>
+<p>在 Intel CPU 上，当软件使用 ENQCMD 将描述符提交给 SWQ 时，源描述符中的这些字段被保留。IA32_PASID MSR 的值放在 PASID 字段中，并且在将描述符发送到设备之前将 Priv 字段设置为 0。</p>
+<p>当软件使用 ENQCMDS 时，必须由软件适当地初始化源描述符中的这些字段。如果 PCI Express PASID 功能的特权模式启用字段为 0，则 Priv 字段必须为 0。</p>
 <p>对于批次中的任何描述符，这些字段都将被忽略。批次描述符的相应字段用于批次中的每个描述符。</p>
 <img src="/2024/09/13/Intel-DSA-spec/QQ_1726709372204.png" class="" title="QQ_1726709372204">
 
@@ -1344,7 +1440,10 @@
 
 <h3 id="8-1-4-完成记录地址"><a href="#8-1-4-完成记录地址" class="headerlink" title="8.1.4 完成记录地址"></a>8.1.4 完成记录地址</h3><p><strong>偏移量 8；大小 8 字节（64 位）</strong></p>
 <p>此字段指定完成记录的地址。完成记录为 32 字节，并且必须与 32 字节边界对齐。如果完成记录地址有效标志为 0，则保留此字段。</p>
-<p>如果请求完成记录标志为 1，则在操作完成时将完成记录写入此地址。如果请求完成记录为 0，则仅当出现页面错误或错误时才将完成记录写入此地址。</p>
+<ul>
+<li>如果请求完成记录标志为 1，则在操作完成时将完成记录写入此地址。</li>
+<li>如果请求完成记录标志为 0，则仅当出现页面错误或错误时才将完成记录写入此地址。</li>
+</ul>
 <p>对于产生结果的任何操作（例如比较），完成记录地址有效和请求完成记录标志必须同时为 1，并且完成记录地址必须有效。</p>
 <p>对于使用虚拟地址的任何操作，无论是否设置了请求完成记录标志，完成记录地址都应该有效，以便在出现页面错误或错误时可以写入完成记录。</p>
 <p>为了获得最佳结果，此字段应在所有描述符中有效，因为它允许设备向提交描述符的软件报告错误。否则，如果发生意外错误，则会在 SWERROR 寄存器或事件日志中报告该错误，并且提交请求的软件可能不会收到有关该错误的通知。</p>
@@ -1602,8 +1701,8 @@
 
 <h1 id="9-寄存器说明"><a href="#9-寄存器说明" class="headerlink" title="9 寄存器说明"></a>9 寄存器说明</h1><p>英特尔数据流加速器的编程接口由 PCI 配置寄存器和 MMIO 寄存器组成，其中包括配置和控制寄存器以及工作提交门户。MMIO 寄存器和门户的基地址由 PCI 配置空间中的两个基地址寄存器 (BAR) 指定。</p>
 <p>PCI 配置空间访问必须以对齐的 1 字节、2 字节或 4 字节访问执行。有关访问 PCI 配置空间中未实现的寄存器和保留位的规则，请参阅第 1.2 节中列出的 PCI Express 基本规范。</p>
-<p>MMIO 空间对 BAR0 区域（功能、配置和状态寄存器）的访问必须以对齐的 1 字节、2 字节、4 字节或 8 字节访问执行。软件可以对任何寄存器使用 8 字节访问，包括使用单个 8 字节访问访问两个相邻的 32 位寄存器。</p>
-<p>MMIO 空间对 BAR2 区域的访问必须以 64 字节访问的形式执行，如第 9.3 节所述。<br>本章使用以下缩写来表示寄存器属性。</p>
+<p><strong>MMIO 空间对 BAR0 区域（功能、配置和状态寄存器）的访问必须以对齐的 1 字节、2 字节、4 字节或 8 字节访问执行。</strong>软件可以对任何寄存器使用 8 字节访问，包括使用单个 8 字节访问访问两个相邻的 32 位寄存器。</p>
+<p><strong>MMIO 空间对 BAR2 区域的访问必须以 64 字节访问的形式执行</strong>，如第 9.3 节所述。<br>本章使用以下缩写来表示寄存器属性。</p>
 <img src="/2024/09/13/Intel-DSA-spec/image-20240919104458048.png" class="" title="image-20240919104458048">
 
 <img src="/2024/09/13/Intel-DSA-spec/image-20240919104508760.png" class="" title="image-20240919104508760">
@@ -1844,8 +1943,14 @@
 <img src="/2024/09/13/Intel-DSA-spec/image-20240919113244601.png" class="" title="image-20240919113244601">
 
 <h2 id="9-3-Portals（BAR2）"><a href="#9-3-Portals（BAR2）" class="headerlink" title="9.3 Portals（BAR2）"></a>9.3 Portals（BAR2）</h2><p>门户用于向设备提交描述符。门户位于 BAR2 指定的地址空间中。每个门户大小为 64 字节，位于单独的 4 KB 页面上。这样，可以使用 CPU 页表和扩展页表将门户独立映射到不同的地址空间。</p>
-<p>每个 WQ 有四个门户，如图 9-2 所示。门户地址的位 5:0 必须为 0。位 11:6 被忽略；因此，页面上的任何 64 字节对齐的地址都可以使用相同的效果。<br>向 SWQ 门户提交描述符必须使用 64 字节可延迟内存写入事务 (DMWr) 执行。任何其他对 SWQ 门户的写入操作都将被忽略。向 DWQ 提交描述符必须使用 64 字节写入操作执行。在 Intel CPU 上，软件应使用 MOVDIR64B 指令生成非破坏性的 64 字节写入。对已禁用或专用 WQ 门户的 DMWr 事务将返回重试。</p>
-<p>对 DWQ 门户的任何其他写入操作都将被忽略。对 BAR2 地址空间的任何读取操作都会返回所有字节中的 0x00 或 0xFF。对 BAR 2 地址空间的读取不相对于对设备的任何其他事务排序，并且不能用于确保上游写入操作已完成。有关与门户访问相关的错误检查和报告的更多信息，请参阅第 5.3 节。</p>
+<p>每个 WQ 有四个门户，如图 9-2 所示。门户地址的位 5:0 必须为 0。位 11:6 被忽略；因此，页面上的任何 64 字节对齐的地址都可以使用相同的效果。</p>
+<ul>
+<li>向 SWQ 门户提交描述符必须使用 64 字节可延迟内存写入事务 (DMWr) 执行。任何其他对 SWQ 门户的写入操作都将被忽略。</li>
+<li>向 DWQ 提交描述符必须使用 64 字节写入操作执行。</li>
+</ul>
+<p>在 Intel CPU 上，软件应使用 <strong>MOVDIR64B</strong> 指令生成非破坏性的 64 字节写入。对已禁用或专用 WQ 门户的 DMWr 事务将返回重试。</p>
+<p><strong>对 DWQ 门户的任何其他写入操作都将被忽略。</strong></p>
+<p>对 BAR2 地址空间的任何读取操作都会返回所有字节中的 0x00 或 0xFF。对 BAR 2 地址空间的读取不相对于对设备的任何其他事务排序，并且不能用于确保上游写入操作已完成。有关与门户访问相关的错误检查和报告的更多信息，请参阅第 5.3 节。</p>
 <img src="/2024/09/13/Intel-DSA-spec/image-20240919113321434.png" class="" title="image-20240919113321434">
 
 <img src="/2024/09/13/Intel-DSA-spec/image-20240919113340382.png" class="" title="image-20240919113340382">
@@ -1959,6 +2064,23 @@
 
 <p>其中 TS 是传输大小（源数据大小），BS 是 DIF 块大小。</p>
 <h1 id="附录-C-PCIe-配置寄存器"><a href="#附录-C-PCIe-配置寄存器" class="headerlink" title="附录 C PCIe 配置寄存器"></a>附录 C PCIe 配置寄存器</h1><p>本附录提供了英特尔 DSA 1.0 版 PCIe 配置寄存器的详细信息。版本寄存器在 9.2.1 节中描述。</p>
+<h1 id="附录-D-性能监控事件"><a href="#附录-D-性能监控事件" class="headerlink" title="附录 D 性能监控事件"></a>附录 D 性能监控事件</h1><h1 id="附录-E-关键架构扩展摘要"><a href="#附录-E-关键架构扩展摘要" class="headerlink" title="附录 E 关键架构扩展摘要"></a>附录 E 关键架构扩展摘要</h1><p>本节列出了英特尔 DSA 规范 2.0 版中引入的关键架构扩展。<br>软件应查阅设备中的功能寄存器（如第 9.2 节所述）以识别实现中是否存在特定功能。</p>
+<img src="/2024/09/13/Intel-DSA-spec/image-20240925125819209.png" class="" title="image-20240925125819209">
+
+
+
+
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shaohef/p/12820952.html">intel DSA spec 解读</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.intel.com/content/www/us/en/search.html?ws=related#q=DSA&sort=relevancy&f:@tabfilter=[Developers]">intel 技术手册</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.wpgdadatong.com.cn/blog/detail/72700">第四代英特尔至强数据流加速器，优化实时视频传输</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.owalle.com/2021/11/05/dsa-overview/">Intel® DSA 综述</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ctyun.cn/developer/article/473663151341637">英特尔Data Streaming Accelerator简介</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011458874/article/details/124898895">英特尔 数据流加速器简介</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.wpgdadatong.com/blog/detail/74240">Intel DSA 技術應用</a></li>
+<li><a target="_blank" rel="noopener" href="https://lrl52.top/1179/introduction-to-intel-dsa-config-and-test/">Introduction to Intel® DSA Config and Test</a></li>
+</ol>
 
       
     </div>
@@ -2021,7 +2143,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-09-26 13:21:59" itemprop="dateModified" datetime="2024-09-26T13:21:59+08:00">2024-09-26</time>
+      <time title="修改时间：2024-09-26 13:42:37" itemprop="dateModified" datetime="2024-09-26T13:42:37+08:00">2024-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -2048,6 +2170,7 @@
     
     <div class="post-body" itemprop="articleBody">
           <h1 id="安装2022serverv版本"><a href="#安装2022serverv版本" class="headerlink" title="安装2022serverv版本"></a>安装2022serverv版本</h1><p>安装时需要带上<strong>虚拟驱动</strong>，否则不会识别硬盘，之后需要<strong>手动安装网卡驱动</strong></p>
+<p>win10 2022 server 评估版下载<a target="_blank" rel="noopener" href="https://go.microsoft.com/fwlink/p/?LinkID=2195280&clcid=0x804&culture=zh-cn&country=CN">20348.1787.230607-0640.fe_release_svc_refresh_SERVER_EVAL_x64FRE_zh-cn.ios</a></p>
 <p>虚拟驱动文件为<a target="_blank" rel="noopener" href="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.262-2/virtio-win-0.1.262.iso"><code>virtio-win-0.1.262.iso</code></a></p>
 <h1 id="评估版升级正式版"><a href="#评估版升级正式版" class="headerlink" title="评估版升级正式版"></a>评估版升级正式版</h1><p>标准版输入命令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DISM /online /Set-Edition:ServerStandard /ProductKey:XXXXX-XXXXX-XXXXX-XXXXX-XXXXX /AcceptEula</span><br></pre></td></tr></table></figure>
