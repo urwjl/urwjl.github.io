@@ -120,18 +120,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -148,6 +148,124 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/08/Intel-DSA-%E7%9B%B8%E5%85%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | WJL's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/10/08/Intel-DSA-%E7%9B%B8%E5%85%B3/" class="post-title-link" itemprop="url">Intel DSA 相关</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-10-08 09:39:00" itemprop="dateCreated datePublished" datetime="2024-10-08T09:39:00+08:00">2024-10-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-10-09 13:01:42" itemprop="dateModified" datetime="2024-10-09T13:01:42+08:00">2024-10-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/intel/" itemprop="url" rel="index"><span itemprop="name">intel</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/intel/DSA/" itemprop="url" rel="index"><span itemprop="name">DSA</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/intel/DSA/%E6%8C%87%E4%BB%A4/" itemprop="url" rel="index"><span itemprop="name">指令</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Intel-DSA-相关指令"><a href="#Intel-DSA-相关指令" class="headerlink" title="Intel DSA 相关指令"></a>Intel DSA 相关指令</h1><ul>
+<li><strong>ENQCMD</strong> 、<strong>ENQCMDS</strong> 是Non-Posted，需要Completer 返回状态，用于共享的工作队列</li>
+<li><strong>MOVDIR64B</strong> 是Posted，不需要返回状态，用于专用的工作队列</li>
+<li><strong>UMONITOR</strong> 、<strong>UMWAIT</strong> 实现更高效的等待和监控功能</li>
+<li><strong>SFENCE</strong> 、 <strong>MFENCE</strong> 内存屏障，在写指令之后插入写屏障，能让写入缓存的最新数据写回到主内存</li>
+</ul>
+<h2 id="提交工作描述符"><a href="#提交工作描述符" class="headerlink" title="提交工作描述符"></a>提交工作描述符</h2><h3 id="ENQCMD-ENQCMDS"><a href="#ENQCMD-ENQCMDS" class="headerlink" title="**ENQCMD ** &#x2F; ENQCMDS"></a>**ENQCMD ** &#x2F; <strong>ENQCMDS</strong></h3><p><a target="_blank" rel="noopener" href="https://www.kernel.org/doc/html/v6.0/x86/sva.html">Shared Virtual Addressing (SVA) with ENQCMD</a></p>
+<p>在 Intel CPU 上，DMWr 是使用 <strong>ENQCMD</strong> 或 <strong>ENQCMDS</strong> 指令生成的。<strong>ENQCMD</strong> 和 <strong>ENQCMDS</strong> 指令在 <strong>EFLAGS.ZF 标志</strong>中返回命令提交的状态；0 表示成功，1 表示重试。<strong>ENQCMD</strong>和 <strong>ENQCMDS</strong> 也自动向设备提交 64 字节工作描述符。但是，它们<em>可以</em>直接从设备报告错误，例如设备是否繁忙、设备未启用或不支持该命令。提交指令本身的这种即时反馈减少了与设备的交互次数，并可以大大提高效率。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_40357487/article/details/123339073">DMWr (Deferrable Memory Write)</a>是一种新的 PCIe TLP 类型。CXL 1.1 中就已经有 Deferrable Writes 了，正式出现在 PCIe 协议中是 PCIe 6.0。</p>
+<p>可延迟的内存写入，顾名思义，Completer 在收到 DMWr 后，可以选择立即执行，也可以选择延迟执行。相比于转发请求 MWr，DMWr 是非转发请求（NPR），无论请求是否被执行，Completer 都应根据完成情况回复指定状态的 Completion。</p>
+</blockquote>
+<h3 id="MOVDIR64B"><a href="#MOVDIR64B" class="headerlink" title="MOVDIR64B"></a><strong>MOVDIR64B</strong></h3><p>在 Intel CPU 上，使用 <strong>MOVDIR64B</strong> 指令将工作提交到 DWQ，该指令生成非撕裂（non-torn）的 64 字节写入。&#x3D;&#x3D;如果使用 <strong>MOVDIR64B</strong> 写入已禁用的 WQ、<strong>共享的 WQ</strong> 或无效的通道地址，则该写入将被丢弃，而不会通知软件。&#x3D;&#x3D;对于专用 WQ，PASID 的使用是可选的。如果未启用 PCI Express PASID 功能，则不使用 PASID。如果启用了 PASID 功能，WQ 配置寄存器的 WQ PASID 启用字段控制是否为每个 DWQ 使用 PASID。由于 <strong>MOVDIR64B</strong> 指令不会像 <strong>ENQCMD</strong> 或 <strong>ENQCMDS</strong> 指令那样填写 PASID，因此描述符中的 PASID 字段将被忽略。当为 DWQ 启用 PASID 时，设备使用 WQ 配置寄存器的 WQ PASID 字段进行地址转换。在专用模式下启用工作队列之前，驱动程序必须设置 WQ PASID 字段。</p>
+<blockquote>
+<p><strong>MOVDIR64B</strong>只能向专用工作队列提交描述符，不能向共享工作队列提交描述符，会被丢弃</p>
+</blockquote>
+<p>目前，<strong>MOVDIR64B</strong> 指令用于自动向设备提交 64 字节工作描述符。虽然在写入设备 MMIO 时可能会遇到设备队列已满、命令未接受、设备未准备好等错误，<em>但 <strong>MOVDIR64B</strong> 无法报告设备本身的错误</em>。这意味着 <strong>MOVDIR64B</strong> 用户需要单独与设备交互以查看描述符是否已成功排队，这会减慢设备交互速度。</p>
+<h2 id="内存屏障"><a href="#内存屏障" class="headerlink" title="内存屏障"></a>内存屏障</h2><h3 id="SFENCE-MFENCE"><a href="#SFENCE-MFENCE" class="headerlink" title="SFENCE &#x2F; MFENCE"></a><strong>SFENCE</strong> &#x2F; <strong>MFENCE</strong></h3><p>正在使用设备的进程可以在正常关机期间使用 Drain 描述符。它可以像整个 PASID 的 Fence 操作一样使用。它可用于请求单个完成记录和&#x2F;或中断以完成多个描述符。批处理中不能包含 Drain 描述符。（批处理中可以使用 Fence 标志来等待批处理中的先前描述符完成。）软件应在提交 Drain 描述符之前执行<strong>隔离指令</strong>（例如 <strong>SFENCE</strong> 或 <strong>MFENCE</strong>），以确保设备在要Drain 的描述符之后收到 Drain 描述符。</p>
+<h2 id="完成记录地址"><a href="#完成记录地址" class="headerlink" title="完成记录地址"></a>完成记录地址</h2><h3 id="UMONITOR-UMWAIT"><a href="#UMONITOR-UMWAIT" class="headerlink" title="UMONITOR &#x2F; UMWAIT"></a><strong>UMONITOR</strong> &#x2F; <strong>UMWAIT</strong></h3><p>使用完成记录地址上的 <a target="_blank" rel="noopener" href="https://cloud.tencent.com.cn/developer/information/%E6%88%91%E5%8F%AF%E4%BB%A5%E5%9C%A8%E5%93%AA%E4%BA%9B%E8%8B%B1%E7%89%B9%E5%B0%94CPU%E4%B8%8A%E4%BD%BF%E7%94%A8umonitor%E5%92%8Cumwait%E6%8C%87%E4%BB%A4%EF%BC%9F"><strong>UMONITOR</strong>&#x2F;<strong>UMWAIT</strong></a> 指令进行阻塞，直到写入或超时。然后，软件应检查状态字段是否为非零，以确定操作是否已完成。</p>
+<p><strong>umonitor</strong>指令用于监控指定内存地址的变化，当监控的内存地址发生变化时，umonitor会触发一个事件，从而可以及时采取相应的处理措施。umonitor指令可以提高云计算和服务器应用中的事件处理效率，减少不必要的轮询操作，节省系统资源。</p>
+<p><strong>umwait</strong>指令用于等待指定事件的发生，可以在等待期间进入低功耗状态，从而降低能耗。umwait指令可以在云计算和服务器应用中实现更高效的等待和唤醒机制，提高系统的能效。</p>
+<h1 id="Intel-官方参考信息"><a href="#Intel-官方参考信息" class="headerlink" title="Intel 官方参考信息"></a>Intel 官方参考信息</h1><p><a target="_blank" rel="noopener" href="https://www.intel.com/content/www/us/en/developer/articles/technical/scalable-io-between-accelerators-host-processors.html">scalable-io-between-accelerators-host-processors</a></p>
+<h1 id="phoronix-中的参考信息"><a href="#phoronix-中的参考信息" class="headerlink" title="phoronix 中的参考信息"></a>phoronix 中的参考信息</h1><p><a target="_blank" rel="noopener" href="https://www.phoronix.com/search/Data%20Streaming%20Accelerator">数据流加速器文章</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.phoronix.com/news/Linux-Make-Use-Of-ENQCMD">Linux 内核准备利用 Sapphire Rapids 中的 Intel DSA &#x2F; ENQCMD</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.phoronix.com/news/Intel-DSA-ENCQCMD-SVA-Prepping">英特尔开始为 Sapphire Rapids 数据流加速器准备更多 Linux 代码</a></p>
+<p><a target="_blank" rel="noopener" href="https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/diff/Documentation/x86/sva.rst?h=x86/pasid&id=4e7b11567d946ebe14a3d10b697b078971a9da89"><strong>tips : about DSA in Linux kernel</strong> </a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
