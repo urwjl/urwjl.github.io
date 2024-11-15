@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/312127.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/312127.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="网上的一些RISC-V 开源core的ip, 包括chisel和verilog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RISC-V 开源core">
+<meta property="og:url" content="http://example.com/2024/11/05/RISC-V_%E5%BC%80%E6%BA%90core/index.html">
+<meta property="og:site_name" content="WJL">
+<meta property="og:description" content="网上的一些RISC-V 开源core的ip, 包括chisel和verilog">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-11-05T08:42:57.000Z">
+<meta property="article:modified_time" content="2024-11-15T03:24:28.122Z">
+<meta property="article:author" content="Wu JInlin">
+<meta property="article:tag" content="RISC-V">
+<meta property="article:tag" content="core">
+<meta property="article:tag" content="开源">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/11/05/RISC-V_%E5%BC%80%E6%BA%90core/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/11/05/RISC-V_%E5%BC%80%E6%BA%90core/","path":"2024/11/05/RISC-V_开源core/","title":"RISC-V 开源core"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>RISC-V 开源core | WJL</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">WJL</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fighting forgetfulness</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RISC-V-%E5%BC%80%E6%BA%90core"><span class="nav-text">RISC-V 开源core</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%E3%80%81Ibex"><span class="nav-text">1、Ibex</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%E3%80%81SweRV-EH1"><span class="nav-text">2、SweRV EH1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3%E3%80%81Hammingbird-E203"><span class="nav-text">3、Hammingbird E203</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4%E3%80%81Rocket%EF%BC%8CBOOM"><span class="nav-text">4、Rocket，BOOM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5%E3%80%81CVA6-RISC-V-CPU"><span class="nav-text">5、CVA6 RISC-V CPU</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6%E3%80%81%E9%A6%99%E5%B1%B1%E5%BC%80%E6%BA%90%E9%AB%98%E6%80%A7%E8%83%BD%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-text">6、香山开源高性能处理器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="nav-text">参考文档</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Rocket-Chip"><span class="nav-text">1. Rocket Chip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-BOOM-Berkeley-Out-of-Order-Machine"><span class="nav-text">2. BOOM (Berkeley Out-of-Order Machine)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-CV64A6-Ariane"><span class="nav-text">3. CV64A6 (Ariane)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-SHAKTI-C-Class"><span class="nav-text">4. SHAKTI C-Class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-SonicBOOM"><span class="nav-text">5. SonicBOOM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-NutShell"><span class="nav-text">6. NutShell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-OpenPiton-Ariane"><span class="nav-text">7. OpenPiton+Ariane</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-Hummingbirdv2"><span class="nav-text">8. Hummingbirdv2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-CVA6"><span class="nav-text">9. CVA6</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu JInlin"
+      src="/images/20241114140630.jpg">
+  <p class="site-author-name" itemprop="name">Wu JInlin</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/05/RISC-V_%E5%BC%80%E6%BA%90core/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/20241114140630.jpg">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="RISC-V 开源core | WJL">
+      <meta itemprop="description" content="网上的一些RISC-V 开源core的ip, 包括chisel和verilog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RISC-V 开源core
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-11-05 16:42:57" itemprop="dateCreated datePublished" datetime="2024-11-05T16:42:57+08:00">2024-11-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 11:24:28" itemprop="dateModified" datetime="2024-11-15T11:24:28+08:00">2024-11-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RISC-V/" itemprop="url" rel="index"><span itemprop="name">RISC-V</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RISC-V/core/" itemprop="url" rel="index"><span itemprop="name">core</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">网上的一些RISC-V 开源core的ip, 包括chisel和verilog</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="RISC-V-开源core"><a href="#RISC-V-开源core" class="headerlink" title="RISC-V 开源core"></a>RISC-V 开源core</h1><h2 id="1、Ibex"><a href="#1、Ibex" class="headerlink" title="1、Ibex"></a>1、<strong>Ibex</strong></h2><p>提到开源RISC-V就不能不提Riscy系列了，尤其是zero-riscy，使用很广泛。Ibex是脱胎于zero-riscy的core，支持RV32IMC及一些Z系列指令，由LowRISC维护。Ibex小巧精悍，文档详实，学习资料丰富，支持verilator， 可以使用verilator+openOCD+GDB 仿真时debug。对于我这样的重度Verilator依赖者来说非常友好。</p>
+<p>Ibex支持machine mode和user mode两种privilege mode，可以实现比单machine mode更加丰富的功能。Ibex采用system verilog开发，对于传统的IC工程师是个好消息。Ibex现在也支持了指令cache了，提高了performance，但装了cache会让core变得臃肿很多，对于学习cache controller的设计是个好事情。</p>
+<p>Ibex使用类TLUL的自定义接口，官方的SoC是PULP。Google的OpenTitan项目也是基于Ibex。相关的设计学习资料算是相当多了。</p>
+<p>github: <a target="_blank" rel="noopener" href="https://github.com/lowRISC/ibex">https://github.com/lowRISC/ibex</a></p>
+<p>文档：<a target="_blank" rel="noopener" href="https://ibex-core.readthedocs.io/en/latest/introduction.html">https://ibex-core.readthedocs.io/en/latest/introduction.html</a></p>
+<h2 id="2、SweRV-EH1"><a href="#2、SweRV-EH1" class="headerlink" title="2、SweRV EH1"></a>2、<strong>SweRV EH1</strong></h2><p>SweRV EH1是WD开发的其中一款RISC-V core，支持RV32IMC，双发射，单线程，9级流水，性能应该说是相当不错，28nm可以跑到1GHz。而且还有份详细的文档，不愧是大厂出品。</p>
+<p>SweRV是使用Verilog&#x2F;System Verilog开发，使用AXI接口，对熟悉AMBA且不想去学Chisel及Scala的同学来说是相当友好了。而且支持verilator，必须点赞。值得一提的是SweRV带指令cache，且实现了丰富的cache maintenance自定义指令，非常值得学习。</p>
+<p>一句话点评：<strong>大厂出品，进阶学习佳作。</strong></p>
+<p>github: <a target="_blank" rel="noopener" href="https://github.com/chipsalliance/Cores-SweRV">https://github.com/chipsalliance/Cores-SweRV</a></p>
+<h2 id="3、Hammingbird-E203"><a href="#3、Hammingbird-E203" class="headerlink" title="3、Hammingbird E203"></a>3、<strong>Hammingbird E203</strong></h2><p>蜂鸟处理器是在国内RISC-V社区大名鼎鼎的芯来科技开发的RISC-V MCU系列。E203是其开源的一款单privilege mode，两级流水（不严格说法）的MCU，主打小面积、低功耗。使用Verilog开发。麻雀虽小，五脏俱全，也包括debug module，代码严谨优美，用来学习设计没得说。官方文档不算多，但是市面上可以买到胡振波大牛写的两本书，也算是学习资料丰富了。</p>
+<p>开源的E203在github上其实是一个SoC平台。E203使用自定义的类AXI接口，支持debug spec 0.11。唯一的缺憾是没有官方的verilator环境，如果使用verilator的话得自己搭个环境了。像我这种在家用不了商业仿真软件（也不愿意装D版）的硅农，只能用意念仿真了，目前还是看看代码，等有时间的话Port一个verilator仿真环境过去。开源蜂鸟E203支持Icarus Verilog开源仿真工具，这个仿真工具不知道还有没有人维护，就我以前使用而言，几乎只能仿纯verilog，对于很多不可综合的写法也不支持，使用非常受限，就更别提把GDB接入到仿真了。</p>
+<p>这里值得是说一下胡振波大牛写的《手把手教你设计CPU——RISC-V处理器篇》，还是很不错的设计入门之作，里面有很多干货，是本让初学者受益良多、让熟手硅农深有共鸣的好书。另一本貌似是嵌入式开发，目前还没有拜读。</p>
+<p>一句话点评：<strong>初学者学习RISC-V处理器设计首选。</strong><br>github: <a target="_blank" rel="noopener" href="https://github.com/SI-RISCV/e200_opensource">https://github.com/SI-RISCV/e200_opensource</a></p>
+<h2 id="4、Rocket，BOOM"><a href="#4、Rocket，BOOM" class="headerlink" title="4、Rocket，BOOM"></a>4、<strong>Rocket，BOOM</strong></h2><p>很多RISC-V开发者，无论硬件还是软件，首次接触的CPU core就是Rocket。Rocket Chip Generator可以生成包括Rocket core的一整套SoC，各种参数统统可配置。Rocket Chip是用Chisel开发的，初学者（CPU设计开发的数字前端初学者，尤其是只懂Verilog的初学者）要去看Rocket的代码还是会有些吃力的，对初学者不太友好。不过正因为其面世较早，又有Berkeley的纯正血统，粉丝众多，很多paper都是基于Rocket Chip做的，资料也很好找，但似乎没有详细的官方文档。</p>
+<p>Rocket chip带MMU，支持操作系统，所以在上面跑Linux是没有问题的。Rocket chip使用Tilelink总线，支持缓存一致性的一款总线。支持Verilator+OpenOCD+GDB仿真。</p>
+<p>Rocket是64位CPU core（也是今天介绍的几款处理器中唯一一款64位的），采用经典五级流水，顺序执行，单发射，还支持各种分支预测。BOOM（Berkeley Out-of-Order Machine）基于Rocket，乱序执行，BOOM有还算比较详细的文档。这两个用来学习还是很不错的。而且Rocket还是比较成熟的，基于Rocket core已经有很多ASIC产品了。只是Chisel是道坎，CPU设计还没开始学就跳进Chisel的坑里去了！</p>
+<p>一句话总结：<strong>Berkeley纯正血统，但欲学本core，必先入Chisel之坑。</strong></p>
+<p>Rocket Chip github：<a target="_blank" rel="noopener" href="https://github.com/chipsalliance/rocket-chip">https://github.com/chipsalliance/rocket-chip</a></p>
+<p>BOOM github: <a target="_blank" rel="noopener" href="https://github.com/riscv-boom/riscv-boom">https://github.com/riscv-boom/riscv-boom</a></p>
+<h2 id="5、CVA6-RISC-V-CPU"><a href="#5、CVA6-RISC-V-CPU" class="headerlink" title="5、CVA6 RISC-V CPU"></a>5、<strong>CVA6 RISC-V CPU</strong></h2><p>CVA6 是一款 6 级、单次、有序 CPU，实现 64 位 RISC-V 指令集。它完全实现了第 I 卷：用户级 ISA V 2.3 中指定的 I、M、A 和 C 扩展以及草案权限扩展 1.10。它实现了三个权限级别M、S、U，以完全支持类Unix操作系统。此外，它还符合外部调试规范草案 0.13。</p>
+<p>它具有可配置的大小、独立的 TLB、硬件 PTW 和分支预测（分支目标缓冲区和分支历史表）。主要设计目标是减少关键路径长度。</p>
+<p>github:<a target="_blank" rel="noopener" href="https://github.com/openhwgroup/cva6">https://github.com/openhwgroup/cva6</a></p>
+<h2 id="6、香山开源高性能处理器"><a href="#6、香山开源高性能处理器" class="headerlink" title="6、香山开源高性能处理器"></a>6、<strong>香山开源高性能处理器</strong></h2><p>“香山”基于Chisel语言开发，支持多核，采用乱序执行、11级流水、6发射。采用28nm台积电工艺预计达到1.3Ghz主频，采用中芯国际14nm工艺预计达到2Ghz主频。性能评估为7&#x2F;Ghz(SEPC2006)，换言之，第一版的雁栖湖架构对标的是ARM A72&#x2F;A73。</p>
+<p>github:<a target="_blank" rel="noopener" href="https://github.com/OpenXiangShan/XiangShan">https://github.com/OpenXiangShan/XiangShan</a></p>
+<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a target="_blank" rel="noopener" href="https://www.riscv-mcu.com/article-article-show-id-329.html">简评几款开源RISC-V处理器</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.pulp-platform.org/">https://www.pulp-platform.org/</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/pulp-platform/axi">https://github.com/pulp-platform/axi</a></p>
+<p>2024年11月11日 15:41:43</p>
+<p>chatgpt：有哪些实现了mmu的开源riscv core？</p>
+<p>以下是一些实现了 MMU 的开源 RISC-V 处理器核心，适用于支持虚拟内存管理的应用，如操作系统（例如 Linux）运行：</p>
+<h3 id="1-Rocket-Chip"><a href="#1-Rocket-Chip" class="headerlink" title="1. Rocket Chip"></a>1. <strong>Rocket Chip</strong></h3><ul>
+<li><strong>开发者</strong>：加州大学伯克利分校（UC Berkeley）</li>
+<li><strong>描述</strong>：Rocket Chip 是一个 64 位的 RISC-V 处理器核心，采用了 Berkeley 的 Chisel 硬件描述语言编写。Rocket 具有简单的 MMU 实现，支持 Sv39 和 Sv48 的虚拟内存模式，适合在嵌入式和基础的服务器级别应用中运行。</li>
+<li><strong>特点</strong>：支持 Linux 和其他需要 MMU 的操作系统，性能优于基本的嵌入式核心。</li>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/chipsalliance/rocket-chip">Rocket Chip GitHub</a></li>
+</ul>
+<h3 id="2-BOOM-Berkeley-Out-of-Order-Machine"><a href="#2-BOOM-Berkeley-Out-of-Order-Machine" class="headerlink" title="2. BOOM (Berkeley Out-of-Order Machine)"></a>2. <strong>BOOM (Berkeley Out-of-Order Machine)</strong></h3><ul>
+<li><strong>开发者</strong>：加州大学伯克利分校（UC Berkeley）</li>
+<li><strong>描述</strong>：BOOM 是一个开源的乱序执行（Out-of-Order Execution）RISC-V 核心，设计上更加复杂，面向高性能计算。BOOM 基于 Rocket Chip 架构，但其性能更强，且支持 MMU，能够运行操作系统如 Linux。</li>
+<li><strong>特点</strong>：适用于需要高性能的场景，如桌面计算和轻量级服务器。</li>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/riscv-boom/riscv-boom">BOOM GitHub</a></li>
+</ul>
+<h3 id="3-CV64A6-Ariane"><a href="#3-CV64A6-Ariane" class="headerlink" title="3. CV64A6 (Ariane)"></a>3. <strong>CV64A6 (Ariane)</strong></h3><ul>
+<li><strong>开发者</strong>：ETH Zurich</li>
+<li><strong>描述</strong>：Ariane 是一个 64 位的 RISC-V 处理器，采用 Chisel 编写，并支持 MMU。Ariane 支持 Linux 所需的虚拟内存（Sv39），适用于嵌入式和基础的服务器应用。</li>
+<li><strong>特点</strong>：支持虚拟内存管理和多级页表，适合需要简单 MMU 功能的场景。</li>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/pulp-platform/ariane">Ariane GitHub</a></li>
+</ul>
+<h3 id="4-SHAKTI-C-Class"><a href="#4-SHAKTI-C-Class" class="headerlink" title="4. SHAKTI C-Class"></a>4. <strong>SHAKTI C-Class</strong></h3><ul>
+<li><strong>开发者</strong>：印度理工学院马德拉斯分校（IIT Madras）</li>
+<li><strong>描述</strong>：Shakti C-Class 是印度 Shakti 项目的一部分，它是一个支持 Linux 的 64 位处理器，包含了 MMU，支持 Sv39 虚拟内存模式。</li>
+<li><strong>特点</strong>：面向教育和研究用途，设计适合简单的服务器应用。</li>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://gitlab.com/shaktiproject">SHAKTI GitHub</a></li>
+</ul>
+<h3 id="5-SonicBOOM"><a href="#5-SonicBOOM" class="headerlink" title="5. SonicBOOM"></a>5. <strong>SonicBOOM</strong></h3><ul>
+<li><strong>开发者</strong>：加州大学伯克利分校（UC Berkeley）</li>
+<li><strong>描述</strong>：SonicBOOM 是 BOOM 的一个高性能变种，进一步优化了乱序执行和缓存。支持 MMU，并且通过更高的频率和更好的性能适用于复杂的操作系统环境。</li>
+<li><strong>特点</strong>：高性能，适合桌面和服务器应用，适合复杂的虚拟内存需求。</li>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/riscv-boom/riscv-boom">SonicBOOM GitHub</a></li>
+</ul>
+<h3 id="6-NutShell"><a href="#6-NutShell" class="headerlink" title="6. NutShell"></a>6. <strong>NutShell</strong></h3><ul>
+<li><strong>开发者</strong>：清华大学</li>
+<li><strong>描述</strong>：NutShell 是一个开源的 RISC-V 处理器，采用 Chisel 开发。支持 64 位地址空间和 Sv39 MMU，能够运行 Linux。</li>
+<li><strong>特点</strong>：面向教育和研究场景，适合虚拟内存和操作系统实验。</li>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/OSCPU/NutShell">NutShell GitHub</a></li>
+</ul>
+<h3 id="7-OpenPiton-Ariane"><a href="#7-OpenPiton-Ariane" class="headerlink" title="7. OpenPiton+Ariane"></a>7. <strong>OpenPiton+Ariane</strong></h3><ul>
+<li><strong>开发者</strong>：普林斯顿大学和 ETH Zurich</li>
+<li><strong>描述</strong>：这是一个结合了 OpenPiton 多核架构和 Ariane 内核的设计，支持 MMU 并且可以运行 Linux。</li>
+<li><strong>特点</strong>：适合多核系统和虚拟内存应用，支持更复杂的操作系统环境。</li>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/PrincetonUniversity/openpiton">OpenPiton+Ariane GitHub</a></li>
+</ul>
+<h3 id="8-Hummingbirdv2"><a href="#8-Hummingbirdv2" class="headerlink" title="8. Hummingbirdv2"></a>8. <strong>Hummingbirdv2</strong></h3><ul>
+<li><strong>开发者</strong>：芯来科技（Nuclei System Technology）</li>
+<li><strong>描述</strong>：Hummingbirdv2 是一个开源的 RISC-V 64 位处理器，支持虚拟内存和 MMU，能够运行 Linux。</li>
+<li><strong>特点</strong>：在嵌入式应用中性能较优，并且具有良好的文档和社区支持。</li>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/Nuclei-Software">Hummingbirdv2 GitHub</a></li>
+</ul>
+<h3 id="9-CVA6"><a href="#9-CVA6" class="headerlink" title="9. CVA6"></a>9. <strong>CVA6</strong></h3><ul>
+<li><strong>开发者</strong>：OpenHW Group</li>
+<li><strong>描述</strong>：CVA6（原 Ariane）是一个开源的 RISC-V 处理器，支持 64 位虚拟地址和 MMU，能够运行操作系统如 Linux。</li>
+<li><strong>特点</strong>：适用于高性能嵌入式系统和轻量级服务器应用。</li>
+<li><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/openhwgroup/cva6">CVA6 GitHub</a></li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>这些开源的 RISC-V 核心中，大部分支持 MMU 并且可以运行 Linux 系统。Rocket Chip、BOOM、Ariane（CVA6）等是最常用的实现，适合不同性能需求和应用场景。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/RISC-V/" rel="tag"># RISC-V</a>
+              <a href="/tags/core/" rel="tag"># core</a>
+              <a href="/tags/%E5%BC%80%E6%BA%90/" rel="tag"># 开源</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/04/ATS%E7%AE%80%E4%BB%8B/" rel="prev" title="ATS简介">
+                  <i class="fa fa-angle-left"></i> ATS简介
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/11/05/EMACS_Verilog_mode/" rel="next" title="EMACS_Verilog_mode">
+                  EMACS_Verilog_mode <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu JInlin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"http://example.com/2024/11/05/RISC-V_%E5%BC%80%E6%BA%90core/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/312127.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/312127.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="RISC-V 中断 CSR 和流程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RISC-V中断">
+<meta property="og:url" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/index.html">
+<meta property="og:site_name" content="WJL">
+<meta property="og:description" content="RISC-V 中断 CSR 和流程">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607095707402-1730798017565-1.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607100326651-1730798017565-2.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607100229914-1730798017565-3.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20220612180146138-1730798017565-6.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230605144546717-1685947558731-5-1730798017565-5.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607141638291-1730798017565-7.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620152021919-1730798017565-4.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620152056468-1730798017565-8.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230627142638175-1730798017565-11.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620154433141-1730798017565-9.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620154803575-1730798017565-10.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607134211813-1730798017566-12.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607134317657-1730798017566-13.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230606151855672-1730798017566-14.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230606152947876-1730798017566-15.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607104406917-1730798017566-16.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607150308306-1730798017566-17.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607144159954-1730798017566-18.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607102401144-1730798017566-20.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607102449479-1730798017566-19.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607144256709-1730798017566-22.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607135602251-1730798017566-23.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619102536443-1730798017566-21.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619104021864-1730798017566-24.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619111427150-1730798017566-25.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619111621452-1730798017566-26.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619112857447-1730798017566-27.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619112917408-1730798017566-28.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619112933217-1730798017566-29.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619133330589-1730798017566-31.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619133352813-1730798017566-30.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619133843695-1730798017566-32.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619134725508-1730798017566-33.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619135337569-1730798017566-34.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619135943653-1730798017566-36.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619140918185-1730798017566-35.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619140944661-1730798017566-38.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619141019050-1730798017566-37.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619141250391-1730798017566-39.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619141328875-1730798017566-40.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230719160026932-1730798017566-41.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619155804871-1730798017566-42.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619160157312-1730798017566-43.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619160224321-1730798017566-44.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619160338892-1730798017566-45.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619160640694-1730798017566-46.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161552863-1730798017566-48.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161636601-1730798017566-47.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161708479-1730798017566-49.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161742529-1730798017566-51.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161821642-1730798017566-50.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619162256524-1730798017566-52.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619162926132-1730798017566-53.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619164229777-1730798017566-54.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619164410329-1730798017566-55.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619165141590-1730798017566-56.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619171652730-1730798017566-57.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619171747318-1730798017566-58.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619171852916-1730798017566-59.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619172226512-1730798017566-60.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619172242100-1730798017566-61.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619172306796-1730798017566-62.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619172325999-1730798017566-63.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620093251053-1730798017566-65.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620095034291-1730798017566-64.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620095148326-1730798017566-66.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620095233766-1730798017566-67.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620095311698-1730798017566-68.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620100733821-1730798017566-71.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620100753539-1730798017566-70.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620100839882-1730798017566-69.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620101004942-1730798017566-72.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620101027513-1730798017566-73.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230613102149237-1730798017566-75.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230613102619528-1730798017566-74.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230613102127993-1730798017566-76.png">
+<meta property="article:published_time" content="2023-11-06T05:52:39.000Z">
+<meta property="article:modified_time" content="2024-11-15T03:24:28.122Z">
+<meta property="article:author" content="Wu JInlin">
+<meta property="article:tag" content="RISC-V">
+<meta property="article:tag" content="中断">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607095707402-1730798017565-1.png">
+
+
+<link rel="canonical" href="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/","path":"2023/11/06/RISC-V中断/","title":"RISC-V中断"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>RISC-V中断 | WJL</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">WJL</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fighting forgetfulness</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1%E3%80%81RISC-V-%E4%B8%AD%E6%96%AD"><span class="nav-text">1、RISC-V 中断</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1%E3%80%81RISC-V-%E5%BC%82%E5%B8%B8%E7%9B%B8%E5%85%B3CSR%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-text">1.1、RISC-V 异常相关CSR寄存器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1%E3%80%81M%E7%BA%A7%E5%88%ABCSR"><span class="nav-text">1.1.1、M级别CSR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2%E3%80%81S%E7%BA%A7%E5%88%ABCSR"><span class="nav-text">1.1.2、S级别CSR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3%E3%80%81H%E7%BA%A7%E5%88%ABCSR"><span class="nav-text">1.1.3、H级别CSR</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2%E3%80%81RISC-V%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-text">1.2、RISC-V中断处理流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-6-%E6%9C%BA%E5%99%A8%E7%8A%B6%E6%80%81%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%88mstatus-%E5%92%8C-mstatush%EF%BC%89"><span class="nav-text">3.1.6 机器状态寄存器（mstatus 和 mstatush）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-6-1-mstatus-%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%AD%E7%9A%84%E6%9D%83%E9%99%90%E5%92%8C%E5%85%A8%E5%B1%80%E4%B8%AD%E6%96%AD%E4%BD%BF%E8%83%BD%E5%A0%86%E6%A0%88"><span class="nav-text">3.1.6.1 mstatus 寄存器中的权限和全局中断使能堆栈</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-6-2-mstatus-%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%AD%E7%9A%84%E5%9F%BA%E6%9C%AC-ISA-%E6%8E%A7%E5%88%B6"><span class="nav-text">3.1.6.2 mstatus 寄存器中的基本 ISA 控制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-6-3-mstatus-%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E6%9D%83%E9%99%90"><span class="nav-text">3.1.6.3 mstatus 寄存器中的内存权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-6-4-mstatus-%E5%92%8C-mstatush-%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%AD%E7%9A%84%E5%AD%97%E8%8A%82%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6"><span class="nav-text">3.1.6.4 mstatus 和 mstatush 寄存器中的字节顺序控制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-6-5-mstatus-%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%AD%E7%9A%84%E8%99%9A%E6%8B%9F%E5%8C%96%E6%94%AF%E6%8C%81"><span class="nav-text">3.1.6.5 mstatus 寄存器中的虚拟化支持</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-6-6-mstatus-%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%AD%E7%9A%84%E6%89%A9%E5%B1%95%E4%B8%8A%E4%B8%8B%E6%96%87%E7%8A%B6%E6%80%81"><span class="nav-text">3.1.6.6 mstatus 寄存器中的扩展上下文状态</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-7-%E6%9C%BA%E5%99%A8%E9%99%B7%E9%98%B1%E5%90%91%E9%87%8F%E5%9F%BA%E5%9C%B0%E5%9D%80%E5%AF%84%E5%AD%98%E5%99%A8-mtvec"><span class="nav-text">3.1.7 机器陷阱向量基地址寄存器  (mtvec)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-8-%E6%9C%BA%E5%99%A8%E9%99%B7%E9%98%B1%E5%A7%94%E6%89%98%E5%AF%84%E5%AD%98%E5%99%A8-medeleg-and-mideleg"><span class="nav-text">3.1.8  机器陷阱委托寄存器  (medeleg and mideleg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-9-%E6%9C%BA%E5%99%A8%E4%B8%AD%E6%96%AD%E4%BD%BF%E8%83%BD%E6%8C%82%E8%B5%B7%E5%AF%84%E5%AD%98%E5%99%A8-mip-and-mie"><span class="nav-text">3.1.9 机器中断使能挂起寄存器  (mip and mie)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-13-%E6%9C%BA%E5%99%A8%E6%9A%82%E7%94%A8%E6%8E%A7%E5%88%B6%E5%AF%84%E5%AD%98%E5%99%A8-mscratch"><span class="nav-text">3.1.13  机器暂用控制寄存器  (mscratch)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-14-%E6%9C%BA%E5%99%A8%E5%BC%82%E5%B8%B8%E7%A8%8B%E5%BA%8F%E8%AE%A1%E6%95%B0%E5%99%A8-mepc"><span class="nav-text">3.1.14 机器异常程序计数器  (mepc)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-15-%E6%9C%BA%E5%99%A8%E5%8E%9F%E5%9B%A0%E5%AF%84%E5%AD%98%E5%99%A8-mcause"><span class="nav-text">3.1.15  机器原因寄存器 (mcause)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-16-%E6%9C%BA%E5%99%A8%E9%99%B7%E9%98%B1%E5%80%BC%E5%AF%84%E5%AD%98%E5%99%A8-mtval"><span class="nav-text">3.1.16 机器陷阱值寄存器  (mtval)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-Hypervisor-Extension-Version-1-0"><span class="nav-text">8 Hypervisor Extension, Version 1.0</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#8-1-%E7%89%B9%E6%9D%83%E6%A8%A1%E5%BC%8F"><span class="nav-text">8.1 特权模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-2-Hypervisor-and-Virtual-Supervisor-CSRs"><span class="nav-text">8.2 Hypervisor and Virtual Supervisor CSRs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-1-Hypervisor-%E7%8A%B6%E6%80%81%E5%AF%84%E5%AD%98%E5%99%A8-hstatus"><span class="nav-text">8.2.1 Hypervisor 状态寄存器(hstatus)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-2-Hypervisor-Trap-%E5%A7%94%E6%89%98%E5%AF%84%E5%AD%98%E5%99%A8-hedeleg%E5%92%8Chideleg"><span class="nav-text">8.2.2 Hypervisor Trap 委托寄存器(hedeleg和hideleg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-3-Hypervisor-%E4%B8%AD%E6%96%AD%E5%AF%84%E5%AD%98%E5%99%A8-hvip%E3%80%81hip%E3%80%81hie"><span class="nav-text">8.2.3 Hypervisor 中断寄存器(hvip、hip、hie)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-4-Hypervisor-Guest-External-Interrupt-Registers-hgeip-and-hgeie"><span class="nav-text">8.2.4 Hypervisor Guest External Interrupt Registers (hgeip and hgeie)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-5-Hypervisor-Environment-Configuration-Registers-henvcfg-and-henvcfgh"><span class="nav-text">8.2.5 Hypervisor Environment Configuration Registers (henvcfg and henvcfgh)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-6-Hypervisor-Counter-Enable-Register-hcounteren"><span class="nav-text">8.2.6 Hypervisor Counter-Enable Register (hcounteren)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-7-Hypervisor-Time-Delta-Registers-htimedelta-htimedeltah"><span class="nav-text">8.2.7 Hypervisor Time Delta Registers (htimedelta, htimedeltah)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-8-Hypervisor-Trap-Value-Register-htval"><span class="nav-text">8.2.8 Hypervisor Trap Value Register (htval)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-9-Hypervisor-Trap-Instruction-Register-htinst"><span class="nav-text">8.2.9 Hypervisor Trap Instruction Register (htinst)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-10-Hypervisor-Guest-Address-Translation-and-Protection-Register-hgatp"><span class="nav-text">8.2.10 Hypervisor Guest Address Translation and Protection Register (hgatp)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-11-Virtual-Supervisor-Status-Register-vsstatus"><span class="nav-text">8.2.11 Virtual Supervisor Status Register (vsstatus)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-12-Virtual-Supervisor-Interrupt-Registers-vsip-and-vsie"><span class="nav-text">8.2.12 Virtual Supervisor Interrupt Registers (vsip and vsie)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-13-Virtual-Supervisor-Trap-Vector-Base-Address-Register-vstvec"><span class="nav-text">8.2.13 Virtual Supervisor Trap Vector Base Address Register (vstvec)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-14-Virtual-Supervisor-Scratch-Register-vsscratch"><span class="nav-text">8.2.14 Virtual Supervisor Scratch Register (vsscratch)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-15-Virtual-Supervisor-Exception-Program-Counter-vsepc"><span class="nav-text">8.2.15 Virtual Supervisor Exception Program Counter (vsepc)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-16-Virtual-Supervisor-Cause-Register-vscause"><span class="nav-text">8.2.16 Virtual Supervisor Cause Register (vscause)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-17-Virtual-Supervisor-Trap-Value-Register-vstval"><span class="nav-text">8.2.17 Virtual Supervisor Trap Value Register (vstval)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-18-Virtual-Supervisor-Address-Translation-and-Protection-Register-vsatp"><span class="nav-text">8.2.18 Virtual Supervisor Address Translation and Protection Register (vsatp)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-3-Hypervisor-Instructions"><span class="nav-text">8.3 Hypervisor Instructions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-1-Hypervisor-Virtual-Machine-Load-and-Store-Instructions"><span class="nav-text">8.3.1 Hypervisor Virtual-Machine Load and Store Instructions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-2-Hypervisor-Memory-Management-Fence-Instructions"><span class="nav-text">8.3.2 Hypervisor Memory-Management Fence Instructions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-4-Machine-Level-CSR"><span class="nav-text">8.4  Machine-Level CSR</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-4-1-%E6%9C%BA%E5%99%A8%E7%8A%B6%E6%80%81%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%88mstatus%E5%92%8Cmstatush%EF%BC%89"><span class="nav-text">8.4.1 机器状态寄存器（mstatus和mstatush）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-4-2-%E6%9C%BA%E5%99%A8%E4%B8%AD%E6%96%AD%E5%A7%94%E6%89%98%E5%AF%84%E5%AD%98%E5%99%A8-mideleg"><span class="nav-text">8.4.2 机器中断委托寄存器(mideleg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-4-3-%E6%9C%BA%E5%99%A8%E4%B8%AD%E6%96%AD%E5%AF%84%E5%AD%98%E5%99%A8-mip%E5%92%8Cmie"><span class="nav-text">8.4.3 机器中断寄存器(mip和mie)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-4-4-%E6%9C%BA%E5%99%A8%E7%AC%AC%E4%BA%8CTrap%E5%80%BC%E5%AF%84%E5%AD%98%E5%99%A8-mtval2"><span class="nav-text">8.4.4 机器第二Trap值寄存器(mtval2)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-4-5-%E6%9C%BA%E5%99%A8%E9%99%B7%E9%98%B1%E6%8C%87%E4%BB%A4%E5%AF%84%E5%AD%98%E5%99%A8-mtinst"><span class="nav-text">8.4.5 机器陷阱指令寄存器(mtinst)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-5-%E4%B8%A4%E9%98%B6%E6%AE%B5%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2"><span class="nav-text">8.5 两阶段地址转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-5-1-Guest-Physical-Address%E8%BD%AC%E6%8D%A2"><span class="nav-text">8.5.1 Guest Physical Address转换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-5-2-Guest%E9%A1%B5%E9%94%99%E8%AF%AF"><span class="nav-text">8.5.2 Guest页错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-5-3-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%9B%B4%E6%A0%8F"><span class="nav-text">8.5.3 内存管理围栏</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-6-Traps"><span class="nav-text">8.6 Traps</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-6-1-Trap%E5%8E%9F%E5%9B%A0%E7%A0%81"><span class="nav-text">8.6.1 Trap原因码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-6-2-Trap%E8%A1%A8%E9%A1%B9"><span class="nav-text">8.6.2 Trap表项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-6-3-mtinst%E6%88%96htinst%E7%9A%84%E8%BD%AC%E6%8D%A2%E6%8C%87%E4%BB%A4%E6%88%96%E4%BC%AA%E6%8C%87%E4%BB%A4"><span class="nav-text">8.6.3 mtinst或htinst的转换指令或伪指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-6-4-Trap%E8%BF%94%E5%9B%9E"><span class="nav-text">8.6.4 Trap返回</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AIA"><span class="nav-text">AIA</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%96%B0%E5%A2%9E%E7%9A%84CSR"><span class="nav-text">1.  新增的CSR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-miselect%E4%B8%8Emireg%E9%97%B4%E6%8E%A5%E8%AE%BF%E9%97%AE%E7%9A%84%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-text">1.1 miselect与mireg间接访问的寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-mtopei-mtopi"><span class="nav-text">1.2  mtopei &#x2F; mtopi</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#APLIC"><span class="nav-text">APLIC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-text">内存映射寄存器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-APLIC%E7%9B%B4%E6%8E%A5%E4%B8%AD%E6%96%AD%E4%BA%A4%E4%BB%98"><span class="nav-text">4.8 APLIC直接中断交付</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IDC-Interrupt-delivery-control-%E7%BB%93%E6%9E%84"><span class="nav-text">IDC (Interrupt delivery control)结构</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#A1"><span class="nav-text">A1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#module-%E5%88%86%E6%9E%90"><span class="nav-text">module 分析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SGEI"><span class="nav-text">SGEI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E4%B8%AD%E6%96%AD%E6%B3%A8%E5%85%A5"><span class="nav-text">虚拟中断注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HS-VS"><span class="nav-text">HS-&gt;VS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E6%8F%90"><span class="nav-text">前提</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B"><span class="nav-text">过程</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu JInlin"
+      src="/images/20241114140630.jpg">
+  <p class="site-author-name" itemprop="name">Wu JInlin</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/20241114140630.jpg">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="RISC-V中断 | WJL">
+      <meta itemprop="description" content="RISC-V 中断 CSR 和流程">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RISC-V中断
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-11-06 13:52:39" itemprop="dateCreated datePublished" datetime="2023-11-06T13:52:39+08:00">2023-11-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 11:24:28" itemprop="dateModified" datetime="2024-11-15T11:24:28+08:00">2024-11-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RISC-V/" itemprop="url" rel="index"><span itemprop="name">RISC-V</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RISC-V/%E4%B8%AD%E6%96%AD/" itemprop="url" rel="index"><span itemprop="name">中断</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">RISC-V 中断 CSR 和流程</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="1、RISC-V-中断"><a href="#1、RISC-V-中断" class="headerlink" title="1、RISC-V 中断"></a>1、RISC-V 中断</h1><p>RISC-V将广义中断分成中断（异步事件event）和异常（同步事件event）；中断能被屏蔽，异常不能。</p>
+<p>异常处理结束后会继续执行触发异常的指令</p>
+<p>中断处理结束后会执行跳转前的下一条指令</p>
+<h2 id="1-1、RISC-V-异常相关CSR寄存器"><a href="#1-1、RISC-V-异常相关CSR寄存器" class="headerlink" title="1.1、RISC-V 异常相关CSR寄存器"></a>1.1、RISC-V 异常相关CSR寄存器</h2><h3 id="1-1-1、M级别CSR"><a href="#1-1-1、M级别CSR" class="headerlink" title="1.1.1、M级别CSR"></a>1.1.1、M级别CSR</h3><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V中断/image-20230607095707402-1730798017565-1.png" alt="image-20230607095707402 " style="zoom:100%;">
+
+
+
+<h3 id="1-1-2、S级别CSR"><a href="#1-1-2、S级别CSR" class="headerlink" title="1.1.2、S级别CSR"></a>1.1.2、S级别CSR</h3><p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607100326651-1730798017565-2.png" alt="image-20230607100326651"></p>
+<h3 id="1-1-3、H级别CSR"><a href="#1-1-3、H级别CSR" class="headerlink" title="1.1.3、H级别CSR"></a>1.1.3、H级别CSR</h3><p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607100229914-1730798017565-3.png" alt="image-20230607100229914"></p>
+<h2 id="1-2、RISC-V中断处理流程"><a href="#1-2、RISC-V中断处理流程" class="headerlink" title="1.2、RISC-V中断处理流程"></a>1.2、RISC-V中断处理流程</h2><p>在riscv中一共定义了4种状态中断，对于hart层面，hart包含local中断源和global中断源。</p>
+<p>而local中断只有<strong>Timer</strong>和<strong>Software</strong>中断两种  (CLINT) 每个hart有只属于自己的中断</p>
+<p>而global中断则称为<strong>extended  interrupts</strong>   (PLIC) 可以分配给任意一个hart</p>
+<blockquote>
+<p>调试中断Debug Interrupt</p>
+</blockquote>
+<p><strong>RISC-V中规定进入和退出异常机制中没有硬件自动保存和恢复上下文的操作，软件需要明确地使用指令进行上下文的保存和恢复</strong></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20220612180146138-1730798017565-6.png" alt="img"></p>
+<p>八个控制状态寄存器（CSR）是机器模式下异常处理的必要部分：</p>
+<ol>
+<li>mtvec（Machine Trap-Vector Base-Address）它保存发生异常时处理器需要跳转到的地址。&#x3D;&#x3D;中断或异常处理函数的入口&#x3D;&#x3D; </li>
+<li>mepc（Machine Exception PC）它<strong>指向</strong>发生异常的指令。&#x3D;&#x3D;对于中断而言，退出时会跳到mepc的下一条尚未执行的指令&#x3D;&#x3D;</li>
+<li>mcause（Machine Exception Cause）它指示发生异常的种类。</li>
+<li>mie（Machine Interrupt Enable）它指出处理器目前能处理和忽略的中断。</li>
+<li>mip（Machine Interrupt Pending）它列出目前正准备处理的中断。 &#x3D;&#x3D;硬件上PLIC输出的信号会接到mip相应寄存器D端&#x3D;&#x3D;</li>
+<li>mtval（Machine Trap Value）它保存了陷入（trap）的附加信息：地址例外中出错 的地址、发生非法指令例外的指令本身，对于其他异常，它的值为 0。 </li>
+<li>mscratch（Machine Scratch）它暂时存放一个字大小的数据。&#x3D;&#x3D;为异常或中断子程序提供临时变量空间&#x3D;&#x3D; </li>
+<li>mstatus（Machine Status）它保存全局中断使能，以及许多其他的状态，如图 10.4 所示。</li>
+</ol>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230605144546717-1685947558731-5-1730798017565-5.png" alt="image-20230605144546717"></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607141638291-1730798017565-7.png" alt="image-20230607141638291"></p>
+<h3 id="3-1-6-机器状态寄存器（mstatus-和-mstatush）"><a href="#3-1-6-机器状态寄存器（mstatus-和-mstatush）" class="headerlink" title="3.1.6 机器状态寄存器（mstatus 和 mstatush）"></a>3.1.6 机器状态寄存器（mstatus 和 mstatush）</h3><p>Machine Status Registers</p>
+<p>mstatus 寄存器是一个 MXLEN 位读&#x2F;写寄存器，其格式如图 3.6（RV32）和图 3.7（RV64）所示。 mstatus 寄存器跟踪并控制 hart 的当前运行状态。 mstatus 的受限视图在 S 级 ISA 中显示为 sstatus 寄存器。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620152021919-1730798017565-4.png" alt="image-20230620152021919"></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620152056468-1730798017565-8.png" alt="image-20230620152056468"></p>
+<p>仅对于 RV32，mstatush 是一个 32 位读&#x2F;写寄存器，格式如图 3.8 所示。 mstatush 的位 30:4 通常包含与 RV64 的 mstatus 的位 62:36 相同的字段。 mstatush 中不存在字段 SD、SXL 和 UXL。</p>
+<h4 id="3-1-6-1-mstatus-寄存器中的权限和全局中断使能堆栈"><a href="#3-1-6-1-mstatus-寄存器中的权限和全局中断使能堆栈" class="headerlink" title="3.1.6.1 mstatus 寄存器中的权限和全局中断使能堆栈"></a>3.1.6.1 mstatus 寄存器中的权限和全局中断使能堆栈</h4><p>全局中断使能位 MIE 和 SIE 分别为 M 模式和 S 模式提供。<strong>这些位主要用于保证当前特权模式下中断处理程序的原子性。</strong></p>
+<blockquote>
+<p>全局 xIE 位位于 mstatus 的低位，允许使用单个 CSR 指令自动设置或清除它们。</p>
+</blockquote>
+<p>当 hart 在特权模式 x 下执行时，中断在 x IE&#x3D;1 时全局启用，在 x IE&#x3D;0 时全局禁用。无论低权限模式的任何全局 wIE 位的设置如何，低权限模式 w&lt;x 的中断始终被全局禁用。更高权限模式的中断 y&gt;x 始终全局启用，而不管更高权限模式的全局 yIE 位的设置。较高权限级别的代码可以使用单独的每个中断启用位来禁用选定的较高权限模式中断，然后再将控制权让给较低权限模式。</p>
+<blockquote>
+<p>较高权限模式 y 可以在将控制权让给较低权限模式之前禁用其所有中断，但这是不寻常的，因为它只会留下同步陷阱、不可屏蔽中断或重置作为重新获得 hart 控制的手段。</p>
+</blockquote>
+<p>为了支持嵌套陷阱，每个可以响应中断的特权模式 x 都有一个两级堆栈的中断使能位和特权模式。 xPIE 保持中断允许位的值在陷阱之前处于活动状态，而 xPP 保持先前的特权模式。 xPP 字段最多只能保存 x 个特权模式，因此 MPP 是两位宽，SPP 是一位宽。当陷阱从特权模式 y 进入特权模式 x 时，xPIE 设置为 x IE 的值； x IE 设置为 0； xPP 设置为 y。</p>
+<blockquote>
+<p>对于较低特权模式，任何陷阱（同步或异步）通常在较高特权模式下进行，进入时禁用中断。更高级别的陷阱处理程序将服务陷阱并使用堆栈信息返回，或者，如果不立即返回到中断的上下文，将在重新启用中断之前保存特权堆栈，因此每个堆栈只需要一个条目。</p>
+</blockquote>
+<p>MRET 或 SRET 指令分别用于从 M 模式或 S 模式的陷阱返回。当执行一条xRET指令时，假设xPP的值为y，xIE设置为xPIE；特权模式更改为y； xPIE 设置为 1； xPP 设置为最低特权支持模式（如果实施了 U 模式，则为 U，否则为 M）。如果 xPP̸&#x3D;M，xRET 也设置 MPRV&#x3D;0。</p>
+<blockquote>
+<p>在 xRET 上将 xPP 设置为最低特权支持模式有助于识别两级特权模式堆栈管理中的软件错误。</p>
+</blockquote>
+<p>xPP 字段是 WARL 字段，只能包含特权模式 x 和任何低于 x 的已实现特权模式。如果未实现特权模式 x，则 xPP 必须为只读 0。</p>
+<blockquote>
+<p>M 模式软件可以通过将特权模式写入 MPP 然后再读回来确定特权模式是否实现</p>
+<p>如果机器只提供 U 和 M 模式，那么只需要一个硬件存储位来表示 MPP 中的 00 或 11。</p>
+</blockquote>
+<h4 id="3-1-6-2-mstatus-寄存器中的基本-ISA-控制"><a href="#3-1-6-2-mstatus-寄存器中的基本-ISA-控制" class="headerlink" title="3.1.6.2 mstatus 寄存器中的基本 ISA 控制"></a>3.1.6.2 mstatus 寄存器中的基本 ISA 控制</h4><p>对于 RV64 系统，SXL 和 UXL 字段是 WARL 字段，分别控制 S 模式和 U 模式的 XLEN 值。这些字段的编码与misa的MXL字段相同，如表3.1所示。 S 模式和 U 模式下的有效 XLEN 分别称为 SXLEN 和 UXLEN。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230627142638175-1730798017565-11.png" alt="image-20230627142638175"></p>
+<p>对于RV32系统，SXL和UXL字段不存在，SXLEN&#x3D;32，UXLEN&#x3D;32。</p>
+<p>对于 RV64 系统，如果不支持 S 模式，则 SXL 为只读零。否则，它是一个 WARL 字段，对 SXLEN 的当前值进行编码。特别是，一个实现可以使 SXL 成为只读字段，其值始终确保 SXLEN&#x3D;MXLEN。</p>
+<p>对于 RV64 系统，如果不支持 U 模式，则 UXL 为只读零。否则，它是对 UXLEN 的当前值进行编码的 WARL 字段。特别是，一个实现可以使 UXL 成为只读字段，其值始终确保 UXLEN&#x3D;MXLEN 或 UXLEN&#x3D;SXLEN。</p>
+<p>每当任何模式下的 XLEN 设置为小于支持的最宽 XLEN 的值时，所有操作都必须忽略高于配置 XLEN 的源操作数寄存器位，并且必须对结果进行符号扩展以填充目标寄存器中支持的整个最宽 XLEN。类似地，XLEN 之上的 pc 位被忽略，并且当 pc 被写入时，它被符号扩展以填充支持的最宽 XLEN。</p>
+<blockquote>
+<p>我们要求操作总是用定义的值填充整个底层硬件寄存器，以避免实现定义的行为。</p>
+<p>为了降低硬件复杂性，该架构不强制检查低权限模式的 XLEN 设置是否小于或等于下一个更高权限模式。实际上，此类设置几乎总是软件错误，但即使在这种情况下，机器操作也是明确定义的。</p>
+</blockquote>
+<p>如果 MXLEN 从 32 更改为更宽的宽度，则 mstatus 字段 SXL 和 UXL 中的每一个（如果不限于单个值）将获取对应于不比新 MXLEN 宽的最宽支持宽度的值。</p>
+<h4 id="3-1-6-3-mstatus-寄存器中的内存权限"><a href="#3-1-6-3-mstatus-寄存器中的内存权限" class="headerlink" title="3.1.6.3 mstatus 寄存器中的内存权限"></a>3.1.6.3 mstatus 寄存器中的内存权限</h4><p><strong>MPRV</strong> <em>bit17</em>（修改 PRiVilege）位修改有效特权模式，即加载和存储执行的特权级别。</p>
+<ul>
+<li>当 MPRV&#x3D;0 时，加载和存储行为正常，使用当前特权模式的转换和保护机制。</li>
+<li>当 MPRV&#x3D;1 时，加载和存储内存地址被转换和保护，并应用字节顺序，就像当前特权模式设置为 MPP 一样。</li>
+</ul>
+<p>指令地址转换和保护不受 MPRV 设置的影响。如果不支持 U 模式，则 MPRV 为只读 0。</p>
+<p>将特权模式更改为特权低于 M 的模式的 MRET 或 SRET 指令也会设置 MPRV&#x3D;0。</p>
+<p><strong>MXR</strong> <em>bit19</em>（使可执行文件可读）位修改加载访问虚拟内存的权限。</p>
+<ul>
+<li>当 MXR&#x3D;0 时，只有从标记为可读（图 4.18 中的 R&#x3D;1）的页面加载才会成功。</li>
+<li>当 MXR&#x3D;1 时，从标记为可读或可执行（R&#x3D;1 或 X&#x3D;1）的页面加载将成功。</li>
+</ul>
+<p>当基于页面的虚拟内存未生效时，MXR 无效。如果不支持 S 模式，MXR 为只读 0。</p>
+<blockquote>
+<p>MPRV 和 MXR 机制旨在提高模拟缺失硬件功能（例如未对齐的加载和存储）的 M 模式例程的效率。 MPRV 无需在软件中执行地址转换。 MXR 允许从标记为只执行的页面加载指令字。</p>
+<p>当前特权模式和 MPP 指定的特权模式可能具有不同的 XLEN 设置。当 MPRV&#x3D;1 时，加载和存储内存地址被视为当前 XLEN 被设置为 MPP 的 XLEN，遵循第 3.1.6.2 节中的规则。</p>
+</blockquote>
+<p><strong>SUM</strong> <em>bit18</em>（允许主管用户内存访问）位修改 S 模式加载和存储访问虚拟内存的权限。</p>
+<ul>
+<li>当 SUM&#x3D;0 时，S-mode 内存访问 U-mode（图 4.18 中的 U&#x3D;1）可访问的页面将出错。</li>
+<li>当 SUM&#x3D;1 时，允许这些访问。当基于页面的虚拟内存无效时，SUM 无效。</li>
+</ul>
+<p>请注意，虽然 SUM 在不在 S 模式下执行时通常会被忽略，但它在 MPRV&#x3D;1 和 MPP&#x3D;S 时有效。如果不支持 S 模式或如果 satp.MODE 为只读 0，则 SUM 为只读 0。</p>
+<p>MXR 和 SUM 机制只影响页表条目中编码的权限的解释。特别是，它们对是否由于 PMA 或 PMP 引发访问错误异常没有影响。</p>
+<h4 id="3-1-6-4-mstatus-和-mstatush-寄存器中的字节顺序控制"><a href="#3-1-6-4-mstatus-和-mstatush-寄存器中的字节顺序控制" class="headerlink" title="3.1.6.4 mstatus 和 mstatush 寄存器中的字节顺序控制"></a>3.1.6.4 mstatus 和 mstatush 寄存器中的字节顺序控制</h4><p>mstatus 和 mstatush 中的 MBE、SBE 和 UBE 位是 WARL 字段，用于控制除指令获取之外的内存访问的字节顺序。取指令总是littleendian。</p>
+<p><strong>MBE</strong> <em>bit37</em> 控制从 M 模式（假设 mstatus.MPRV&#x3D;0）进行的非指令获取内存访问是小端（MBE&#x3D;0）还是大端（MBE&#x3D;1）。</p>
+<p>如果不支持 S -mode，则 <strong>SBE</strong> <em>bit36</em> 为只读 0。否则，SBE 控制从  S-mode 进行的显式加载和存储内存访问是小端 (SBE&#x3D;0) 还是大端 (SBE&#x3D;1)。</p>
+<p>如果不支持 U-mode，则 <strong>UBE</strong> <em>bit6</em> 为只读 0。否则，UBE 控制从 U-mode进行的显式加载和存储内存访问是小端 (UBE&#x3D;0) 还是大端 (UBE&#x3D;1)。</p>
+<p>对于管理级内存管理数据结构（例如页表）的隐式访问，字节顺序始终由 SBE 控制。由于更改 SBE 会改变实现对这些数据结构的解释，如果任何此类数据结构在 SBE 更改期间仍在使用，则 M 模式软件必须通过执行带有 rs1 &#x3D; x0 和 rs2 的 SFENCE.VMA 指令来遵循对 SBE 的此类更改&#x3D;x0。</p>
+<blockquote>
+<p>只有在人为设计的场景中，给定的内存管理数据结构才会被解释为小端和大端。实际上，SBE 只会在运行时在世界切换时更改，在这种情况下，旧的或新的内存管理数据结构都不会以不同的字节顺序重新解释。在这种情况下，不需要额外的 SFENCE.VMA，世界切换通常需要的除外。</p>
+</blockquote>
+<p>如果支持 S 模式，一个实现可以使 SBE 成为 MBE 的只读副本。如果支持 U 模式，一个实现可以使 UBE 成为 MBE 或 SBE 的只读副本。</p>
+<blockquote>
+<p>如果字段 MBE、SBE 和 UBE 均为只读 0，则实现仅支持小端内存访问。如果 MBE 为只读 1 且 SBE 和 UBE，则实现仅支持大端内存访问（除了指令获取）当支持 S-mode 和 U-mode 时，每个都是只读的 1。</p>
+</blockquote>
+<blockquote>
+<p>第 I 卷将 hart 的地址空间定义为连续地址处的 2 XLEN 字节的循环序列。地址和字节位置之间的对应关系是固定的，不受任何字节顺序模式的影响。相反，适用的字节序模式决定了内存字节和多字节数量（半字、字等）之间的映射顺序。</p>
+</blockquote>
+<blockquote>
+<p>标准 RISC-V ABI 预计将是纯小端或大端，不支持混合字节序。然而，字节序控制已被定义为允许例如一个字节序的OS执行相反字节序的用户模式程序。还考虑了非标准用法的可能性，即软件根据需要翻转内存访问的字节顺序。</p>
+</blockquote>
+<blockquote>
+<p>RISC-V 指令统一采用小尾数法，以将指令编码与当前的字节顺序设置分离，从而使硬件和软件都受益。否则，例如，RISC-V 汇编器或反汇编器将始终需要知道预期的活动字节顺序，尽管字节顺序模式可能会在执行期间动态更改。相比之下，通过为指令提供固定的字节序，有时即使是二进制形式，精心编写的软件也可能与字节序无关，就像位置无关代码一样。</p>
+<p>然而，对于编码或解码机器指令的 RISC-V 软件来说，选择只使用小端字节序的指令确实会产生影响。在大端模式下，此类软件必须考虑到显式加载和存储具有与指令相反的字节序这一事实，例如通过在加载之后和存储之前交换字节顺序。</p>
+</blockquote>
+<h4 id="3-1-6-5-mstatus-寄存器中的虚拟化支持"><a href="#3-1-6-5-mstatus-寄存器中的虚拟化支持" class="headerlink" title="3.1.6.5 mstatus 寄存器中的虚拟化支持"></a>3.1.6.5 mstatus 寄存器中的虚拟化支持</h4><p><strong>TVM</strong>（陷阱虚拟内存）<em>bit20</em> 位是一个 WARL 字段，支持拦截管理器虚拟内存管理操作。</p>
+<ul>
+<li>当 TVM&#x3D;1 时，在 S 模式下执行时尝试读取或写入 satp CSR  (Supervisor Address Translation and Protection主管地址转换和保护) 或执行 SFENCE.VMA 或 SINVAL.VMA 指令将引发非法指令异常。</li>
+<li>当 TVM&#x3D;0 时，这些操作在 S 模式下是允许的。不支持 S-mode 时 TVM 为只读 0。</li>
+</ul>
+<blockquote>
+<p>TVM 机制通过允许guest OS在 S 模式下执行而不是在 U 模式下经典地虚拟化它们来提高虚拟化效率。这种方法无需捕获对大多数 S 模式 CSR 的访问。</p>
+<p>捕获 satp 访问以及 SFENCE.VMA 和 SINVAL.VMA 指令提供了延迟填充影子页表所必需的挂钩。</p>
+</blockquote>
+<p><strong>TW</strong> (Timeout Wait)  <em>bit21</em> 位是一个 WARL 字段，支持拦截 WFI 指令（参见第 3.3.3 节）。</p>
+<ul>
+<li>当 TW&#x3D;0 时，WFI 指令可以在较低特权模式下执行，而不会因为某些其他原因而被阻止。</li>
+<li>当 TW&#x3D;1 时，如果 WFI 在任何低特权模式下执行，并且它没有在特定于实现的有限时间限制内完成，则 WFI 指令会导致非法指令异常。</li>
+</ul>
+<p>时间限制可能始终为 0，在这种情况下，当 TW&#x3D;1 时，WFI 总是在低特权模式下导致非法指令异常。</p>
+<p>当没有比 M 特权低的模式时，TW 是只读的 0。</p>
+<blockquote>
+<p>捕获 WFI 指令可以触发世界切换到另一个guest OS，而不是在当前guest OS中浪费时间闲置。</p>
+</blockquote>
+<p>实现 S 模式后，在 U 模式下执行 WFI 会导致非法指令异常，除非它在特定于实现的有限时间限制内完成。此规范的未来修订版可能会添加一项功能，允许 S 模式选择性地允许 U 模式下的 WFI。这样的功能只有在 TW&#x3D;0 时才有效。</p>
+<p><strong>TSR</strong>（Trap SRET）<em>bit22</em> 位是一个WARL字段，支持拦截supervisor异常返回指令SRET。</p>
+<ul>
+<li>当 TSR&#x3D;1 时，在 S 模式下执行时尝试执行 SRET 将引发非法指令异常。</li>
+<li>当 TSR&#x3D;0 时，此操作在 S 模式下是允许的。当不支持 S-mode 时，TSR 为只读 0。</li>
+</ul>
+<blockquote>
+<p>捕获 SRET 是在不提供它的实现上模拟hypervisor扩展（参见第 8 章）所必需的。</p>
+</blockquote>
+<h4 id="3-1-6-6-mstatus-寄存器中的扩展上下文状态"><a href="#3-1-6-6-mstatus-寄存器中的扩展上下文状态" class="headerlink" title="3.1.6.6 mstatus 寄存器中的扩展上下文状态"></a>3.1.6.6 mstatus 寄存器中的扩展上下文状态</h4><p>支持大量扩展是 RISC-V 的主要目标之一，因此我们定义了一个标准接口以允许未更改的特权模式代码，特别是主管级OS，以支持任意用户模式状态扩展。</p>
+<blockquote>
+<p>迄今为止，V 扩展是唯一定义浮点 CSR 和数据寄存器之外的附加状态的标准扩展。</p>
+</blockquote>
+<p>FS[1:0] 和 VS[1:0] WARL 字段以及 XS[1:0] 只读字段分别用于通过设置和跟踪浮动的当前状态来降低上下文保存和恢复的成本点单元和任何其他用户模式扩展。 </p>
+<p>FS 字段编码浮点单元状态的状态，包括浮点寄存器 f0-f31 和 CSRs fcsr、frm 和 fflags。</p>
+<p>VS 字段编码向量扩展状态的状态，包括向量寄存器 v0–v31 和 CSR vcsr、vxrm、vxsat、vstart、vl、vtype 和 vlenb。</p>
+<p>XS 字段编码附加用户模式扩展和关联状态的状态。</p>
+<p><strong>上下文切换例程可以检查这些字段，以快速确定是否需要保存或恢复状态。如果需要保存或恢复，通常需要额外的说明和 CSR 来影响和优化流程。</strong></p>
+<blockquote>
+<p>该设计预计大多数上下文切换不需要在浮点单元或其他扩展中的一个或两个中保存&#x2F;恢复状态，因此通过 SD 位提供快速检查。</p>
+</blockquote>
+<p>FS、VS 和 XS 字段使用与表 3.3 中所示相同的状态编码，四个可能的状态值是 Off、Initial、Clean 和 Dirty。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620154433141-1730798017565-9.png" alt="image-20230620154433141"></p>
+<p>如果实现 F 扩展，FS 字段不应为只读零。</p>
+<p>如果 F 扩展和 S 模式均未实现，则 FS 为只读零。如果实现了 S 模式但未实现 F 扩展，则 FS 可以选择为只读零。</p>
+<blockquote>
+<p>允许但不要求使用 S 模式但不使用 F 扩展的实现，以使 FS 字段为只读零。一些这样的实现将选择不让 FS 字段为只读零，以便通过不可见的陷阱模拟 S 模式和 U 模式的 F 扩展到 M 模式。</p>
+</blockquote>
+<p>如果实现了 v 寄存器，则 VS 字段不应为只读零。</p>
+<p>如果 v 寄存器和 S 模式均未实现，则 VS 为只读零。如果实现了 S 模式但未实现 v 寄存器，则 VS 可以选择为只读零。</p>
+<p>在没有需要新状态的额外用户扩展的系统中，XS 字段为只读零。每个带有状态的附加扩展都提供了一个 CSR 字段，该字段对 XS 状态的等效项进行编码。 XS 字段表示所有扩展状态的摘要，如表 3.3 所示。</p>
+<blockquote>
+<p>XS 字段有效地报告了所有用户扩展状态字段的最大状态值，尽管个别扩展可以使用与 XS 不同的编码。</p>
+</blockquote>
+<p><strong>SD</strong> <em>bit63</em> 位是一个只读位，它总结了 FS、VS 或 XS 字段是否表示存在某些需要将扩展用户上下文保存到内存的脏状态。如果 FS、XS 和 VS 都为只读零，则 SD 也始终为零。</p>
+<p>当扩展的状态设置为Off时，任何试图读取或写入相应状态的指令都将导致非法指令异常。当状态为 Initial 时，对应的状态应该有一个初始常量值。当状态为 Clean 时，相应的状态可能与初始值不同，但与存储在上下文交换中的最后一个值匹配。当状态为 Dirty 时，相应的状态自上次上下文保存以来可能已被修改。</p>
+<p>在上下文保存期间，负责的特权代码只需要在其状态为 Dirty 时写出相应的状态，然后就可以将扩展的状态重置为 Clean。在上下文恢复期间，如果状态为 Clean（在恢复时它永远不应该是 Dirty），则只需要从内存中加载上下文。如果状态为 Initial，则必须在上下文恢复时将上下文设置为初始常量值以避免安全漏洞，但这可以在不访问内存的情况下完成。例如，浮点寄存器都可以初始化为立即数 0。</p>
+<p>FS 和 XS 字段在保存上下文之前由特权代码读取。 FS 字段在恢复用户上下文时由特权代码直接设置，而 XS 字段通过写入各个扩展的状态寄存器间接设置。无论特权模式如何，状态字段也将在指令执行期间更新。</p>
+<p>用户模式 ISA 的扩展通常包括额外的用户模式状态，并且该状态可能比基本整数寄存器大得多。这些扩展可能仅用于某些应用程序，或者可能仅在单个应用程序中的短期阶段需要。为了提高性能，用户模式扩展可以定义额外的指令，以允许用户模式软件将设备返回到初始状态，甚至关闭设备。</p>
+<p>例如，协处理器可能需要在使用前进行配置，并且可以在使用后“取消配置”。未配置状态将表示为上下文保存的初始状态。如果相同的应用程序在取消配置和下一次配置之间保持运行（这会将状态设置为脏），则无需在取消配置指令中实际重新初始化状态，因为所有状态对于用户进程都是本地的，即 Initial state 可能只会导致协处理器状态在上下文恢复时被初始化为一个常量值，而不是在每次取消配置时。</p>
+<p>执行用户模式指令以禁用单元并将其置于关闭状态将导致如果任何后续指令在重新打开之前尝试使用该单元，则会引发非法指令异常。打开一个单元的用户模式指令还必须确保单元的状态被正确初始化，因为该单元可能同时被另一个上下文使用。</p>
+<p>更改 FS 的设置对浮点寄存器状态的内容没有影响。特别是，设置 FS&#x3D;Off 不会破坏状态，设置 FS&#x3D;Initial 也不会清除内容。同样，VS 的设置对向量寄存器状态的内容没有影响。但是，其他扩展在设置为关闭时可能不会保留状态。</p>
+<p>实现可能会选择通过将状态报告为脏来不精确地跟踪浮点寄存器状态的脏度，即使它没有被修改。在某些实现中，某些不改变浮点状态的指令可能会导致状态从 Initial 或 Clean 转换为 Dirty。在其他实现中，脏可能根本不会被跟踪，在这种情况下，有效的 FS 状态是 Off 和 Dirty，并且尝试将 FS 设置为 Initial 或 Clean 会导致它被设置为 Dirty。</p>
+<blockquote>
+<p>FS 的这个定义不允许由于错误的推测而将 FS 设置为 Dirty。一些平台可能会选择禁止推测性地写入 FS 以关闭潜在的侧通道。</p>
+</blockquote>
+<p>如果指令显式或隐式写入浮点寄存器或 fcsr 但不更改其内容，并且 FS&#x3D;Initial 或 FS&#x3D;Clean，则 FS 是否转换为 Dirty 由实现定义。</p>
+<p>实现可以选择以类似的不精确方式跟踪向量寄存器状态的脏度，包括当软件尝试设置 VS&#x3D;Initial 或 VS&#x3D;Clean 时可能将 VS 设置为 Dirty。当 VS&#x3D;Initial 或 VS&#x3D;Clean 时，写入向量寄存器或向量 CSR 但不更改其内容的指令是否会导致 VS 转换为 Dirty 是由实现定义的。</p>
+<p>表 3.4 显示了 FS、VS 或 XS 状态位的所有可能的状态转换。请注意，标准浮点和矢量扩展不支持用户模式取消配置或禁用&#x2F;启用指令。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620154803575-1730798017565-10.png" alt="image-20230620154803575"></p>
+<p>提供用于初始化、保存和恢复扩展状态的标准特权指令，通过将状态视为不透明对象来将特权代码与添加的扩展状态的详细信息隔离开来。</p>
+<blockquote>
+<p>许多协处理器扩展仅在有限的上下文中使用，允许软件在完成时安全地取消配置甚至禁用单元。这减少了大型有状态协处理器的上下文切换开销。</p>
+<p>我们将浮点状态与其他扩展状态分开，因为当存在浮点单元时，浮点寄存器是标准调用约定的一部分，因此用户模式软件无法知道何时禁用浮动是安全的-点单位。</p>
+</blockquote>
+<p>XS 字段提供所有添加的扩展状态的摘要，但扩展中可能会保留额外的微体系结构位，以进一步减少上下文保存和恢复开销。</p>
+<p>SD 位是只读的，当 FS、VS 或 XS 位编码为脏状态（即 SD&#x3D;((FS=&#x3D;11) OR (XS=&#x3D;11) OR (VS=&#x3D;11) )).这允许特权代码快速确定何时不需要除整数寄存器集和 PC 之外的额外上下文保存。</p>
+<p>浮点单元状态始终使用标准指令（F、D 和&#x2F;或 Q）进行初始化、保存和恢复，特权代码必须知道 FLEN 以确定为每个 f 寄存器保留的适当空间。</p>
+<p><strong>机器模式和管理模式共享 FS、VS 和 XS 位的单个副本</strong>。<strong>主管级软件通常直接使用 FS、VS 和 XS 位来记录与主管级保存上下文相关的状态。机器级软件必须更保守地保存和恢复相应版本上下文中的扩展状态。</strong></p>
+<blockquote>
+<p>在任何合理的用例中，<strong>用户和管理员级别之间的上下文切换次数应该远远超过切换到其他特权级别的上下文次数</strong>。请注意，<strong>协处理器不应要求保存和恢复其上下文以服务异步中断，除非中断导致用户级上下文交换</strong>。</p>
+</blockquote>
+<h3 id="3-1-7-机器陷阱向量基地址寄存器-mtvec"><a href="#3-1-7-机器陷阱向量基地址寄存器-mtvec" class="headerlink" title="3.1.7 机器陷阱向量基地址寄存器  (mtvec)"></a>3.1.7 机器陷阱向量基地址寄存器  (mtvec)</h3><p>Machine Trap-Vector Base-Address Register</p>
+<p>mtvec寄存器是一个mxlen位的WARL读&#x2F;写寄存器，它保存陷阱向量配置，包括一个向量基址(base)和一个向量模式(mode)。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607134211813-1730798017566-12.png" alt="image-20230607134211813"></p>
+<p>必须始终实现mtvec寄存器，但可以包含只读值。如果mtvec是可写的，那么寄存器可能保存的值的集合可能因实现而异。<strong>BASE字段中的值必须始终在4字节边界上对齐</strong>，并且MODE设置可能会对BASE字段中的值施加额外的对齐约束。</p>
+<blockquote>
+<p>我们允许相当大的灵活性实现陷阱向量基址。一方面，我们不希望给低端实现增加大量状态位的负担，但另一方面，我们希望为大型系统提供灵活性。</p>
+</blockquote>
+<img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V中断/image-20230607134317657-1730798017566-13.png" alt="image-20230607134317657" style="zoom:90%;">
+
+<p>MODE字段的编码如表3.5所示。</p>
+<ul>
+<li>当MODE&#x3D;Direct时，所有进入机器模式的陷阱都会导致pc被设置为BASE字段中的地址。</li>
+<li>当MODE&#x3D;Vectored时，所有进入机器模式的同步异常导致pc被设置为BASE字段中的地址，而中断导致pc被设置为BASE字段中的地址加上中断原因编号的四倍。</li>
+</ul>
+<p>例如，机器模式定时器中断(参见第39页的表3.6)导致pc被设置为BASE+0x1c。(0x1C&#x3D;0x7&lt;&lt;2)</p>
+<blockquote>
+<p>当Vectored中断被启用时，中断原因0(对应于用户模式软件中断)被矢量到与同步异常相同的位置。这种歧义在实践中不会出现，因为用户模式软件中断要么被禁用，要么被委托给用户模式。</p>
+</blockquote>
+<p>对于不同的模式，实现可能具有不同的对齐约束。特别是，MODE&#x3D;Vectored可能比MODE&#x3D;Direct具有更严格的对齐约束。</p>
+<blockquote>
+<p>在Vectored模式中允许更粗的对齐，使得矢量可以在没有硬件加法器电路的情况下实现</p>
+</blockquote>
+<blockquote>
+<p>复位和NMI矢量位置在平台规范中给出。</p>
+</blockquote>
+<h3 id="3-1-8-机器陷阱委托寄存器-medeleg-and-mideleg"><a href="#3-1-8-机器陷阱委托寄存器-medeleg-and-mideleg" class="headerlink" title="3.1.8  机器陷阱委托寄存器  (medeleg and mideleg)"></a>3.1.8  机器陷阱委托寄存器  (medeleg and mideleg)</h3><p>Machine Trap Delegation Registers</p>
+<p>默认情况下，任何特权级别的所有Trap都是在机器模式下处理的，尽管机器模式处理程序可以使用 <strong>MRET</strong> 指令将陷阱重定向回适当的级别(第3.3.2节)。	</p>
+<p>为了提高性能，实现可以在<code>medeleg</code>和<code>mideleg</code>中提供单独的读&#x2F;写位，以指示某些异常和中断应该由较低的特权级别直接处理。机器异常委托寄存器(<code>medeleg</code>)和机器中断委托寄存器(<code>mideleg</code>)是mxlen位读&#x2F;写寄存器。</p>
+<p>在具有S模式的系统中，必须存在<code>medeleg</code>和<code>mideleg</code>寄存器，并且在<code>medeleg</code>或<code>mideleg</code>中设置一个位，当在S模式或U模式下发生时，将把相应的陷阱委托给S-mode陷阱处理程序。在没有S模式的系统中，<code>medeleg</code>和<code>mideleg</code>寄存器不应该存在。</p>
+<blockquote>
+<p>在1.9.1和更早的版本中，这些寄存器存在，但只在M模式下硬连接到零，或者在没有N系统的M&#x2F;U中。在这些情况下，没有理由要求它们返回零，因为<code>misa</code>寄存器指示它们是否存在。</p>
+</blockquote>
+<p>当一个陷阱被委托到S模式时:</p>
+<ul>
+<li><code>scause</code>写入陷阱原因;</li>
+<li><code>sepc</code>寄存器写入产生陷阱的指令的虚拟地址;</li>
+<li><code>stval</code>寄存器写入使用特定于异常的数据;</li>
+<li><code>mstatus.SPP</code>字段写入发生trap时所处的特权模式;</li>
+<li><code>mstatus.SPIE</code>字段写入发生trap时<code>mstatus.SIE</code>的值;</li>
+<li>并且<code>mstatus.SIE</code>字段被清除。</li>
+<li><code>mcause</code>、<code>mepc</code>和<code>mtval</code>寄存器以及<code>mstatus</code>的MPP和MPIE字段不被写。</li>
+</ul>
+<p>实现对可委派trap可配的子集，通过向每个bit写入1，然后回读<code>medeleg</code>或<code>mideleg</code>中的值，以查看哪些位位置为1，从而找到支持的可委派位。</p>
+<p>实现中不能有任何<code>medeleg</code>位是只读的1，也就是说，任何可以委托的同步trap必须能够不使能委托。类似地，实现不应将与机器级中断相对应的<code>mideleg</code>的任何位固定为只读1(但对于较低级的中断可以这样做)。</p>
+<blockquote>
+<p>版本1.11和更早的版本禁止<code>mideleg</code>的任何位为只读位。平台标准可能总是添加这样的限制</p>
+</blockquote>
+<p><font color="#FF000">Traps永远不会从特权较多的模式过渡到特权较少的模式。例如，如果M-mode将非法指令异常委托给S模式，而M-mode软件随后执行非法指令，则在M-mode中捕获trap，而不是委托给S模式。相比之下，陷阱(traps)可以水平委托( taken horizontally)。使用同样的例子，如果M-mode将非法指令异常委托给S模式，而S模式软件随后执行非法指令，则在S模式中捕获陷阱。</font></p>
+<p>&#x3D;&#x3D;委托中断导致中断在委托权限级别被屏蔽。例如，如果通过设置<code>mideleg[5]</code>将supervisor timer interrupt (STI)委托给S模式，则在M模式下执行时不会触发STI。相反，如果<code>mideleg[5]</code>被清除，则STIs可以在任何模式下进行，无论当前模式如何，都会将控制转移到M模式。&#x3D;&#x3D;</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230606151855672-1730798017566-14.png" alt="image-20230606151855672"></p>
+<p><font color="#FF00FF" size="5"><code>medeleg</code></font>为每个同步异常分配了一个bit，如原文39页中 表3.6 所示，每个bit的 &#x3D;&#x3D;索引&#x3D;&#x3D; 等于<code>mcause</code>寄存器中返回的值(即，设置bit 8允许将用户模式下环境调用（Environment call from U-mode）委托给权限较低的trap处理程序)。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230606152947876-1730798017566-15.png" alt="image-20230606152947876"></p>
+<p><font color="#ff00ff" size="5"><code>mideleg</code></font>为单个中断保存trap委托位，其位的布局与<code>mip</code>寄存器中的位相匹配(即，STIP中断委托控制位于第5位)。</p>
+<p>&#x3D;&#x3D;对于不能在较低特权模式下发生的异常，相应的<font color="#FF00FF" size="4"><code>medeleg</code></font>位应该为只读零。特别地，<code>medeleg[11]</code>是只读零。&#x3D;&#x3D;</p>
+<h3 id="3-1-9-机器中断使能挂起寄存器-mip-and-mie"><a href="#3-1-9-机器中断使能挂起寄存器-mip-and-mie" class="headerlink" title="3.1.9 机器中断使能挂起寄存器  (mip and mie)"></a>3.1.9 机器中断使能挂起寄存器  (mip and mie)</h3><p>Machine Interrupt Registers</p>
+<p>mip是一个MXLEN-bit的读&#x2F;写寄存器，包含挂起中断信息</p>
+<p>mie是相应的MXLEN-bit的读&#x2F;写寄存器，包含中断使能位</p>
+<p>中断原因号i(如第3.1.15节CSR原因中所述)与mip和mie中的第i位对应。bit15:0只分配给标准中断原因，而bit16及以上被指定用于平台或自定义使用。</p>
+<p>如果以下所有条件都为真，中断i将捕获到M模式(导致特权模式更改为M模式):</p>
+<ul>
+<li>(a)当前特权模式为M并且mstatus寄存器中的MIE位被设置，或者当前特权模式的特权小于M模式;</li>
+<li>(b)位i在mip和mie中均设置;</li>
+<li>(c)如果寄存器mideleg存在，则mideleg中没有设置第i位。</li>
+</ul>
+<p>中断陷阱发生的这些条件必须在中断在mip中变为挂起或停止挂起的有限时间内求值，并且还必须在执行xRET指令或显式写入这些中断陷阱条件明确依赖的CSR(包括mip, mie, mstatus和mideleg)之后立即求值。</p>
+<p>M模式的中断比任何低权限模式的中断优先级更高。</p>
+<p>寄存器mip中的每个位可以是可写的，也可以是只读的。当mip中的第i位可写时，可以通过向该位写入0来清除挂起的中断i。如果中断i可以成为挂起，但是mip中的第i位是只读的，则实现必须提供一些其他机制来清除挂起的中断。</p>
+<p>如果相应的中断可以挂起，则mie中的位必须是可写的。不可写的位必须为只读零。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607104406917-1730798017566-16.png" alt="image-20230607104406917"></p>
+<blockquote>
+<p>机器级中断寄存器处理一些根中断源(soft&#x2F;timer)，这些根中断源为简单起见被分配了固定的服务优先级，而单独的外部中断控制器可以在更大的中断集上实现更复杂的优先级方案，然后将这些中断混合到机器级中断源中。</p>
+</blockquote>
+<blockquote>
+<p>不可屏蔽中断不会通过mip寄存器显示，因为在执行NMI陷阱处理程序时，它的存在是隐式已知的。</p>
+</blockquote>
+<p><code>mip.MEIP</code> 和 <code>mie.MEIE</code>是用于机器级外部中断的中断挂起和中断启用位。<strong>MEIP在mip中是只读的</strong>，由<strong>特定于平台的中断控制器设置和清除</strong>。</p>
+<p><code>mip.MTIP</code>和<code>mie.MTIE</code>是机器定时器中断的中断挂起和中断启用位。<strong>MTIP在mip中是只读的</strong>，通过写入内存映射的<strong>机器模式定时器比较寄存器</strong>来清除。</p>
+<p><code>mip.MSIP</code>和<code>mie.MSIE</code>是用于机器级软件中断的中断挂起和中断启用位。<strong>MSIP在mip中是只读的</strong>，通过**访问内存映射的控制寄存器来&#x3D;&#x3D;写入&#x3D;&#x3D;**，远程hart使用这些寄存器来提供机器级的处理器间中断。hart可以使用相同的内存映射控制寄存器写入自己的MSIP位。如果系统只有一个hart，或者平台标准支持通过外部中断(MEI)交付机器级处理器间中断，那么<code>mip.MSIP</code>和<code>mie.MSIE</code>可能都是只读零。</p>
+<p>如果不启用管理员模式，则<code>mip</code>的SEIP、STIP、SSIP位和<code>mie</code>的SEIE、STIE、SSIE位为只读零。</p>
+<p>如果采用supervisor模式，则bits <code>mip.SEIP</code>和<code>mie.SEIE</code>是用于管理级外部中断的中断挂起和中断使能位。SEIP在mip中是可写的，并且可以由M模式软件写入，以向s模式指示外部中断正在等待。此外，平台级中断控制器可以生成主管级外部中断。基于软件可写SEIP位的逻辑或和来自外部中断控制器的信号，管理员级外部中断被设置为暂挂。当用CSR指令读取mip时，在rd目的寄存器中返回的SEIP位的值是软件可写位和中断控制器发出的中断信号的逻辑或，但是来自中断控制器的信号不用于计算写入SEIP的值。只有软件可写的SEIP位参与CSRRS或CSRRC指令的读-修改-写序列。</p>
+<blockquote>
+<p>例如，如果我们将软件可写的SEIP位命名为B，外部中断控制器的信号命名为E，则如果执行csrrs t0, mip, t1, t0[9]用B || E写入，则B用B || t1[9]写入。如果执行csrrw t0, mip, t1，则将t0[9]写入B || E，将B简单地写入t1[9]。在两种情况下，B都不依赖于E。</p>
+<p>SEIP字段行为被设计为允许更高的特权层干净地模拟外部中断，而不会丢失任何真正的外部中断。因此，CSR指令的行为与常规CSR访问略有不同。</p>
+</blockquote>
+<p>如果采用supervisor模式，则bits <code>mipSTIP</code>和<code>mie.STIE</code>是主管级定时器中断的中断挂起和中断启用位。STIP可以在mip中写入，并且可以由M模式软件编写，以将定时器中断发送到s模式。</p>
+<p>如果采用supervisor模式，则bits <code>mip.SSIP</code>和<code>mie.SSIE</code>是用于管理级软件中断的中断挂起和中断启用位。SSIP在mip中是可写的，也可以由平台特定的中断控制器设置为1。</p>
+<p>以M模式为目的地的多个同时中断按以下优先级递减顺序处理:MEI、MSI、MTI、SEI、SSI、STI。</p>
+<blockquote>
+<p>机器级中断固定优先级排序规则是根据以下原理开发的。</p>
+<p>为了支持抢占，高特权模式的中断必须在低特权模式的中断之前处理。</p>
+<p>16位及以上的特定于平台的机器级中断源具有特定于平台的优先级，但通常被选择为具有最高的服务优先级以支持非常快的本地矢量中断。</p>
+<p>&#x3D;&#x3D;外部中断在内部(定时器&#x2F;软件)中断之前处理&#x3D;&#x3D;，因为外部中断通常由可能需要低中断服务时间(low interrupt service)的设备生成。</p>
+<p>&#x3D;&#x3D;软件中断在内部计时器中断之前处理&#x3D;&#x3D;，因为内部计时器中断通常用于时间切片，其中时间精度不太重要，而软件中断用于处理器间消息传递。当需要高精度定时时，可以避免软件中断，或者可以通过不同的中断路径路由高精度定时器中断。软件中断位于mip的最低4位，因为这些通常是由软件编写的，并且这个位置允许使用具有5位立即的单个CSR指令</p>
+</blockquote>
+<p>mip和mie寄存器的受限视图显示为主管级别的sip和sie寄存器。如果一个中断通过在mideleg寄存器中设置一个位被委托到s模式，那么它将在sip寄存器中可见，并且可以使用sie寄存器进行屏蔽。否则，sip和sie对应的位为只读零。</p>
+<h3 id="3-1-13-机器暂用控制寄存器-mscratch"><a href="#3-1-13-机器暂用控制寄存器-mscratch" class="headerlink" title="3.1.13  机器暂用控制寄存器  (mscratch)"></a>3.1.13  机器暂用控制寄存器  (mscratch)</h3><p>Machine Scratch Register</p>
+<p>mscratch寄存器是专用于机器模式使用的mxlen位读&#x2F;写寄存器。通常，它用于<strong>保存指向机器模式hart-local上下文空间的指针，并在进入M模式陷阱处理程序时与用户寄存器交换</strong>。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607150308306-1730798017566-17.png" alt="image-20230607150308306"></p>
+<blockquote>
+<p>MIPS ISA分配了两个用户寄存器(k0&#x2F;k1)供OS使用。尽管MIPS方案提供了快速而简单的实现，但它也减少了可用的用户注册，并且不能扩展到更高的特权级别或嵌套陷阱。它还可以要求在返回到用户级之前清除两个寄存器，以避免潜在的安全漏洞并提供确定的调试行为。</p>
+</blockquote>
+<blockquote>
+<p>RISC-V用户ISA被设计为支持许多可能的特权系统环境，因此我们不想让任何依赖于OS的特性感染用户级ISA。RISCV CSR交换指令可以快速地将值保存&#x2F;恢复到mscratch寄存器。与MIPS设计不同，OS可以依赖于在运行用户上下文时在mscratch寄存器中保存一个值。</p>
+</blockquote>
+<h3 id="3-1-14-机器异常程序计数器-mepc"><a href="#3-1-14-机器异常程序计数器-mepc" class="headerlink" title="3.1.14 机器异常程序计数器  (mepc)"></a>3.1.14 机器异常程序计数器  (mepc)</h3><p>Machine Exception Program Counter</p>
+<p>mepc是一个mxlen位读写寄存器，格式如图3.21所示。mepc的低位位(mepc[0])始终为零。在只支持IALIGN&#x3D;32的实现中，两个低位位(mepc[1:0])总是为零。</p>
+<p>如果实现允许IALIGN为16或32(例如，通过更改CSR misa)，那么0，每当IALIGN&#x3D;32时，位mepc[1]在读取时被屏蔽，使其看起来为0。这种屏蔽也发生在MRET指令的隐式读取上。虽然被屏蔽，当IALIGN&#x3D;32时，mepc[1]仍然是可写的。</p>
+<p>mepc是一个必须能够保存所有有效虚拟地址的WARL寄存器。它不需要能够保存所有可能的无效地址。在编写mepc之前，实现可能会将无效地址转换为mepc能够保存的其他一些无效地址。</p>
+<blockquote>
+<p>当地址转换不生效时，虚拟地址和物理地址是相等的。</p>
+<p>因此，mepc必须能够表示的地址集包括可用作 有效pc 或 有效地址 的物理地址集。</p>
+</blockquote>
+<p>&#x3D;&#x3D;<strong>当一个陷阱进入M模式时，用被中断或遇到异常的指令的虚拟地址写入mepc</strong>&#x3D;&#x3D;。否则，mepc永远不会由实现编写，尽管它可能由软件显式编写。</p>
+<h3 id="3-1-15-机器原因寄存器-mcause"><a href="#3-1-15-机器原因寄存器-mcause" class="headerlink" title="3.1.15  机器原因寄存器 (mcause)"></a>3.1.15  机器原因寄存器 (mcause)</h3><p>Machine Cause Register </p>
+<p>mcause寄存器是一个 MXLEN-bit 读写寄存器，格式如图3.22所示。当一个trap进入M模式时，mcause会被写入一个代码，表示引起该trap的事件。否则，尽管可以由软件显式地编写，mcause is never written by the implementation。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607144159954-1730798017566-18.png" alt="image-20230607144159954"></p>
+<p>如果陷阱是由中断引起的，则cause寄存器中的中断位被设置。异常代码字段包含标识最后一个异常或中断的代码。表3.6列出了可能的机器级异常代码。异常代码是一个WLRL字段，因此只保证保存受支持的异常代码。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607102401144-1730798017566-20.png" alt="image-20230607102401144"></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607102449479-1730798017566-19.png" alt="image-20230607102449479"></p>
+<p>注意，load和load-reserved指令生成load异常，而store、store conditional和AMO指令生成store&#x2F;AMO异常。</p>
+<blockquote>
+<p>可以判断cause寄存器的符号位（最高位）将中断与其他陷阱分开。左移可以移除中断位并缩放异常代码以索引到陷阱向量表中。</p>
+</blockquote>
+<blockquote>
+<p>我们不区分特权指令异常和非法操作码异常。这简化了体系结构，还隐藏了实现支持哪些更高权限指令的细节。服务于陷阱的特权级别可以实现一个策略，来决定是否需要区分这些操作码，如果需要区分，则应该将给定的操作码视为非法操作码还是特权操作码。</p>
+</blockquote>
+<p>如果一条指令可能引发多个同步异常，表3.7中优先级递减的顺序指示了哪个异常被获取并在mcause中报告。任何自定义同步异常的优先级是由实现定义的。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607144256709-1730798017566-22.png" alt="image-20230607144256709"></p>
+<p>当虚拟地址转换为物理地址时，地址转换算法决定可能引发哪些特定的异常。</p>
+<p>Load&#x2F;store&#x2F;AMO 地址不对齐(address-misaligned)异常的优先级可能高于或低于Load&#x2F;store&#x2F;AMO 页面错误(page-fault a)和访问错误(page-fault )异常。</p>
+<blockquote>
+<p>Load&#x2F;store&#x2F;AMO 地址不对齐和页面错误异常的相对优先级是具体实现定义的，以灵活地满足两个设计要点。从不支持不对齐访问的实现可以无条件地引发不对齐地址异常，而不执行地址转换或保护检查。只支持对某些物理地址进行不对齐访问的实现必须在确定是否可以继续进行不对齐访问之前转换和检查地址，在这种情况下引发页错误异常或访问更合适。</p>
+</blockquote>
+<blockquote>
+<p>指令地址断点与数据地址断点(又称观察点)和环境中断异常(由EBREAK指令引发)具有相同的原因值，但优先级不同。</p>
+</blockquote>
+<blockquote>
+<p>指令地址不对齐异常是由目标不对齐的控制流指令引发的，而不是由获取指令的行为引发的。因此，这些异常的优先级低于其他指令地址异常。</p>
+</blockquote>
+<h3 id="3-1-16-机器陷阱值寄存器-mtval"><a href="#3-1-16-机器陷阱值寄存器-mtval" class="headerlink" title="3.1.16 机器陷阱值寄存器  (mtval)"></a>3.1.16 机器陷阱值寄存器  (mtval)</h3><p>Machine Trap Value Register</p>
+<p>mtval寄存器是一个mxlen位读写寄存器，格式如图3.23所示。当一个陷阱进入M模式时，mtval要么设置为零，要么写入异常特定的信息，以帮助软件处理陷阱。否则，mtval永远不会由实现编写，尽管它可能由软件显式编写。硬件平台将指定哪些异常必须以信息方式设置mtval，哪些异常可以无条件地将其设置为零。如果硬件平台指定没有异常将mtval设置为非零值，则mtval为只读零。</p>
+<p>如果在指令获取、加载或存储中发生断点、地址不对齐、访问错误或页面错误异常时，使用非零值写入mtval，则&#x3D;&#x3D;<strong>mtval将包含发生故障的虚拟地址</strong>&#x3D;&#x3D;。</p>
+<blockquote>
+<p>当启用基于页面的虚拟内存时，即使对于物理内存访问错误异常，也会使用故障虚拟地址写入mtval。这种设计降低了大多数实现的数据路径成本，特别是那些带有&#x3D;&#x3D;<strong>hardware page-table walkers</strong>&#x3D;&#x3D;的实现。</p>
+</blockquote>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230607135602251-1730798017566-23.png" alt="image-20230607135602251"></p>
+<p>如果在不对齐的加载或存储导致访问错误或页面错误异常时，使用非零值写入mtval，则mtval将包含导致错误的访问部分的虚拟地址。</p>
+<p>如果在具有变长指令的系统上发生指令访问错误或页面错误异常时，使用非零值写入mtval，则mtval将包含导致错误的指令部分的虚拟地址，而mepc将指向该指令的开始。</p>
+<p>还可以选择使用mtval寄存器在非法指令异常时返回错误指令位(mepc指向内存中的错误指令)。如果在发生非法指令异常时使用非零值写入mtval，则mtval将包含最短的值:</p>
+<ul>
+<li>实际故障指令</li>
+<li>故障指令的第一个ILEN位</li>
+<li>故障指令的第一个MXLEN位</li>
+</ul>
+<p>在非法指令异常时加载到mtval中的值是右对齐的，所有未使用的上位被清除为零。</p>
+<blockquote>
+<p>在mtval中捕获错误指令减少了指令模拟的开销，如果指令不对齐，可能会避免几个部分指令加载，并且当使用加载将指令获取到数据寄存器中时，可能会出现数据缓存丢失或缓慢的非缓存访问。如果另一个代理正在操纵指令存储器，就像在动态翻译系统中可能发生的那样，还存在原子性问题。</p>
+<p>一个要求是整个指令(或者至少是第一个MXLEN位)在捕获陷阱之前被提取到mtval中。这不应该约束实现，因为实现通常会在尝试解码指令之前获取整个指令，并避免使软件处理程序复杂化。</p>
+<p>如果mtval中的值为零，则表示不支持该特性，或者获取了非法的零指令。可以使用mepc指向的指令内存中的负载来区分这两种情况(或者，可以查询系统配置信息，以便在运行时之前安装适当的陷阱处理)。</p>
+</blockquote>
+<p>如果mtval中的值为零，则表示不支持该特性，或者获取了非法的零指令。可以使用mepc指向的指令内存中的负载来区分这两种情况(或者，可以查询系统配置信息，以便在运行时之前安装适当的陷阱处理)。</p>
+<p>如果mtval不是只读0，则它是一个WARL寄存器，必须能够保存所有有效的虚拟地址和值0。它不需要能够保存所有可能的无效地址。在写入mtval之前，实现可能会将无效地址转换为mtval能够保存的其他无效地址。如果实现了返回故障指令位的特性，则mtval还必须能够保存小于2^N^的所有值，其中N为MXLEN和ILEN中较小的一个。</p>
+<h1 id="8-Hypervisor-Extension-Version-1-0"><a href="#8-Hypervisor-Extension-Version-1-0" class="headerlink" title="8 Hypervisor Extension, Version 1.0"></a>8 Hypervisor Extension, Version 1.0</h1><p>本章描述了RISC-V hypervisor extension ，它<strong>虚拟化了supervisor-level的体系结构</strong>，以支持在type-1或type-2 hypervisor 之上高效地托管guestOS。</p>
+<p> hypervisor extension 将<strong>supervisor mode更改</strong>为 <em>hypervisor-extended supervisor mode</em>  (HS-mode，或简称hypervisor mode)，其中运行hypervisor或具有托管功能(hosting-capable)的OS。</p>
+<p> hypervisor extension <strong>还添加了另一个地址转换阶段，从GPA（guest physical addresses）到SPA（supervisor physical addresses），从而为guest OS虚拟化内存和内存映射的I&#x2F;O子系统</strong>。</p>
+<p>HS-mode的行为与S-mode相同，但有<strong>额外的指令和CSR来控制地址转换的新阶段</strong>，并<strong>支持在虚拟S-mode (VS-mode)中托管guest OS</strong>。<strong>常规的S模式OS无需修改即可在HS模式或VS模式guest模式下执行。</strong></p>
+<p>在HS模式下，OS或hypervisor通过与S模式下的OS<strong>相同的SBI</strong>与机器进行交互。期望 HS模式hypervisor为其VS模式客户机实现SBI。</p>
+<p>hypervisor扩展依赖于具有32个寄存器(RV32I或RV64I)的“I”基础整数ISA，而不是只有16个寄存器的RV32E。**&#x3D;&#x3D;CSR mtval不能为只读零，并且必须支持标准的基于页面的地址转换，RV32支持Sv32, <font color="red">RV64支持Sv39</font>&#x3D;&#x3D;**。</p>
+<p>通过在misa CSR中设置第7位来启用虚拟机hypervisor扩展，这与字母h相对应。<strong>建议实现虚拟机hypervisor扩展的RISC-V hart不要硬连接misa[7]，以便该扩展能够被禁用</strong>。</p>
+<blockquote>
+<p>基准特权架构旨在<strong>简化经典虚拟化技术的使用</strong>，其中**<font color="red">guest OS 在user-level 运行</font>，因为数量少的特权指令可以很容易地检测和捕获**。hypervisor扩展&#x3D;&#x3D;<strong>通过降低这些traps的频率来提高虚拟化性能</strong>&#x3D;&#x3D;。</p>
+<p>通过<strong>以S模式运行hypervisor</strong>，并为<strong>hypervisor CSR访问</strong>和<strong>维护影子页表（shadow page tables）</strong> <strong>捕获到M模式</strong>， hypervisor extension被设计为可以在<strong>不实现该扩展的平台上有效地进行仿真</strong>。type-2 hypervisors 的大多数CSR访问都是有效的S模式访问，因此不需要被捕获。Hypervisors可以类似地支持嵌套虚拟化。</p>
+</blockquote>
+<h2 id="8-1-特权模式"><a href="#8-1-特权模式" class="headerlink" title="8.1 特权模式"></a>8.1 特权模式</h2><p>Privilege Modes</p>
+<p>当前虚拟化模式（表示为 V）指示 hart 当前是否正在 guest 虚拟机中执行。</p>
+<ul>
+<li>当 V&#x3D;1 时，hart 要么处于虚拟 S 模式（VS 模式），要么处于以 VS 模式运行的guest OS之上的虚拟 U 模式（VU 模式）。</li>
+<li>当 V&#x3D;0 时，hart 处于 M 模式、HS 模式或在 HS 模式下运行的OS之上的 U 模式。</li>
+</ul>
+<p>虚拟化模式还指示两阶段地址转换是激活的(V&#x3D;1)还是非激活的(V&#x3D;0)。表8.1列出了带有hypervisor扩展的RISC-V hart可能的特权模式。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619102536443-1730798017566-21.png" alt="image-20230619102536443"></p>
+<p>对于特权模式U和VU，名义特权模式为U，对于特权模式HS和VS，名义特权模式为S。</p>
+<p>HS模式比VS式优先，VS模式比VU模式优先。<strong>在U模式下执行时，VS-mode中断被全局禁用</strong>。</p>
+<blockquote>
+<p>&#x3D;&#x3D;<strong>此描述没有考虑U模式或VU模式中断的可能性，如果采用 user-level 中断的扩展，则将进行修改。</strong>&#x3D;&#x3D;</p>
+</blockquote>
+<h2 id="8-2-Hypervisor-and-Virtual-Supervisor-CSRs"><a href="#8-2-Hypervisor-and-Virtual-Supervisor-CSRs" class="headerlink" title="8.2 Hypervisor and Virtual Supervisor CSRs"></a>8.2 Hypervisor and Virtual Supervisor CSRs</h2><p>以HS-mode运行的OS或hypervisor使用supervisor CSR与异常、中断和地址转换子系统进行交互。<strong>额外的CSRs提供给HS-mode，但不提供给VS-mode</strong>，用于管理两阶段地址转换和控制VS-mode客户机的行为:hstatus、hedeleg、hideleg、hvip、hip、hie、hgeip、hgeie、henvcfg、henvcfgh、hcounteren、htimedelta、htimedelta、htval、htinst和hgatp。</p>
+<p>此外，一些virtual supervisor CSR (VS CSR)是正常supervisor CSR的副本。例如，vsstatus是复制了通常的sstatus CSR的VS CSR。</p>
+<p><strong>当V&#x3D;1时</strong>，<strong>VS CSR代替相应的主管CSR</strong>，除另有规定外，<strong>接管通常的主管CSR的所有功能</strong>。通常<strong>读取或修改主管CSR的指令应改为访问相应的VS CSR</strong>。当V&#x3D;1时，试图通过单独的CSR地址直接读写VS CSR会导致虚拟指令异常。(从U模式的尝试通常会导致非法指令异常。)VS CSR只能通过M模式或HS模式访问。</p>
+<p><strong>当V&#x3D;1时</strong>，<strong>被VS CSR取代的正常HS级主管CSR保留其值，但不影响机器的行为</strong>，除非有专门的文件这样做。相反，<strong>当V&#x3D;0时，除了CSR指令可读可写之外，VS CSR通常不会影响机器的行为</strong>。</p>
+<p>一些标准的管理CSR (senvcfg, scounteren和scontext，可能还有其他)没有匹配的VS CSR。当V&#x3D;1时，除了VS-mode和VU-mode取代了HS-mode和U-mode外，<strong>这些supervisor CSR仍然具有其通常的功能和可访问性</strong>。<strong>要求hypervisor软件将根据需要 手动交换这些寄存器的内容。</strong></p>
+<blockquote>
+<p>匹配的 VS CSR 只存在于必须复制的supervisor CSR 中，这些 CSR 主要是那些由traps自动写入的 CSR，或者仅凭软件无法在以下情况交换 CSR 时，在陷阱进入后 and&#x2F;or SRET之前立即影响指令执行的 CSR。目前，大多数主管 CSR 都属于这一类，但未来可能不会。</p>
+</blockquote>
+<p>在本章中，我们使用术语HSXLEN来指代在HS-mode下执行时的有效XLEN，而使用术语VSXLEN来指代在VS模式下执行时的有效XLEN。</p>
+<h3 id="8-2-1-Hypervisor-状态寄存器-hstatus"><a href="#8-2-1-Hypervisor-状态寄存器-hstatus" class="headerlink" title="8.2.1 Hypervisor 状态寄存器(hstatus)"></a>8.2.1 Hypervisor 状态寄存器(hstatus)</h3><p>hstatus寄存器是一个HSXLEN位读写寄存器，当HSXLEN&#x3D;32时格式如图8.1所示，当HSXLEN&#x3D;64时格式如图8.2所示。hstatus寄存器提供了类似于mstatus寄存器的功能，用于<strong>跟踪和控制VS模式客户机的异常行为</strong>。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619104021864-1730798017566-24.png" alt="image-20230619104021864"></p>
+<p><strong>VSXL字段控制VS模式的有效XLEN</strong>(称为VSXLEN)，它可能与HS模式的XLEN (HSXLEN)不同。当HSXLEN&#x3D;32时，表示VSXL字段不存在，且HSXLEN&#x3D;32。当HSXLEN&#x3D;64时，VSXL是一个与misa的MXL字段编码相同的WARL字段，如第16页表3.1所示。特别是，<strong>实现可以使VSXL成为只读字段，其值始终确保VSXLEN&#x3D;HSXLEN。</strong></p>
+<p>如果将HSXLEN从32更改为更宽的宽度，并且如果字段VSXL不限于单个值，则它将获得与支持的最宽宽度相对应的值，该宽度不宽于新的HSXLEN。</p>
+<p>hstatus字段<strong>VTSR、VTW和VTVM的定义类似于mstatus字段TSR、TW和TVM，但只影响VS模式下的执行，并且导致虚拟指令异常，而不是非法指令异常</strong>。当VTSR&#x3D;1时，试图在VS模式下执行SRET会引发一个虚拟指令异常。当VTW&#x3D;1(并假设mstatus.TW&#x3D;0)时，如果WFI没有在特定于实现的有限时间限制内完成，则在VS模式下执行WFI的尝试会引发虚拟指令异常。当VTVM&#x3D;1时，尝试以VS模式执行SFENCE。VMA或SINVAL。VMA或访问CSR satp会引发虚拟指令异常。</p>
+<p>&#x3D;&#x3D;<strong>VGEIN(虚拟guest外部中断号)字段为VS级外部中断选择guest外部中断源</strong>&#x3D;&#x3D;。VGEIN是一个WLRL字段<strong>，它必须能够保存介于0和最大guest外部中断号(称为GEILEN)之间的值</strong>，包括在内。<strong>当VGEIN&#x3D;0时，对VS级外部中断不选择guest外部中断源</strong>。GEILEN可能为零，在这种情况下，VGEIN可能为只读零。客户外部中断将在8.2.4节中解释，VGEIN的使用将在8.2.3节中进一步介绍。</p>
+<p><strong>字段HU (U模式hypervisor)控制虚拟机加载&#x2F;存储指令HLV、HLVX和HSV是否也可以在U模式下使用</strong>。当HU&#x3D;1时，这些指令可以像HS模式一样在U模式下执行。当HU&#x3D;0时，所有hypervisor指令都会导致U模式的非法指令trap。</p>
+<blockquote>
+<p>HU位允许虚拟机hypervisor的一部分以U模式运行，以更好地防止软件错误，同时仍然保留对虚拟机内存的访问。</p>
+</blockquote>
+<p><strong>SPV位(Supervisor Previous Virtualization mode)是在trap进入HS模式时由实现写入的</strong>。正如在发生trap时，sstatus中的SPP位被设置为(名义)特权模式，hstatus中的SPV位被设置为发生trap时虚拟化模式V的值。当一条SRET指令在V&#x3D;0时执行时，V被设置到 SPV。</p>
+<p>当V&#x3D;1并且trap进入HS模式时，<strong>位SPVP (Supervisor Previous Virtual Privilege)被设置为trap发生时的名义特权模式</strong>，与status. spp相同。但如果在陷阱之前V&#x3D;0，则SPVP在陷阱进入时保持不变。SPVP控制由虚拟机加载&#x2F;存储指令HLV、HLVX和HSV进行的显式内存访问的有效权限。</p>
+<blockquote>
+<p>如果没有SPVP, HLV, HLVX和HSV的指示看起来反而是状态。那么，即使HU&#x3D;1, U模式也不能在VS级访问虚拟机内存，因为使用SRET进入U模式总是使SPP&#x3D;0。与SPP不同，SPVP不受HS模式和Umode之间来回转换的影响。</p>
+</blockquote>
+<p><strong>字段GVA(guest虚拟地址)由 实现(implementation)在trap进入HS模式时写入</strong>。对于任何将guest虚拟地址写入stval的陷阱(断点、地址不一致、访问错误、页面错误或guest页面错误)，GVA设置为1。对于其他进入HS模式的trap, GVA设置为0。</p>
+<blockquote>
+<p>对于将非零值写入stval的断点和内存访问陷阱，除了HLV、HLVX或HSV指令的显式内存访问导致错误外，GVA与字段SPV(两个位设置相同)是冗余的。在这种情况下，SPV&#x3D;0, GVA&#x3D;1。</p>
+</blockquote>
+<p><strong>VSBE位是一个WARL字段，它控制从VS模式进行的显式内存访问的端序。</strong>如果VSBE&#x3D;0，则从VS模式进行的显式加载和存储内存访问是小端序，如果VSBE&#x3D;1，则是大端序。VSBE还控制对VS级内存管理数据结构(如页表)的所有隐式访问的端序。一个实现可以使VSBE成为一个只读字段，它总是指定与HS模式相同的端序。</p>
+<h3 id="8-2-2-Hypervisor-Trap-委托寄存器-hedeleg和hideleg"><a href="#8-2-2-Hypervisor-Trap-委托寄存器-hedeleg和hideleg" class="headerlink" title="8.2.2 Hypervisor Trap 委托寄存器(hedeleg和hideleg)"></a>8.2.2 Hypervisor Trap 委托寄存器(hedeleg和hideleg)</h3><p>寄存器hedeleg和hideleg是HSXLEN位读写寄存器，格式分别如图8.3和8.4所示。<strong>默认情况下，任何特权级别的所有陷阱都以M模式处理，尽管M模式通常使用medeleg和mideleg CSR将一些陷阱委托给HS模式</strong>。<strong>hedeleg和hideleg CSR允许将这些陷阱进一步委托给VS模式的客户机；它们的布局与medeleg和mideleg相同。</strong></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619111427150-1730798017566-25.png" alt="image-20230619111427150"></p>
+<p>如果在trap和相应的hedeleg位设置之前V&#x3D;1，则已经委托给HS模式(使用medeleg)的同步trap将进一步委托给VS模式。hedeleg的每个位要么为可写零，要么为只读零。<strong>hedeleg的许多位被明确要求为可写或为零，如表8.2所列。</strong>如果IALIGN&#x3D;32，对应于指令地址不对齐异常的位0必须是可写的。</p>
+<blockquote>
+<p>要求hedeleg的某些位是可写的，可以减轻hypervisor处理实现变化的负担。</p>
+</blockquote>
+<p>如果设置了相应的hideleg位，那么已经被委托到HS模式(使用mideleg)的中断将进一步被委托到VS模式。hideleg的15:0位中，10、6、2位(对应标准VS级中断)是可写的，12、9、5、1位(对应标准s级中断)是只读零。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619111621452-1730798017566-26.png" alt="image-20230619111621452"></p>
+<p><strong>当虚拟管理器外部中断(代码10)被委托到VS模式时，它被机器自动转换为VS模式的管理器外部中断(代码9)，包括在中断陷阱上写入vscause的值。同样，将虚拟管理器定时器中断(6)转换为VS模式的管理器定时器中断(5)，将虚拟管理器软件中断(2)转换为VS模式的管理器软件中断(1)。对于平台或自定义中断原因(代码16及以上)，可能会或可能不会进行类似的翻译。</strong></p>
+<h3 id="8-2-3-Hypervisor-中断寄存器-hvip、hip、hie"><a href="#8-2-3-Hypervisor-中断寄存器-hvip、hip、hie" class="headerlink" title="8.2.3 Hypervisor 中断寄存器(hvip、hip、hie)"></a>8.2.3 Hypervisor 中断寄存器(hvip、hip、hie)</h3><p><strong>寄存器hvip是一个HSXLEN位读&#x2F;写寄存器，hypervisor可以写入它来指示用于VS模式的虚拟中断。</strong>hvip中不可写的位是只读零。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619112857447-1730798017566-27.png" alt="image-20230619112857447"></p>
+<p>hvip的标准部分(比特15:0)格式化如图8.6所示。<strong>hvip的VSEIP、VSTIP、VSSIP位是可写的。在hvip中设置VSEIP&#x3D;1断言一个VS级外部中断;设置VSTIP断言一个VS级定时器中断;设置VSSIP断言一个VS级软件中断。</strong></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619112917408-1730798017566-28.png" alt="image-20230619112917408"></p>
+<p>寄存器hip和hie是HSXLEN位读&#x2F;写寄存器，<strong>分别补充HS级的sip和sie。hip寄存器指示挂起的VS级中断和特定于hypervisor的中断，而hie包含相同中断的启用位。</strong></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619112933217-1730798017566-29.png" alt="image-20230619112933217"></p>
+<p>对于sie中的每一个可写位，对应的位在hip和hie中都必须是只读零。因此，sie和hie中的非零位总是互斥的，sip和hip也是如此。</p>
+<blockquote>
+<p>hip和hip的活动位不能放在HS级的sip和sie中，因为这样做会使软件无法在没有在硬件中实现的平台上模拟hypervisor扩展。</p>
+</blockquote>
+<p>当下列所有条件都为真时，<strong>中断i将被捕获到HS模式</strong>:</p>
+<ol>
+<li><p><strong>当前工作模式为HS模式，并且设置了sstatus寄存器中的SIE位，或者当前工作模式的特权小于HS模式;</strong></p>
+</li>
+<li><p><strong>第i位同时位于sip 和sie，或同时位于hip 和hie;和</strong></p>
+</li>
+<li><p><strong>第i位未设置在hideleg中。</strong></p>
+</li>
+</ol>
+<p>如果sie的位i是只读零，则寄存器hip中的相同位可以是可写的，也可以是只读的。当hip中的位i可写时，可以通过向该位写入0来清除挂起的中断i。如果中断i可以在hip中变为挂起，但hip中的位i是只读的，则可以通过清除hvip的位i来清除中断，或者实现必须提供一些其他机制来清除挂起的中断（这可能涉及对执行环境的调用）</p>
+<p>如果相应的中断可能在hip中挂起，则hie中的一位应是可写的。hie中不可写的位应为只读零。</p>
+<p>寄存器hip和hie的标准部分（位15:0）的格式分别如图8.9和8.10所示。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619133330589-1730798017566-31.png" alt="image-20230619133330589"></p>
+<p>位hip.SGEIP和hie.SGEIE是主管级（HS级）guest外部中断的中断挂起和中断启用位。SGEIP在hip中是只读的，并且是1，当且仅当CSR hgeip和hgeie的逐位逻辑and在任何位中都是非零的。（参见第8.2.4节。）</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619133352813-1730798017566-30.png" alt="image-20230619133352813"></p>
+<p>位hip.VSEIP和hie.VSEIE是VS级外部中断的中断挂起和中断使能位。VSEIP在hip中是只读的，是这些中断源的逻辑或：</p>
+<ul>
+<li>hvip的位VSEIP；</li>
+<li>由hstatus.VGEIN选择的hgeip的比特；</li>
+<li>以及指向VS电平的任何其他平台特定的外部中断信号。</li>
+</ul>
+<p>位hip.VSTIP和hie.VSTIE是VS级定时器中断的中断挂起和中断使能位。VSTIP在hip中是只读的，并且是hvip.VSTIP和指向VS电平的任何其他特定于平台的定时器中断信号的逻辑OR。</p>
+<p>位hip.VSSIP和hie.VSSIE是VS级软件中断的中断挂起和中断使能位。hip中的VSSIP是hvip中相同位的别名（可写）。</p>
+<p>以HS模式为目的地的多个同时中断按以下递减优先级顺序处理：SEI、SSI、STI、SGEI、VSEI、VSSI、VSTI。</p>
+<h3 id="8-2-4-Hypervisor-Guest-External-Interrupt-Registers-hgeip-and-hgeie"><a href="#8-2-4-Hypervisor-Guest-External-Interrupt-Registers-hgeip-and-hgeie" class="headerlink" title="8.2.4 Hypervisor Guest External Interrupt Registers (hgeip and hgeie)"></a>8.2.4 Hypervisor Guest External Interrupt Registers (hgeip and hgeie)</h3><p><strong>hgeip寄存器</strong>是一个HSXLEN位<strong>只读寄存器</strong>，其格式如图8.11所示，<strong>表示该hart的待处理guest外部中断</strong>。</p>
+<p><strong>hgeie寄存器</strong>是一个HSXLEN位<strong>读&#x2F;写寄存器</strong>，其格式如图8.12所示，<strong>其中包含该hart处Guest外部中断的启用位</strong>。Guest外部中断编号i与hgeip和hgeie中的位i都对应。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619133843695-1730798017566-32.png" alt="image-20230619133843695"></p>
+<p><strong>guest外部中断表示在VS级别上指向单个虚拟机的中断</strong>。如果RISC-V平台支持<strong>将物理设备置于guest OS的直接控制之下</strong>，而虚拟机hypervisor的干预最少(称为虚拟机和物理设备之间的直通或直接分配)，那么，在这种情况下，<strong>来自设备的中断将用于特定的虚拟机</strong>。</p>
+<p><strong>hgeip的每个位汇总了中断控制器收集和报告的指向一个虚拟Hart的所有待处理中断。要区分来自多个设备的特定待处理中断，软件必须查询中断控制器。</strong></p>
+<blockquote>
+<p><strong>对guest外部中断的支持需要一个中断控制器，它可以从其他中断中单独收集虚拟机定向中断</strong>。</p>
+</blockquote>
+<p>hgeip和hgeie中为guest外部中断实现的位数未指定，可能为零。这个数字被称为GEILEN。除0位外，最低有效位首先实现。因此，如果GEILEN为非零，GEILEN:1位在hgeie中是可写的，其他位在hgeip和hgeie中都是只读零。</p>
+<blockquote>
+<p>在一个物理hart接收和处理的guest外部中断集可能不同于在其他hart接收到的中断集。通常期望一个物理节点上的guest外部中断号i与任何其他节点上的guest外部中断号i不相同。对于任何一个<strong>物理hart</strong>，<strong>可以直接接收guest外部中断的虚拟hart的最大数量是由GEILEN限制的</strong>。对于任何实现，每个物理hart的<strong>这个数字的最大值是RV32的31和RV64的63</strong>。</p>
+<p><strong>hypervisor始终可以自由地为任意数量的虚拟hart模拟设备</strong>，而不受GEILEN的限制。<strong>只有中断的直接传递(直接分配)受GEILEN限制的影响</strong>，并且<strong>限制的是接收此类中断的虚拟hart的数量</strong>，<strong>而不是接收到的不同中断的数量</strong>。一个虚拟hart可以接收的不同中断的数量是由中断控制器决定的。</p>
+</blockquote>
+<p>hgeie选择导致管理员级(HS级)guest外部中断的guest外部中断子集。hgeie中的使能位不影响hstatus.VGEIN从hgeip中选择的VS级外部中断信号。</p>
+<h3 id="8-2-5-Hypervisor-Environment-Configuration-Registers-henvcfg-and-henvcfgh"><a href="#8-2-5-Hypervisor-Environment-Configuration-Registers-henvcfg-and-henvcfgh" class="headerlink" title="8.2.5 Hypervisor Environment Configuration Registers (henvcfg and henvcfgh)"></a>8.2.5 Hypervisor Environment Configuration Registers (henvcfg and henvcfgh)</h3><p>henvcfg CSR是一个HSXLEN位读&#x2F;写寄存器，格式化为HSXLEN&#x3D;64，如图8.13所示，它<strong>控制虚拟化模式V&#x3D;1时执行环境的某些特征</strong>。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619134725508-1730798017566-33.png" alt="image-20230619134725508"></p>
+<p>如果位FIOM (I&#x2F;O的Fence意味着内存)在henvcfg中设置为1，则在V&#x3D;1时执行的Fence指令被修改，因此对设备I&#x2F;O的顺序访问要求也意味着对主内存访问的顺序要求。表8.3详细说明了FIOM&#x3D;1和V&#x3D;1时FENCE指令位PI、PO、SI和SO的修改解释。</p>
+<p>类似地，当FIOM&#x3D;1和V&#x3D;1时，如果一个原子指令访问一个排序为设备I&#x2F;O的区域，并且设置了aq和&#x2F;或rl位，那么该指令就被排序为既访问设备I&#x2F;O又访问内存。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619135337569-1730798017566-34.png" alt="image-20230619135337569"></p>
+<p>表8.3:FIOM&#x3D;1和虚拟化模式V&#x3D;1时修改的FENCE前后继集解释。</p>
+<table>
+<thead>
+<tr>
+<th>Instruction bit</th>
+<th>Meaning when set</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PI<br>PO</td>
+<td>前置设备输入和内存读取(PR隐含) (PR implied)<br>前导设备输出和内存写入(PW隐含)</td>
+</tr>
+<tr>
+<td>SI<br>SO</td>
+<td>后继设备输入和内存读取(SR隐含)<br>后继设备输出和内存写入(SW隐含)</td>
+</tr>
+</tbody></table>
+<p>PBMTE位控制Svpbmt扩展是否可用于VS阶段地址转换。当PBMTE&#x3D;1时，Svpbmt可用于VS-stage地址转换。当PBMTE&#x3D;0时，实现的行为就像没有为VS阶段地址转换实现Svpbmt一样。如果不实现Svpbmt, PBMTE为只读零。</p>
+<p>VSTCE字段的定义将由即将发布的Sstc扩展提供。其在henvcfg内的分配可能在批准该延长之前发生变化。</p>
+<p>CBZE字段的定义将由即将到来的Zicboz扩展提供。其在henvcfg内的分配可能在批准该延长之前发生变化。</p>
+<p>CBCFE和CBIE字段的定义将由即将发布的Zicbom扩展提供。它们在henvcfg内的分配可能在批准该延长之前发生变化。</p>
+<p>当HSXLEN&#x3D;32时，henvcfg包含与HSXLEN&#x3D;64时henvcfg中31:0位相同的字段。此外，当HSXLEN&#x3D;32时，henvcfgh是一个32位读&#x2F;写寄存器，其中包含与HSXLEN&#x3D;64时henvcfg的63:32位相同的字段。当HSXLEN&#x3D;64时，henvcfgh不存在。</p>
+<h3 id="8-2-6-Hypervisor-Counter-Enable-Register-hcounteren"><a href="#8-2-6-Hypervisor-Counter-Enable-Register-hcounteren" class="headerlink" title="8.2.6 Hypervisor Counter-Enable Register (hcounteren)"></a>8.2.6 Hypervisor Counter-Enable Register (hcounteren)</h3><p>计数器启用寄存器hcounteren是一个32位寄存器，<strong>它控制硬件性能监视计数器对guest虚拟机的可用性</strong>。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619135943653-1730798017566-36.png" alt="image-20230619135943653"></p>
+<p>当hcounteren寄存器中的CY、TM、IR或HPMn位清除时，在V&#x3D;1时尝试读取周期、时间、instet或hpmcountern寄存器，如果mcounteren中的相同位为1，则会导致虚拟指令异常。当这些位之一被设置时，当V&#x3D;1时允许访问相应的寄存器，除非由于其他原因阻止。在VU模式下，除非在hcounteren和scounteren中都设置了适用的位，否则计数器是不可读的。</p>
+<p>必须实现hcounten。然而，任何比特都可以是只读的零，这表明当V＝1时，对相应计数器的读取将导致异常。因此，它们实际上是WARL字段。</p>
+<h3 id="8-2-7-Hypervisor-Time-Delta-Registers-htimedelta-htimedeltah"><a href="#8-2-7-Hypervisor-Time-Delta-Registers-htimedelta-htimedeltah" class="headerlink" title="8.2.7 Hypervisor Time Delta Registers (htimedelta, htimedeltah)"></a>8.2.7 Hypervisor Time Delta Registers (htimedelta, htimedeltah)</h3><p>htimedelta CSR是一个读&#x2F;写寄存器，它<strong>包含time CSR的值和在VS模式或VU模式中返回的值之间的增量</strong>。也就是说，在VS或VU模式下读取时间CSR将返回htimedelta的内容与time的实际值之和</p>
+<blockquote>
+<p><strong>由于在对htimedelta和时间求和时忽略溢出，因此可以使用大的htimedelta值来表示负时间偏移。</strong></p>
+</blockquote>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619140918185-1730798017566-35.png" alt="image-20230619140918185"></p>
+<p>仅当HSXLEN&#x3D;32时，htimedelta保持delta的低32位，而htimedeltah保持delta中的高32位。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619140944661-1730798017566-38.png" alt="image-20230619140944661"></p>
+<h3 id="8-2-8-Hypervisor-Trap-Value-Register-htval"><a href="#8-2-8-Hypervisor-Trap-Value-Register-htval" class="headerlink" title="8.2.8 Hypervisor Trap Value Register (htval)"></a>8.2.8 Hypervisor Trap Value Register (htval)</h3><p>htval寄存器是一个HSXLEN位读&#x2F;写寄存器，其格式如图8.17所示。<strong>当陷阱进入HS模式时，htval会与stval一起写入额外的异常特定信息，以帮助软件处理陷阱</strong>。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619141019050-1730798017566-37.png" alt="image-20230619141019050"></p>
+<p>当客户页面故障陷阱进入HS模式时，写入的htval要么为零，要么为发生故障的guest physical addresses，右移2位。对于其他陷阱，htval设置为零，但未来的标准或扩展可能会重新定义htval对其他陷阱的设置。由于第一阶段（VS阶段）地址转换期间的隐式存储器访问，可能会出现访客页面故障，在这种情况下，写入htval的guest physical addresses是发生故障的隐式内存访问的地址，例如，无法读取的VS级页表项的地址。（当VS阶段转换无法完成时，与原始虚拟地址对应的guest物理地址是未知的。）CSR htinst中提供了其他信息，以消除此类情况的歧义。</p>
+<p>否则，对于导致客户机页面错误的未对齐的加载和存储，htval中的非零客户机物理地址对应于stval中的虚拟地址所指示的访问的错误部分。对于具有变长指令的系统上的指令访客页面错误，一个非零的htval对应于由stval中的虚拟地址所指示的指令的错误部分。</p>
+<blockquote>
+<p>写入htval的guest physical addresses向右移动2位，以容纳比当前XLEN更宽的地址。对于RV32，虚拟机监控程序扩展允许guest physical addresses的宽度为34位，并且htval报告地址的位33:2。客户机物理地址的按2移位编码与PMP地址寄存器(章节3.7)和页表项(章节4.3、4.4、4.5和4.6)中的物理地址编码相匹配。</p>
+<p>如果需要故障客户机物理地址的最低有效位，这些位通常与stval中故障虚拟地址的最低有效位相同。对于由于VS阶段地址转换的隐式内存访问而导致的错误，最低有效的两位将改为零。可以使用注册表htinst中提供的值来区分这些情况。</p>
+</blockquote>
+<p>htval是一个WARL寄存器，它必须能够保存0，并且可能只能够保存其他2位移位的guest physical addresses的任意子集(如果有的话)。</p>
+<blockquote>
+<p>除非有其他理由(例如平台标准)，否则将值写入htval的软件应该从htval回读以确认存储的值。</p>
+</blockquote>
+<h3 id="8-2-9-Hypervisor-Trap-Instruction-Register-htinst"><a href="#8-2-9-Hypervisor-Trap-Instruction-Register-htinst" class="headerlink" title="8.2.9 Hypervisor Trap Instruction Register (htinst)"></a>8.2.9 Hypervisor Trap Instruction Register (htinst)</h3><p>htinst寄存器是一个HSXLEN位读&#x2F;写寄存器，格式如图8.18所示。当一个陷阱进入HS模式时，htinst被写入一个值，如果该值非零，则提供有关被捕获的指令的信息，以帮助软件处理该陷阱。可以在trap上写入htinst的值在第8.6.3节中有文档说明。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619141250391-1730798017566-39.png" alt="image-20230619141250391"></p>
+<p>htinst是一个WARL寄存器，它只需要能够保存实现可能在陷阱时自动写入它的值。</p>
+<h3 id="8-2-10-Hypervisor-Guest-Address-Translation-and-Protection-Register-hgatp"><a href="#8-2-10-Hypervisor-Guest-Address-Translation-and-Protection-Register-hgatp" class="headerlink" title="8.2.10 Hypervisor Guest Address Translation and Protection Register (hgatp)"></a>8.2.10 Hypervisor Guest Address Translation and Protection Register (hgatp)</h3><p><strong>hgatp</strong>寄存器是一个HSXLEN位读&#x2F;写寄存器，它控制G-stage地址转换和保护，这是guest virtual addresses两阶段转换的第二阶段(参见8.5节)。</p>
+<p>与CSR satp类似，该寄存器保存guest-physical root page table的物理页号(PPN)；虚拟机标识符 (VMID)，有助于在每个虚拟机的基础上进行地址转换(which facilitates address-translation fences on a per-virtual-machine basis)； </p>
+<p><strong>MODE</strong> 字段，用于选择客户物理地址的地址转换方案。</p>
+<p>当 mstatus.TVM&#x3D;1 时，在 HS 模式下执行时尝试读取或写入 <strong>hgatp</strong> 将引发非法指令异常。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619141328875-1730798017566-40.png" alt="image-20230619141328875"></p>
+<p>表 8.4 显示了 HSXLEN&#x3D;32 和 HSXLEN&#x3D;64 时 MODE 字段的编码。</p>
+<p>当MODE&#x3D;Bare时，guest physical addresses等于supervisor physical addresses，并且除了第3.7节中描述的物理内存保护方案之外，guest虚拟机没有进一步的内存保护。在这种情况下，<strong>hgatp</strong> 中的其余字段必须设置为零。</p>
+<p>当 HSXLEN&#x3D;32 时，MODE 的唯一其他有效设置是 Sv32x4，它是通常 Sv32 分页虚拟内存方案的修改，扩展为支持 34 位客户机物理地址。</p>
+<p>当 HSXLEN&#x3D;64 时，模式 Sv39x4、Sv48x4 和 Sv57x4 被定义为 Sv39、Sv48 和 Sv57 分页虚拟内存方案的修改。所有这些分页虚拟内存方案都在第 8.5.1 节中描述。</p>
+<p>当 HSXLEN&#x3D;64 时剩余的 MODE 设置保留供将来使用，并且可以定义 <strong>hgatp</strong> 中其他字段的不同解释。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230719160026932-1730798017566-41.png" alt="image-20230719160026932"></p>
+<p>当 HSXLEN&#x3D;64 时，实现不需要支持所有定义的 MODE 设置。</p>
+<p>与 satp 一样，使用不支持的 MODE 值写入 hgatp 不会被忽略。相反，当如此指示时，hgatp 的字段以正常方式进行 WARL。</p>
+<p>如第 8.5.1 节中所述，对于分页虚拟内存方案（Sv32x4、Sv39x4、Sv48x4 和 Sv57x4），根页表为 16 KiB，并且必须与 16 KiB 边界对齐。在这个模式下，hgatp 中物理页号 (PPN) 的最低两位始终读为零。仅支持定义的分页虚拟内存方案 和&#x2F;或 Bare 的实现可以使 PPN[1:0] 只读为零。</p>
+<p>VMID 位的数量未指定，可能为零。所实现的 VMID 位的数量（称为 VMIDLEN）可以通过将 1 写入 VMID 字段中的每个位位置，然后读回 hgatp 中的值以查看 VMID 字段中的哪些位位置保持为 1 来确定。首先实现 VMID 的最低有效位：即，如果 VMIDLEN &gt; 0，则 VMID[VMIDLEN-1:0] 可写。 VMIDLEN 的最大值（称为 VMIDMAX）对于 Sv32x4 为 7，对于 Sv39x4、Sv48x4 和 Sv57x4 为 14。</p>
+<p>出于地址转换算法的目的，<strong>hgatp</strong> 寄存器被视为活动的，除非有效特权模式为 U 并且 hstatus.HU&#x3D;0。</p>
+<blockquote>
+<p>此定义简化了 HLV、HLVX 和 HSV 指令的推测执行的实现。</p>
+</blockquote>
+<p>请注意，编写 <strong>hgatp</strong> 并不意味着页表更新和后续 G 阶段地址转换之间存在任何顺序约束。如果新虚拟机的 guest 物理页表已被修改，或者 VMID 被重用，则可能需要在写入 <strong>hgatp</strong> 之前或之后执行 HFENCE.GVMA 指令（请参见第 8.3.2 节）。</p>
+<h3 id="8-2-11-Virtual-Supervisor-Status-Register-vsstatus"><a href="#8-2-11-Virtual-Supervisor-Status-Register-vsstatus" class="headerlink" title="8.2.11 Virtual Supervisor Status Register (vsstatus)"></a>8.2.11 Virtual Supervisor Status Register (vsstatus)</h3><p>vsstatus寄存器是一个vslen位的读写寄存器，它是VS模式的管理寄存器sstatus的版本，当VSXLEN&#x3D;32时格式如图8.21所示，当VSXLEN&#x3D;64时格式如图8.22所示。当V&#x3D;1时，vsstatus代替了通常的sstatus，因此通常读取或修改sstatus的指令实际上访问的是vsstatus。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619155804871-1730798017566-42.png" alt="image-20230619155804871"></p>
+<p>UXL字段控制VU模式的有效XLEN，它可能不同于vmode的XLEN (VSXLEN)。</p>
+<p>当VSXLEN&#x3D;32时，表示UXL字段不存在，且u -mode XLEN&#x3D;32。</p>
+<p>当VSXLEN&#x3D;64时，UXL是一个与misa的MXL字段编码相同的WARL字段，如第16页的表3.1所示。具体来说，实现可能会使UXL成为hstatus字段VSXL的只读副本，从而强制使用VU模式XLEN&#x3D;VSXLEN。</p>
+<p>如果将VSXLEN从32更改为更宽的宽度，并且如果字段UXL不限制为单个值，则它将获得与支持的最宽宽度相对应的值，该宽度不大于新的VSXLEN。</p>
+<p>当V&#x3D;1时，vsstatus.FS和HS级sstatus.FS均有效。当任一字段为 0（关闭）时尝试执行浮点指令会引发非法指令异常。当 V&#x3D;1 时修改浮点状态会导致两个字段都设置为 3（Dirty）。</p>
+<blockquote>
+<p>要使系统hypervisor受益于扩展上下文状态，它必须在HS级状态下拥有自己的副本，独立于以VS模式运行的guest OS进行维护。虽然扩展上下文状态的一个版本显然必须存在于VS模式的vsstatus中，但虚拟机监控程序不能依赖于正确维护该版本，因为VS级别的软件可以更改vsstatus。任意FS。如果HS-level状态为。FS不是独立活动的，由硬件与vsstatus并行维护。当V&#x3D;1时，hypervisor在虚拟机之间进行上下文切换时总是被迫保守地交换所有浮点状态。</p>
+<p>为了使hypervisor从扩展上下文状态中受益，它必须在 HS 级别状态中有自己的副本，独立于在 VS 模式下运行的guest OS进行维护。虽然 VS 模式的扩展上下文状态的一个版本显然必须存在于 vsstatus 中，但hypervisor不能依赖此版本正确维护，因为 VS 级别的软件可以任意更改 vsstatus.FS。如果在 V&#x3D;1 时 HS 级别的 sstatus.FS 不是独立活动的并且由硬件与 vsstatus.FS 并行维护，则在虚拟机之间进行上下文切换时，虚拟机管理程序将始终被迫保守地交换所有浮点状态。</p>
+</blockquote>
+<p>，当V&#x3D;1时，vsstatus.VS和HS级sstatus.VS都有效。当任何一个字段为0 (Off)时，尝试执行向量指令将引发非法指令异常。当V&#x3D;1时修改向量状态会导致两个字段都被设置为3 (Dirty)。</p>
+<p>只读字段SD和XS概述了扩展上下文状态，因为它仅对VS模式可见。例如HS级别的sstatus.FS的值不会影响vsstatus.SD。</p>
+<p>实现可以使UBE字段成为hstatus.VSBE的只读副本。</p>
+<p>当 V&#x3D;0 时，vsstatus 不会直接影响机器的行为，除非虚拟机加载&#x2F;存储（HLV、HLVX 或 HSV）或 mstatus 寄存器中的 MPRV 功能用于执行加载或存储，就像V&#x3D;1。</p>
+<h3 id="8-2-12-Virtual-Supervisor-Interrupt-Registers-vsip-and-vsie"><a href="#8-2-12-Virtual-Supervisor-Interrupt-Registers-vsip-and-vsie" class="headerlink" title="8.2.12 Virtual Supervisor Interrupt Registers (vsip and vsie)"></a>8.2.12 Virtual Supervisor Interrupt Registers (vsip and vsie)</h3><p>vsip 和 vsie 寄存器是 VSXLEN 位读&#x2F;写寄存器，它们是管理器 CSR sip 和 sie 的 VS 模式版本，格式分别如图 8.23 和 8.24 所示。当V&#x3D;1时，vsip和vsie替代通常的sip和sie，因此通常读取或修改sip&#x2F;sie的指令实际上访问vsip&#x2F;vsie。然而，当 V&#x3D;1 时，针对 HS 级的中断继续在 HS 级 sip 寄存器中指示，而不是在 vsip 中。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619160157312-1730798017566-43.png" alt="image-20230619160157312"></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619160224321-1730798017566-44.png" alt="image-20230619160224321"></p>
+<p>寄存器vsip和vsie的标准部分(位15:0)分别格式化如图8.25和8.26所示。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619160338892-1730798017566-45.png" alt="image-20230619160338892"></p>
+<p>当hidedleg的第10位为零时，vsip.SEIP和vsie.SEIE为只读零。否则，vsip.SEIP和vsie.SEIE是hip.VSEIP和hie.VSEIE的别名。</p>
+<p>当hidedleg的第6位为零时，vsip.STIP和vsie.STIE为只读零。否则，vsip.STIP和vsie.STIE是hip.VSTIP和hie.VSTIE的别名。</p>
+<p>当hidedleg的第2位为零时，vsip.SSIP和vsie.SSIE为只读零。否则，vsip.SSIP和vsie.SSIE是hip.VSSIP和hie.VSSIE的别名。</p>
+<h3 id="8-2-13-Virtual-Supervisor-Trap-Vector-Base-Address-Register-vstvec"><a href="#8-2-13-Virtual-Supervisor-Trap-Vector-Base-Address-Register-vstvec" class="headerlink" title="8.2.13 Virtual Supervisor Trap Vector Base Address Register (vstvec)"></a>8.2.13 Virtual Supervisor Trap Vector Base Address Register (vstvec)</h3><p>vstvec 寄存器是一个 VSXLEN 位读&#x2F;写寄存器，是 VS 模式版本的supervisor寄存器 stvec，格式如图 8.27 所示。当V&#x3D;1时，vstvec替代通常的stvec，因此通常读取或修改stvec的指令实际上访问vstvec。当V&#x3D;0时，vstvec不会直接影响机器的行为。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619160640694-1730798017566-46.png" alt="image-20230619160640694"></p>
+<h3 id="8-2-14-Virtual-Supervisor-Scratch-Register-vsscratch"><a href="#8-2-14-Virtual-Supervisor-Scratch-Register-vsscratch" class="headerlink" title="8.2.14 Virtual Supervisor Scratch Register (vsscratch)"></a>8.2.14 Virtual Supervisor Scratch Register (vsscratch)</h3><p>vsscratch 寄存器是一个 VSXLEN 位读&#x2F;写寄存器，是 VS 模式的supervisor寄存器 sscratch 的版本，格式如图 8.28 所示。当 V&#x3D;1 时，vsscratch 会替代通常的 sscratch，因此通常读取或修改 sscratch 的指令实际上会访问 vsscratch。 vsscratch 的内容永远不会直接影响机器的行为。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161552863-1730798017566-48.png" alt="image-20230619161552863"></p>
+<h3 id="8-2-15-Virtual-Supervisor-Exception-Program-Counter-vsepc"><a href="#8-2-15-Virtual-Supervisor-Exception-Program-Counter-vsepc" class="headerlink" title="8.2.15 Virtual Supervisor Exception Program Counter (vsepc)"></a>8.2.15 Virtual Supervisor Exception Program Counter (vsepc)</h3><p>vsepc寄存器是一个VSXLEN位读&#x2F;写寄存器，它是VS模式的supervisor寄存器sepc版本，格式如图8.29所示。当V&#x3D;1时，vsepc代替了通常的sepc，因此通常读取或修改sepc的指令实际上会访问vsepc。当V&#x3D;0时，vsepc不会直接影响机器的行为。</p>
+<p>vsepc是一个WARL寄存器，它必须能够保存sepc可以保存的相同值集。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161636601-1730798017566-47.png" alt="image-20230619161636601"></p>
+<h3 id="8-2-16-Virtual-Supervisor-Cause-Register-vscause"><a href="#8-2-16-Virtual-Supervisor-Cause-Register-vscause" class="headerlink" title="8.2.16 Virtual Supervisor Cause Register (vscause)"></a>8.2.16 Virtual Supervisor Cause Register (vscause)</h3><p>vscause寄存器是一个VSXLEN位读&#x2F;写寄存器，它是VS模式的supervisor寄存器scause版本，格式如图8.30所示。当V&#x3D;1时，vscause会替代通常的scause，因此通常读取或修改scause的指令实际上会访问vscause。当V&#x3D;0时，vscause不会直接影响机器的行为。</p>
+<p>vscause是一个WLRL寄存器，它必须能够保存scause可以保存的相同值集。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161708479-1730798017566-49.png" alt="image-20230619161708479"></p>
+<h3 id="8-2-17-Virtual-Supervisor-Trap-Value-Register-vstval"><a href="#8-2-17-Virtual-Supervisor-Trap-Value-Register-vstval" class="headerlink" title="8.2.17 Virtual Supervisor Trap Value Register (vstval)"></a>8.2.17 Virtual Supervisor Trap Value Register (vstval)</h3><p>vstval寄存器是一个VSXLEN位读&#x2F;写寄存器，它是VS模式的supervisor寄存器stval版本，格式如图8.31所示。当V＝1时，vstval代替通常的stval，因此通常读取或修改stval的指令实际上访问vstval。当V&#x3D;0时，vstval不会直接影响机器的行为。</p>
+<p>vstval是一个WARL寄存器，它必须能够保存stval可以保存的相同值集。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161742529-1730798017566-51.png" alt="image-20230619161742529"></p>
+<h3 id="8-2-18-Virtual-Supervisor-Address-Translation-and-Protection-Register-vsatp"><a href="#8-2-18-Virtual-Supervisor-Address-Translation-and-Protection-Register-vsatp" class="headerlink" title="8.2.18 Virtual Supervisor Address Translation and Protection Register (vsatp)"></a>8.2.18 Virtual Supervisor Address Translation and Protection Register (vsatp)</h3><p>vsatp寄存器是一个VSXLEN位读&#x2F;写寄存器，它是VS模式的supervisor寄存器satp版本，对于VSXLEN&#x3D;32，其格式如图8.32所示，对于VSXL EN&#x3D;64，其格式见图8.33。</p>
+<p>当V&#x3D;1时，vsatp代替了通常的satp，因此通常读取或修改satp的指令实际上访问了vsatp。vsatp控制VS阶段地址转换，即guest virtual addresses的两阶段转换的第一阶段（见第8.5节）。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619161821642-1730798017566-50.png" alt="image-20230619161821642"></p>
+<p>为了地址转换算法的目的，vsatp寄存器被认为是活动的，除非有效特权模式是U并且hstatus.HU&#x3D;0。然而，即使vsatp处于活动状态，VS阶段页表条目的A位也不能作为推测执行的结果而设置，除非有效的特权模式是VS或VU。</p>
+<blockquote>
+<p>特别是，错误执行的虚拟机加载&#x2F;存储（HLV、HLVX或HSV）指令不得导致VS阶段A位被设置。</p>
+</blockquote>
+<p>当V&#x3D;0时，对vsatp写入不支持的MODE值不会像对satp那样被忽略。相反，vsatp的字段以正常方式为WARL。</p>
+<p>当V&#x3D;0时，vsatp不会直接影响机器的行为，除非虚拟机加载&#x2F;存储（HLV、HLVX或HSV）或mstatus寄存器中的MPRV功能被用来执行加载或存储，就像V&#x3D;1一样。</p>
+<h2 id="8-3-Hypervisor-Instructions"><a href="#8-3-Hypervisor-Instructions" class="headerlink" title="8.3 Hypervisor Instructions"></a>8.3 Hypervisor Instructions</h2><p>系统hypervisor扩展添加了虚拟机加载和存储指令以及两条特权围栏指令。</p>
+<h3 id="8-3-1-Hypervisor-Virtual-Machine-Load-and-Store-Instructions"><a href="#8-3-1-Hypervisor-Virtual-Machine-Load-and-Store-Instructions" class="headerlink" title="8.3.1 Hypervisor Virtual-Machine Load and Store Instructions"></a>8.3.1 Hypervisor Virtual-Machine Load and Store Instructions</h3><p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619162256524-1730798017566-52.png" alt="image-20230619162256524"></p>
+<p>虚拟机监控程序虚拟机加载和存储指令仅在M模式或HS模式下有效，或在hstatus.HU&#x3D;1时在U模式下有效。每个指令执行显式存储器访问，就好像V＝1一样；即，具有适用于VS模式或VU模式下的存储器访问的地址转换和保护以及端序。hstatus的字段SPVP控制访问的权限级别。显式存储器访问在SPVP&#x3D;0时如同在VU模式下进行，并且在SPVP&#x3D;1时如同在VS模式下进行。通常，当V&#x3D;1时，应用两阶段地址转换，并且忽略HS级别sstatus.SUM。HS级别的sstatus.MXR使地址转换的两个阶段（VS阶段和G-stage）都可以读取仅执行页面，而vsstatus.MKR仅影响第一个转换阶段（VS步骤）。</p>
+<p>对于每个RV32I或RV64I加载指令LB、LBU、LH、LHU、LW、LWU和LD，都有一个相应的虚拟机加载指令：HLV.B、HLV.BU、HLV.H、HLV.HU、HLV.W、HLV.WU和HLV.D。对于每个RV32I或RV64I存储指令SB、SH、SW和SD，都有一个相应的虚拟机存储指令：HSV.B、HSV.H、HSV.W和HSV.D。当然，指令HLV.WU、HLV.D和HSV.D对RV32无效。</p>
+<p>指令HLVX.HU和HLVX.WU与HLV.HU和HLV.WU相同，只是在地址转换过程中执行权限代替读取权限。也就是说，被读取的内存必须在地址转换的两个阶段都是可执行的，但不需要读取权限。对于由地址转换产生的主管物理地址，主管物理内存属性必须同时授予执行和读取权限。（主管物理内存属性是由物理内存保护第3.7节针对主管级别修改的机器物理内存属性。）</p>
+<blockquote>
+<p>HLVX无法覆盖机器级物理内存保护（PMP），因此尝试读取PMP指定为仅执行的内存仍然会导致访问故障异常。</p>
+</blockquote>
+<p>HLVX.WU对RV32有效，即使LWU和HLV.WU无效。（对于RV32，HLVX.WU可以被视为HLV.W的变体，因为符号扩展与32位值无关。）</p>
+<p>当V&#x3D;1时，试图执行虚拟机加载&#x2F;存储指令（HLV、HLVX或HSV）会导致虚拟指令陷阱。当hstatus.HU&#x3D;0时，尝试从U模式执行其中一条相同的指令会导致非法的指令陷阱。</p>
+<h3 id="8-3-2-Hypervisor-Memory-Management-Fence-Instructions"><a href="#8-3-2-Hypervisor-Memory-Management-Fence-Instructions" class="headerlink" title="8.3.2 Hypervisor Memory-Management Fence Instructions"></a>8.3.2 Hypervisor Memory-Management Fence Instructions</h3><p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619162926132-1730798017566-53.png" alt="image-20230619162926132"></p>
+<p>hypervisor内存管理围栏指令HFENCE.VMA和HFENCE.GVMA执行类似于SFENCE.VMA的功能（第4.2.1节），除了应用于由CSR vsatp（HFENCE.VVMA）控制的VS级存储器管理数据结构或由CSR hgatp（HFANCE.GVMA）控制（guestphysical memory management data structures）。指令SFENCE.VMA仅应用于由当前satp控制的存储器管理数据结构（当V&#x3D;0时为HS级satp或当V&#x3D;1时为vsatp）。</p>
+<p>HFNCE.VVMA仅在M模式或HS模式下有效。它的效果与暂时进入VS模式并执行SFENCE.VMA大致相同。执行HFENCE..VVMA保证当前hart已经可见的任何先前存储在VS级内存管理数据结构的hart的所有后续隐式读取之前进行排序，而这些隐式读取是针对</p>
+<ul>
+<li>在HFNCE.VVMA之后，并且</li>
+<li>当hgatp.VMID具有与执行HFENCE.VMA时相同的设置时执行。</li>
+</ul>
+<p>当hgatp.VMID与执行HFNCE.VVMA时不同时，无需对隐式读取进行排序。如果操作数&#x3D;&#x3D;<strong>rs1$\neq$x0</strong>&#x3D;&#x3D;，则指定单个guest虚拟地址；如果操作数&#x3D;&#x3D;<strong>rs2$\neq$x0</strong>&#x3D;&#x3D;，则规定单个guest地址空间标识符（ASID）。</p>
+<blockquote>
+<p>HFENCE.VMA指令仅适用于单个虚拟机，该虚拟机由HFENCE.VMA执行时hgatp.VMID的设置标识。</p>
+</blockquote>
+<p>当rs2$\neq$x0时，rs2中保持的值的位XLEN-1:ASIDMAX被保留以供将来的标准使用。在它们的使用被标准扩展定义之前，它们应该被软件归零，而被当前的实现忽略。此外，如果ASIDLEN&lt;ASIDMAX，则实现应忽略rs2中保持的值的位ASIDMAX-1:ASIDLEN。</p>
+<blockquote>
+<p>HFNCE.VVMA的更简单实现可以忽略rs1中的guest virtual addresses和rs2中的客户ASID值，以及hgatp.VMID，并始终为所有虚拟机的VS级内存管理执行全局围栏，甚至为所有内存管理数据结构执行全局围栏。</p>
+</blockquote>
+<p>mstatus.TVM和hstatus.VTVM都不会导致HFNCE.VVMA陷入陷阱。</p>
+<p>当mstatus.TVM&#x3D;0时，HFENCE.GVMA仅在HS模式下有效，或在M模式下有效（与mstatus.TVM无关）。执行HFENCE.GVMA指令可确保当前hart已经可见的任何先前存储都在该hart为遵循HFENCE.GVMA的指令执行的guest物理内存管理数据结构的所有后续隐式读取之前排序。如果操作数rs1̸&#x3D;x0，它指定单个guest物理地址，右移2位，如果操作数rs2̸&#x3D;x0，则指定单个虚拟机标识符（VMID）。</p>
+<blockquote>
+<p>就像在陷阱上写入htval的guest physical addresses一样，rs1中指定的客户物理寻址被右移2位，以适应比当前XLEN更宽的地址。</p>
+</blockquote>
+<p>当rs2$\neq$x0时，rs2中保持的值的位XLEN-1:VMIDMAX被保留以供将来的标准使用。</p>
+<p>在它们的使用被标准扩展定义之前，它们应该被软件归零，而被当前的实现忽略。此外，如果VMIDLEN＜VMIDMAX，则该实现将忽略rs2中保持的值的位VMIDMAX-1:VMIDLEN。</p>
+<blockquote>
+<p>HFENCE.GVMA的更简单实现可以忽略rs1中的guest physical addresses和rs2中的VMID值，并始终为所有虚拟机的客户物理内存管理执行全局围栏，甚至为所有内存管理数据结构执行全局围栏。</p>
+</blockquote>
+<p>如果为给定的VMID更改hgatp.MODE，则必须执行rs1&#x3D;x0（且rs2设置为x0或VMID）的HFENCE.GVMA，以便在MODE更改的情况下订购后续客户翻译，即使旧的MODE或新的MODE为Bare。</p>
+<p>当V&#x3D;1时，尝试执行HFENCE.VMA或HFENCE.GVMA会导致虚拟指令陷阱，而在U模式下尝试执行同样的操作会导致非法指令陷阱。当mstatus.TVM&#x3D;1时，试图在HS模式下执行HFENCE.GVMA也会导致非法的指令陷阱。</p>
+<h2 id="8-4-Machine-Level-CSR"><a href="#8-4-Machine-Level-CSR" class="headerlink" title="8.4  Machine-Level CSR"></a>8.4  Machine-Level CSR</h2><p>系统hypervisor扩展增强或修改了机器CSR mstatus、mstatush、mideleg、mip和mie，并添加了CSR mtval2和mtinst。</p>
+<h3 id="8-4-1-机器状态寄存器（mstatus和mstatush）"><a href="#8-4-1-机器状态寄存器（mstatus和mstatush）" class="headerlink" title="8.4.1 机器状态寄存器（mstatus和mstatush）"></a>8.4.1 机器状态寄存器（mstatus和mstatush）</h3><p>系统hypervisor扩展将MPV和GVA两个字段添加到机器级mstatus或mstatus-CSR，并修改几个现有mstatus字段的行为。图8.34显示了在实现虚拟机监控程序扩展并且MXLEN&#x3D;64时修改的mstatus寄存器。当MXLEN&#x3D;32时，系统hypervisor扩展程序将MPV和GVA添加到mstatus，而不是mstatus。图8.35显示了当系统hypervisor扩展被实现并且MXLEN&#x3D;32时的mstatush寄存器。</p>
+<p>每当陷阱进入M模式时，MPV位（机器先前的虚拟化模式）都由实现写入。正如MPP字段在陷阱时被设置为（标称）特权模式一样，MPV bit 在陷阱时也被设置为虚拟化模式V的值。当执行MRET指令时，虚拟化模式V被设置为MPV，除非MPP＝3，在这种情况下V保持为0。</p>
+<p>每当陷阱进入M模式时，字段GVA（访客虚拟地址）由实现写入。对于将guest虚拟地址写入mtval的任何陷阱（断点、地址未对齐、访问错误、页面错误或guest页面错误），GVA设置为1。对于进入M模式的任何其他陷波器，GVA设置为0。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619164229777-1730798017566-54.png" alt="image-20230619164229777"></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619164410329-1730798017566-55.png" alt="image-20230619164410329"></p>
+<p>mstatus的TSR和TVM字段仅在HS模式下影响执行，而在VS模式下不影响执行。TW字段影响除M模式以外的所有模式下的执行。</p>
+<p>设置TVM&#x3D;1可防止HS模式访问hgatp或执行HFENCE.GVMA或HINVAL.VMA，但对访问vsatp或指令HFENCE.VMA或HINVAL.VVMA没有影响。</p>
+<blockquote>
+<p>TVM存在于mstatus中，允许机器级软件修改由主管级OS管理的地址转换，通常是为了在OS控制的地址转换下面插入另一个地址转换阶段。TVM&#x3D;1启用的指令陷阱允许机器级同时选择satp和hgatp，并替换影子页表，这些影子页表将OS选择的页翻译与M级的低级翻译合并在一起，而OS对此一无所知。M级软件不仅需要这种能力来模拟hypervisor扩展（如果尚未支持的话），而且还需要模拟任何未来的RISC-V扩展，这些扩展可能会修改或添加地址转换阶段，例如，以提高对嵌套hypervisor的支持，即在其他hypervisor之上运行hypervisor。</p>
+<p>然而，设置TVM&#x3D;1不会导致访问vsatp或指令HFENCE.VMA或HINVAL.VVMA的陷阱，也不会导致在VS模式下采取的任何操作的陷阱，因为M级软件预计不需要参与VS阶段地址转换。对于虚拟机来说，只保留VS阶段地址转换，并将所有其他转换阶段合并到由hgatp控制的G-stage阴影页表中，就足够了，而且很可能更快。这一假设确实对当前机器能够有效模拟的未来可能的RISC-V扩展设置了一些限制。</p>
+</blockquote>
+<p><strong>系统hypervisor扩展更改mstatus的Modify Privilege字段MPRV的行为</strong>。当MPRV&#x3D;0时，转换和保护行为正常。当MPRV&#x3D;1时，显式存储器访问被转换和保护，并且端序被应用，就好像当前虚拟化模式被设置为MPV并且当前标称特权模式被设置成MPP一样。表8.5列举了这些案例。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619165141590-1730798017566-56.png" alt="image-20230619165141590"></p>
+<table>
+<thead>
+<tr>
+<th align="center">MPRV</th>
+<th align="center">MPV</th>
+<th align="center">MPP</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td>正常访问；当前特权模式适用。</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td>仅提供HS级翻译和保护的U级访问。</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td>仅提供HS级翻译和保护的HS级访问。</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">-</td>
+<td align="center">3</td>
+<td>M级访问，无需翻译。</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td>VU级访问，具有两阶段翻译和保护功能。HS-level MXR位使任何可执行页面都可读。<br>vsstatus.MXR使那些在VS翻译阶段标记为可执行的页面可读，但前提是在guest物理翻译阶段可读。</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td>VS级访问，具有两阶段翻译和保护功能。HS-level MXR位使任何可执行页面都可读。<br>vsstatus.MXR使那些在VS翻译阶段标记为可执行的页面可读，但前提是在guest物理翻译阶段可读。<br>vsstatus.SUM取代HS-level SUM位。</td>
+</tr>
+</tbody></table>
+<p>表8.5:MPRV对显式内存访问的翻译和保护的影响。</p>
+<p>MPRV不影响虚拟机加载&#x2F;存储指令、HLV、HLVX和HSV。这些指令的显式加载和存储总是像V&#x3D;1一样，并且标称特权模式是hstatus.SSPP，覆盖MPRV。</p>
+<p>mstatus寄存器是HS级sstatus寄存器的超集，但不是vsstatus的超集。</p>
+<h3 id="8-4-2-机器中断委托寄存器-mideleg"><a href="#8-4-2-机器中断委托寄存器-mideleg" class="headerlink" title="8.4.2 机器中断委托寄存器(mideleg)"></a>8.4.2 机器中断委托寄存器(mideleg)</h3><p>当实现hypervisor扩展时，mideleg的第10、6和2位(对应于标准的VS级中断)都是只读的。此外，如果实现了任何客户机外部中断(GEILEN非零)，则mideleg的第12位(对应于主管级客户机外部中断)也是只读位。VS级中断和guest外部中断总是从M模式委派到HS模式。</p>
+<p>对于mideleg的位为零，hideleg、hip和hie中的相应位为只读零。</p>
+<h3 id="8-4-3-机器中断寄存器-mip和mie"><a href="#8-4-3-机器中断寄存器-mip和mie" class="headerlink" title="8.4.3 机器中断寄存器(mip和mie)"></a>8.4.3 机器中断寄存器(mip和mie)</h3><p>hypervisor扩展为hypervisor添加的中断为寄存器mip和mie提供了额外的活动位。图8.36和8.37显示了实现hypervisor扩展时寄存器mip和mie的标准部分(15:0位)。</p>
+<p>mip中的SGEIP、VSEIP、VSTIP、VSSIP是hypervisor CSR hip中相同位的别名，mie中的SGEIE、VSEIE、VSTIE、VSSIE是hypervisor CSR hip中相同位的别名。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619171652730-1730798017566-57.png" alt="image-20230619171652730"></p>
+<h3 id="8-4-4-机器第二Trap值寄存器-mtval2"><a href="#8-4-4-机器第二Trap值寄存器-mtval2" class="headerlink" title="8.4.4 机器第二Trap值寄存器(mtval2)"></a>8.4.4 机器第二Trap值寄存器(mtval2)</h3><p>mtval2寄存器是一个mxlen位读&#x2F;写寄存器，格式如图8.38所示。当一个陷阱进入M模式时，除了mtval之外，还将使用附加的异常特定信息编写mtval2，以帮助软件处理陷阱。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619171747318-1730798017566-58.png" alt="image-20230619171747318"></p>
+<p>当客户机页面错误陷阱进入M模式时，将用零或出错的客户机物理地址向右移动2位来写入mtval2。对于其他陷阱，mtval2设置为零，但未来的标准或扩展可能会为其他陷阱重新定义mtval2的设置。</p>
+<p>如果客户机页面故障是由于第一阶段(VS阶段)地址转换期间的隐式内存访问造成的，那么写入mtval2的客户机物理地址就是发生故障的隐式内存访问的物理地址。CSR mist中提供了其他信息以消除这种情况的歧义。</p>
+<p>否则，对于导致客户机页面错误的未对齐的加载和存储，mtval2中的非零客户机物理地址对应于mtval中的虚拟地址所指示的访问的错误部分。对于具有变长指令的系统上的指令访客页面错误，非零的mtval2对应于由mtval中的虚拟地址所指示的指令的错误部分。</p>
+<p>mtval2是一个WARL寄存器，它必须能够保存0，并且可能只能够保存其他2位移位的guest physical addresses的任意子集(如果有的话)。</p>
+<h3 id="8-4-5-机器陷阱指令寄存器-mtinst"><a href="#8-4-5-机器陷阱指令寄存器-mtinst" class="headerlink" title="8.4.5 机器陷阱指令寄存器(mtinst)"></a>8.4.5 机器陷阱指令寄存器(mtinst)</h3><p>mtinst寄存器是一个mxlen位读&#x2F;写寄存器，格式如图8.39所示。当一个陷阱进入M模式时，mtinst被写入一个值，如果该值非零，则提供有关被捕获的指令的信息，以帮助软件处理该陷阱。可以在trap上写入mtinst的值在第8.6.3节中有文档说明。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619171852916-1730798017566-59.png" alt="image-20230619171852916"></p>
+<p>mtinst是一个WARL寄存器，它只需要能够保存实现可能在陷阱时自动写入它的值。</p>
+<h2 id="8-5-两阶段地址转换"><a href="#8-5-两阶段地址转换" class="headerlink" title="8.5 两阶段地址转换"></a>8.5 两阶段地址转换</h2><p>每当 当前虚拟化模式V为1时，两阶段地址转换和保护生效。</p>
+<p>对于任何虚拟内存访问，原始虚拟地址在<strong>第一阶段</strong>通过VS级地址转换(由<strong>vsatp</strong>寄存器控制)转换为guest physical addresses。</p>
+<p>然后，在<strong>第二阶段</strong>，由<strong>hgatp</strong>寄存器控制的guest物理地址转换将guest物理地址转换为主管物理地址。这两个阶段也被称为VS阶段和G-stage的翻译。虽然在V&#x3D;1时没有禁用两阶段地址转换的选项，但是通过将相应的vsatp或hgatp寄存器调零，可以有效地禁用两阶段转换。</p>
+<p>每当当前虚拟化模式V为1时，两级地址转换和保护就生效。</p>
+<ul>
+<li>对于任何虚拟内存访问，原始虚拟地址(original <strong>virtual address</strong>)在第一阶段通过 VS 级地址转换（由 <strong>vsatp</strong> 寄存器控制）转换为<strong>guest physical addresses</strong>。</li>
+<li>然后，在第二阶段，<strong>guest physical addresses</strong>通过guest physical addresses translation（由 <strong>hgatp</strong> 寄存器控制）转换为supervisor physical address。</li>
+</ul>
+<p>这两个阶段也称为 <strong>VS-stage</strong>和 <strong>G-stage</strong>翻译。尽管当 V&#x3D;1 时没有禁用两级地址转换的选项，但可以通过清零 vsatp 或 hgatp 寄存器来有效地禁用任一级地址转换。</p>
+<p>vsstatus.MXR 使 <strong>只执行页面</strong>(execute-only pages) 可读，仅覆盖(overrides) VS-stage页面保护。在 VS 级别设置 MXR 不会覆盖guest-physical page保护。但是，在 HS 级别设置 MXR 会覆盖 VS-stage和 G-stage仅执行权限。</p>
+<p>当V&#x3D;1时，通常绕过地址转换的内存访问只服从G-stage地址转换。这包括为支持VS级地址转换而进行的内存访问，例如VS级页表的读取和写入。</p>
+<p>机器级物理内存保护适用于supervisor physical addresses，并且无论虚拟化模式如何都有效。</p>
+<h3 id="8-5-1-Guest-Physical-Address转换"><a href="#8-5-1-Guest-Physical-Address转换" class="headerlink" title="8.5.1 Guest Physical Address转换"></a>8.5.1 Guest Physical Address转换</h3><p>guest physical addresses到supervisor physical addresses的映射由CSR hgatp控制(章节8.2.10)。</p>
+<p>当hgatp的MODE字段选择的地址转换方案为Bare时，无需修改，guest物理地址等于主管物理地址，并且在从guest物理地址到主管物理地址的简单转换中不使用内存保护。</p>
+<p>当hgatp.MODE指定Sv32x4、Sv39x4、Sv48x4或Sv57x4的转换方案，G-stage地址转换是Sv32、Sv39、Sv48或Sv57的基于页面的虚拟地址转换方案的变体。在每种情况下，入站地址的大小都被加宽2位(34,41或50位)。为了容纳额外的2位，根页表(仅根页表)被扩展了4倍，变为16 KiB，而不是通常的4 KiB。与其更大的大小相匹配，根页表也必须对齐到16 KiB边界，而不是通常的4 KiB页面边界。</p>
+<p>除特别说明外，在G-stage翻译中，均采用Sv32、Sv39、Sv48、Sv57的其他方面不变。非根页表和所有页表项(pte)的格式与第4.3、4.4、4.5和4.6节中记录的格式相同。</p>
+<p>对于Sv32x4，传入guest物理地址被划分为虚拟页码(VPN)和页面偏移量，如图8.40所示。这个分区与图4.16所示的Sv32虚拟地址的分区相同，只是在VPN的高端多了2位[1]。(注意，分区客户机物理地址的字段也与Sv32分配给物理地址的结构一一对应，如图4.17所示。)</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619172226512-1730798017566-60.png" alt="image-20230619172226512"></p>
+<p>对于Sv39x4，传入guest物理地址被分区，如图8.41所示。这个分区与图4.19所示的Sv39虚拟地址的分区相同，只是在VPN的高端多了2位[2]。地址位63:41必须全部为零，否则会发生客户页面错误异常。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619172242100-1730798017566-61.png" alt="image-20230619172242100"></p>
+<p>对于Sv48x4，传入guest物理地址被分区，如图8.42所示。这个分区与图4.22所示的Sv48虚拟地址的分区相同，只是在VPN的高端多了2位[3]。地址位63:50必须全部为零，否则会发生客户页面错误异常。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619172306796-1730798017566-62.png" alt="image-20230619172306796"></p>
+<p>对于Sv57x4，传入guest物理地址被分区，如图8.43所示。这个分区与图4.25所示的Sv57虚拟地址的分区相同，只是在VPN的高端多了2位[3]。地址位63:50必须全部为零，否则会发生客户页面错误异常。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230619172325999-1730798017566-63.png" alt="image-20230619172325999"></p>
+<blockquote>
+<p>RV32的基于页面的G-stage地址转换方案Sv32x4被定义为支持34位guest物理地址，因此RV32hypervisor不需要限制其虚拟化实际32位RISC-V机器的能力，即使是那些具有33位或34位物理地址的机器。如果机器碰巧使用33位或34位物理地址，这可能包括对其自身进行虚拟化的可能性。将根页表的大小和对齐方式乘以4倍是扩展Sv32以覆盖34位地址的最便宜的方法。对于大多数(可能是所有)实际使用来说，不必要的大根页表可能造成的12 KiB的浪费可以忽略不计。</p>
+<p>对物理地址空间是虚拟地址空间四倍的机器进行虚拟化的一致能力被认为对RV64也有一定的用处。例如，对于实现39位虚拟地址(Sv39)的机器，这允许hypervisor扩展最多支持41位guest物理地址空间，而不需要硬件支持48位虚拟地址(Sv48)，也不需要使用影子页表来模拟更大的地址空间。</p>
+</blockquote>
+<p>Sv32x4、Sv39x4、Sv48x4或Sv57x4guest physical addresses的转换使用与第4.3.2节中介绍的Sv32、Sv39、Sv48或Sv57相同的算法完成，不同之处在于:</p>
+<ul>
+<li>hgatp代替通常的satp;</li>
+<li>若要开始翻译，有效的特权模式必须是VS模式或VU模式;</li>
+<li>检查位U时，始终取当前特权模式为U模式;和</li>
+<li>引发guest-page-fault异常，而不是常规的page-fault异常。</li>
+</ul>
+<p>对于 G-stage 地址转换，所有内存访问(包括为VS阶段地址转换而访问数据结构的访问)都被认为是用户级访问，就像在U模式下执行一样。访问类型权限(可读、可写或可执行)在G-stage翻译期间进行检查，与VS阶段翻译相同。对于支持VS阶段地址转换的内存访问(例如读&#x2F;写VS级页表)，检查权限就像检查加载或存储一样，而不是检查原始访问类型。然而，对于原始访问类型(指令、加载或存储&#x2F;AMO)，总是报告任何异常。</p>
+<p>所有G级pte中的G位都保留用于将来的标准使用。在标准扩展定义它的使用之前，软件应该清除它以实现向前兼容性，而硬件必须忽略它。</p>
+<blockquote>
+<p>G-stage 地址转换对pte使用与常规地址转换相同的格式，甚至包括U位，因为在G-stage 转换和常规HS级地址转换之间可能共享一些(或全部)页表。不管这种用法是否会变得普遍，我们选择不排除它。</p>
+</blockquote>
+<h3 id="8-5-2-Guest页错误"><a href="#8-5-2-Guest页错误" class="headerlink" title="8.5.2 Guest页错误"></a>8.5.2 Guest页错误</h3><p>Guest-page-fault trap可以在CSR medeleg的控制下从M模式委派到HS模式，但不能委派到其他特权模式。在客户机页面故障时，像往常一样使用发生故障的客户机虚拟地址写入CSR mtval或stval，而mtval2或htval要么使用零写入，要么使用发生故障的客户机物理地址写入，并向右移动2位。如第8.6.3节所述，还可以编写关于错误指令或访问的其他原因的信息。</p>
+<p>当指令读取或内存访问不对齐跨越页面边界时，涉及两种不同的地址转换。在这种情况下发生客户页面故障时，写入mtval&#x2F;stval的故障虚拟地址与常规页面故障所需的虚拟地址相同。因此，如果页边界处的字节位于被访问的字节中，则故障虚拟地址可能是高于指令原始虚拟地址的页边界地址。</p>
+<p>当客户页面故障不是由于VS阶段地址转换的隐式内存访问时，写入mtval2&#x2F;htval的非零guest physical addresses应与写入mtval&#x2F;stval的确切虚拟地址相对应。</p>
+<h3 id="8-5-3-内存管理围栏"><a href="#8-5-3-内存管理围栏" class="headerlink" title="8.5.3 内存管理围栏"></a>8.5.3 内存管理围栏</h3><p>Memory-Management Fences</p>
+<p>SFENCE的行为。VMA指令受当前虚拟化模式V的影响。当V&#x3D;0时，virtual-address参数为HS级虚拟地址，ASID参数为HS级ASID。指令指令仅存储到具有后续HS级地址转换的HS级地址转换结构中。</p>
+<p>当V&#x3D;1时，虚拟地址参数为SFENCE。VMA是当前虚拟机中的guest虚拟地址，而ASID参数是当前虚拟机中的VS级ASID。当前虚拟机由CSR hgatp的VMID字段标识，有效的ASID可以认为是该VMID与VS级ASID的结合。SFENCE。VMA指令指令仅存储到VS级地址转换结构中，并在同一虚拟机中进行后续的VS级地址转换，即仅当hgatp。vid与SFENCE时相同。影响执行。</p>
+<p>hypervisor指令HFENCE。VVMA和HFENCE。GVMA提供额外的内存管理栅栏来补充senced . vma。这些指令将在第8.3.2节中描述。</p>
+<p>第3.7.2节讨论了物理内存保护(PMP)和基于页面的地址转换之间的交集。需要注意的是，当修改PMP设置的方式影响保存页表的物理内存或页表指向的物理内存时，M模式软件必须将PMP设置与虚拟内存系统同步。对于HS级地址转换，这是通过在M模式下执行一个SFENCE来完成的。在PMP CSR写入后，rs1&#x3D;x0和rs2&#x3D;x0的VMA指令。如果正在使用G-stage地址转换并且不是Bare，则还需要与其数据结构同步。当修改PMP设置的方式影响保存guest物理页表的物理内存或guest物理页表所指向的物理内存时，HFENCE。在PMP CSR写入后，必须以M模式执行rs1&#x3D;x0和rs2&#x3D;x0的GVMA指令。一个HFENCE。不需要VVMA指令。</p>
+<h2 id="8-6-Traps"><a href="#8-6-Traps" class="headerlink" title="8.6 Traps"></a>8.6 Traps</h2><h3 id="8-6-1-Trap原因码"><a href="#8-6-1-Trap原因码" class="headerlink" title="8.6.1 Trap原因码"></a>8.6.1 Trap原因码</h3><p>hypervisor扩展扩展了陷阱原因编码。表8.6列出了实现hypervisor扩展时可能的M模式和HS模式trap原因码。添加了VS级中断(中断2、6、10)、主管级guest外部中断(中断12)、虚拟指令异常(异常22)和guest页面错误(异常20、21、23)的代码。此外，来自VS模式的环境调用被分配原因10，而来自HS模式或s模式的调用通常使用原因9。</p>
+<blockquote>
+<p>HS模式和VS模式ECALLs使用不同的原因值，因此可以分别委托它们。</p>
+</blockquote>
+<p>当V&#x3D;1时，如果尝试的指令是HS合格的，但在V&#x3D;1时由于权限不足或由于指令被主管程序或hypervisorCSR(如scounteren或hcounteren)明确禁用而无法执行，则通常会引发虚拟指令异常(代码22)，而不是非法指令异常。如果一条指令可以在HS模式下有效地执行(对于指令的寄存器操作数的某些值)，则该指令是HS合格的，假设CSR mstatus的字段TSR和TVM都为零。</p>
+<p>对于访问32位高半CSR(如cycle、htimedelta)的CSR指令，有特殊的规则。当V&#x3D;1且XLEN&gt;32时，试图访问高阶主管级CSR、高阶hypervisorCSR、高阶VS CSR或高阶无特权CSR总是引发非法指令异常。在VS模式中，如果VU模式的XLEN大于32，则访问高一半用户级CSR(不同于无特权CSR)的尝试总是引发非法指令异常。另一方面，当V&#x3D;1和XLEN&#x3D;32时，访问高一半s级、hypervisor、VS或无特权CSR的无效尝试会引发虚拟指令异常，而不是非法指令异常，如果合作伙伴低一半CSR的相同CSR指令(例如:cycle或htimedelta)是HS合格的。同样，在VS模式中，如果VU模式的XLEN为32，那么访问高一半用户级CSR的无效尝试将引发虚拟指令异常，而如果合作伙伴低一半CSR的相同CSR指令是HS合格的，则会引发非法指令异常。</p>
+<blockquote>
+<p>RISC-V特权架构目前没有定义用户级CSR，但它们可能会在该标准的未来版本或扩展中添加。</p>
+</blockquote>
+<img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V中断/image-20230620093251053-1730798017566-65.png" alt="image-20230620093251053" style="zoom:150%;">
+
+<p>具体来说，在以下情况下会引发虚拟指令异常:</p>
+<ul>
+<li><p>在VS模式下，当hcounteren中对应位为0且mcounteren中同一位为1时，尝试访问非高半计数器CSR;</p>
+</li>
+<li><p>在VS模式中，如果XLEN &#x3D; 32，试图访问一个高半计数器CSR在相应的位hcounteren是0,同一位mcounteren是1;</p>
+</li>
+<li><p>在VU模式下，当hcounteren或scounteren中对应的位为0且mcounteren中相同的位为1时，尝试访问非高半计数器CSR;</p>
+</li>
+<li><p>在VU模式下，如果XLEN&#x3D;32，当hcounteren或scounteren中对应的位为0且mcounteren中相同的位为1时，尝试访问高半计数器CSR;</p>
+</li>
+<li><p>在VS模式或VU模式下，尝试执行hypervisor指令(HLV、HLVX、HSV或HFENCE);</p>
+</li>
+<li><p>在VS模式或VU模式中，当在HS模式中允许相同的访问(读&#x2F;写)时，尝试访问已实现的非高阶hypervisorCSR或VS CSR，假设status.TVM&#x3D;0;</p>
+</li>
+<li><p>假设mstatus.TVM&#x3D;0，在VS模式或VU模式下，如果XLEN&#x3D;32，尝试访问已实现的高半hypervisor CSR或高半VS CSR，而在HS模式下允许对CSR的低半伙伴进行相同的访问(读&#x2F;写);</p>
+</li>
+<li><p>在VU模式下，处于状态时尝试执行WFI。TW&#x3D;0，或者执行上级指令(SRET或SFENCE);</p>
+</li>
+<li><p>在VU模式中，当在HS模式中允许相同的访问(读&#x2F;写)时，尝试访问已实现的非高阶主管CSR，假设mstatus.TVM&#x3D;0;</p>
+</li>
+<li><p>假设mstatus.TVM&#x3D;0，在VU模式下，如果XLEN&#x3D;32，尝试访问一个已实现的高半主管CSR，而在HS模式下，对CSR的低半伙伴的访问是允许的;</p>
+</li>
+<li><p>在VS模式下，当hstatus.VTW&#x3D;1和mstatus.TW&#x3D;0时，尝试执行WFI，除非指令在特定于实现的有限时间内完成;</p>
+</li>
+<li><p>在VS模式下，当hstatus.VTSR&#x3D;1时，尝试执行SRET;</p>
+</li>
+<li><p>在VS模式下，尝试执行SFENCE。VMA或SINVAL。当hstatus.VTVM&#x3D;1时，VMA指令或访问satp。</p>
+</li>
+</ul>
+<p>RISC-V特权架构的其他扩展可能会增加在V&#x3D;1时导致虚拟指令异常的情况集。</p>
+<p>在虚拟指令陷阱中，mtval或stval的写入与非法指令陷阱相同。</p>
+<blockquote>
+<p>hypervisor必须模拟引发虚拟指令异常的指令，以支持嵌套hypervisor或出于其他原因，这是很常见的。通常期望机器级将虚拟指令陷阱直接委托给HS级，而非法指令陷阱可能首先在M模式中处理，然后(由软件)有条件地委托给HS级。因此，虚拟指令陷阱通常比非法指令陷阱处理得更快。</p>
+<p>当不模拟捕获指令时，hypervisor应该将虚拟指令陷阱转换为客户虚拟机的非法指令异常。</p>
+</blockquote>
+<blockquote>
+<p>由于处于状态的TSR和TVM旨在仅影响s模式(HS模式)，因此在确定VS模式中的异常时忽略它们。</p>
+</blockquote>
+<p>如果一条指令可能引发多个同步异常，表8.7中优先级递减的顺序指示了哪个异常被获取并在mcause或scause中报告。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620095034291-1730798017566-64.png" alt="image-20230620095034291"></p>
+<h3 id="8-6-2-Trap表项"><a href="#8-6-2-Trap表项" class="headerlink" title="8.6.2 Trap表项"></a>8.6.2 Trap表项</h3><p>当trap在HS模式或U模式下发生时，它将进入M模式，除非由medelegate或mideleg委托，在这种情况下它将进入HS模式。当trap在VS模式或VU模式下发生时，它进入M模式，除非由medelegate或mideleg委托，在这种情况下，它进入HS模式，除非由hedeleg或hideleg进一步委托，在这种情况下，它进入VS模式。</p>
+<p>当trap进入M模式时，虚拟化模式V设置为0,mstatus(或mstatush)中的MPV和MPP字段设置如表8.8所示。M模式的trap还写入mstatus&#x2F;mstatush中的GVA、MPIE和MIE字段，并写入csv字段mepc、mcause、mtval、mtval2和mtinst。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620095148326-1730798017566-66.png" alt="image-20230620095148326"></p>
+<p>当trap进入HS模式时，虚拟化模式V设置为0,hstatus设置为0。SPV和地位。SPP按表8.9设置。如果trap前V为1，则设置hstatus中的字段SPVP与status. spp相同;否则，SPVP保持不变。进入HS模式的trap还会在hstatus中写入字段GVA，在sstatus中写入字段SPIE和SIE，在CSRs中写入字段sepc、cause、stval、htval和htinst。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620095233766-1730798017566-67.png" alt="image-20230620095233766"></p>
+<p>当trap进入VS模式时，vsstatus。SPP按表8.10设置。不修改Register hstatus和HS-level sstatus，虚拟化模式V保持1。进入VS模式的trap还会在vsstatus中写入字段SPIE和SIE，并写入CSR vsepc、vcause和vstval。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620095311698-1730798017566-68.png" alt="image-20230620095311698"></p>
+<h3 id="8-6-3-mtinst或htinst的转换指令或伪指令"><a href="#8-6-3-mtinst或htinst的转换指令或伪指令" class="headerlink" title="8.6.3 mtinst或htinst的转换指令或伪指令"></a>8.6.3 mtinst或htinst的转换指令或伪指令</h3><p>在任何进入M模式或HS模式的陷阱中，这些值会自动写入相应的陷阱指令CSR、mtinst或htinst中:</p>
+<ul>
+<li>零;</li>
+<li>捕获指令的转换;</li>
+<li>自定义值(仅当捕获指令是非标准指令时允许);</li>
+<li>或一个特殊的伪指令。</li>
+</ul>
+<p>除非需要一个伪指令值(稍后会描述)，否则写入mtinst或htinst的值可能总是为零，这表明硬件没有在寄存器中为这个特定的陷阱提供任何信息。</p>
+<blockquote>
+<p>写入陷阱指令CSR的值有两个目的。首先是提高陷阱处理程序中指令仿真的速度，部分原因是允许处理程序跳过从内存加载陷阱指令，部分原因是避免了解码和执行指令的一些工作。第二个目的是通过伪指令提供额外的关于客户页面错误异常的信息，这些异常是由为VSstage地址转换进行的隐式内存访问引起的。</p>
+<p>编写捕获指令的转换，而不是简单地复制原始指令，以便尽量减少硬件负担，同时仍然向陷阱处理程序提供模拟指令所需的信息。实现可以在任何时候通过用零代替转换后的指令来减少工作量。</p>
+</blockquote>
+<p>在中断时，写入陷阱指令寄存器的值总是零。在同步异常中，如果写入非零值，则该值的下列条件之一必须为真:</p>
+<ul>
+<li><p>比特0为1，将比特1替换为1，使该值成为标准指令的有效编码。<br>在这种情况下，被捕获的指令与寄存器值所指示的指令类型相同，寄存器值是捕获指令的转换，如后面定义的那样。例如，如果比特1:0为二进制11，寄存器值为标准LW(加载字)指令的编码，则捕获指令为LW，寄存器值为捕获LW指令的转换。</p>
+</li>
+<li><p>比特0为1，将比特1替换为1，使该值成为明确指定用于自定义指令的指令编码(而不是未使用的保留编码)。<br>这是一个自定义值。被捕获的指令是非标准指令。自定义值的解释在本标准中没有其他规定。</p>
+</li>
+<li><p>该值是后面定义的特殊伪指令之一，所有这些伪指令的bit1:0 &#x3D; 00。</p>
+</li>
+</ul>
+<p>这三种情况排除了大量其他可能的值，例如所有那些位为1:0等于二进制10的值。未来的标准或扩展可能会定义额外的情况，从而允许当前排除的值。软件可以安全地将陷阱指令寄存器中无法识别的值视为零。</p>
+<blockquote>
+<p>为了向前兼容本标准的未来修订版，解释来自mtinst或htinst的非零值的软件必须完全验证该值符合上面列出的情况之一。例如，对于RV64，发现mtinst的6:0位是0000011，而14:12位是010，不足以确定第一种情况适用，并且捕获指令是标准的LW指令;相反，软件还必须确认mtinst的63:32位都是零。未来的标准可能会为64位mtinst定义新的值，这些值在63:32位中是非零的，但在31:0位中可能恰好具有与标准RV64指令相同的位模式。</p>
+</blockquote>
+<blockquote>
+<p>与标准指令不同，不要求自定义值的指令编码与被捕获的指令具有相同的“类型”(甚至与捕获指令有任何相关性)。</p>
+</blockquote>
+<p>表8.11显示了针对每个标准异常原因可能自动写入trap指令寄存器的值。对于阻止获取指令的异常，只能写入零或伪指令值。只有当捕获指令是非标准指令时，才可以自动写入自定义值。将来的标准或扩展可能允许从先前建立的允许值集中选择其他值来写入。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620100733821-1730798017566-71.png" alt="image-20230620100733821"></p>
+<p>如表中所列，同步异常可以将捕获指令的标准转换写入陷阱指令寄存器，仅用于显式内存访问(来自加载、存储和AMO指令)引起的异常。因此，目前仅为这些内存访问指令定义了标准转换。如果没有定义转换的标准指令发生同步陷阱，则陷阱指令寄存器应写入零(或者，在某些情况下，写入一个特殊的伪指令值)。</p>
+<p>对于非压缩指令且为LB、LBU、LH、LHU、LW、LWU、LD、FLW、FLD、FLQ或FLH之一的标准加载指令，转换后的指令格式如图8.44所示。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620100753539-1730798017566-70.png" alt="image-20230620100753539"></p>
+<p>对于一个不是压缩指令的标准存储指令，它是SB、SH、SW、SD、FSW、FSD、FSQ或FSH之一，转换后的指令格式如图8.45所示。</p>
+<p>对于一个标准的原子指令(load-reserved、store-conditional或AMO指令)，转换后的指令格式如图8.46所示。</p>
+<p>对于标准的虚拟机加载&#x2F;存储指令(HLV、HLVX或HSV)，转换后的指令格式如图8.47所示。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620100839882-1730798017566-69.png" alt="image-20230620100839882"></p>
+<p>在上述所有转换后的指令中，Addr。偏移字段取代了19:15位指令的rs1字段，是故障虚拟地址(写入到mtval或stval)与原始虚拟地址之间的正差。只有在内存访问不对齐的情况下，这个差异才能是非零的。还要注意，对于基本加载和存储，转换将指令的直接偏移字段替换为零。</p>
+<p>对于标准压缩指令(16位大小)，转换后的指令如下:</p>
+<ol>
+<li><p>将压缩指令展开为32位的等效指令。</p>
+</li>
+<li><p>转换32位等效指令。</p>
+</li>
+<li><p>将位1替换为0。</p>
+</li>
+</ol>
+<p>如果捕获指令被压缩，转换后的标准指令的位1:0将是二进制01，如果没有压缩，则为11。</p>
+<blockquote>
+<p>在解码mtinst或htinst的内容时，一旦软件确定寄存器包含标准基本加载(LB、LBU、LH、LHU、LW、LWU、LD、FLW、FLD、FLQ或FLH)或基本存储(SB、SH、SW、SD、FSW、FSD、FSQ或FSH)的编码，就不需要再确认直接偏移字段(31:25、24:20或11:7)是否为零。知道寄存器的值是基本加载&#x2F;存储的编码就足以证明捕获指令是相同类型的</p>
+<p>该标准的未来版本可能会向当前为零的字段添加信息。但是，为了向后兼容，任何此类信息将仅用于性能目的，可以安全地忽略。</p>
+</blockquote>
+<p>对于客户页面错误，如果:(a)错误是由VS阶段地址转换的隐式内存访问引起的，并且(b)将非零值(出错的guest physical addresses)写入mtval2或htval，则trap指令寄存器将使用一个特殊的伪指令值写入。如果两个条件都满足，则写入mtinst或htinst的值必须取自表8.12;零是不允许的。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620101004942-1730798017566-72.png" alt="image-20230620101004942"></p>
+<p>定义的伪指令值被设计成与基本加载和存储的编码紧密对应，如表8.13所示。</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230620101027513-1730798017566-73.png" alt="image-20230620101027513"></p>
+<p>写伪指令(0x00002020或0x00003020)用于机器试图自动更新VS级页表中的A位和&#x2F;或D位的情况。所有其他用于VS阶段地址转换的隐式内存访问都将被读取。如果机器从未自动更新VS级页表中的a位或D位(将此留给软件)，则永远不会出现写情况。这种页表更新实际上必须是原子的，而不仅仅是简单的写操作，这一事实对于伪指令来说是忽略的。</p>
+<blockquote>
+<p>如果需要伪指令值的条件在M模式中可能出现，那么mtinst不能完全是只读零;HS-mode和hst也是如此。但是，在这种情况下，trap指令寄存器可能最低限度地只支持值0和0x00002000或0x00003000，也可能支持0x00002020或0x00003020，每个寄存器只需要硬件中的一个或两个触发器。</p>
+<p>在这里，忽略页表更新的原子性需求并没有什么害处，因为在这些情况下，不希望hypervisor模拟失败的隐式内存访问。更确切地说，hypervisor获得了关于错误访问的足够信息，以便能够在通过重试错误指令恢复执行之前使内存可访问(例如，通过恢复丢失的虚拟内存页)。</p>
+</blockquote>
+<h3 id="8-6-4-Trap返回"><a href="#8-6-4-Trap返回" class="headerlink" title="8.6.4 Trap返回"></a>8.6.4 Trap返回</h3><p>MRET指令用于从进入M模式的陷阱返回。MRET首先根据mstatus或mstatush中的MPP和MPV值确定新的特权模式是什么，如表8.8所示。MRET则在mstatus&#x2F;mstatush中设置MPV&#x3D;0、MPP&#x3D;0、MIE&#x3D;MPIE、MPIE&#x3D;1。最后，MRET设置前面确定的特权模式，并设置pc&#x3D;mepc。</p>
+<p>SRET指令用于从进入HS模式或VS模式的陷阱返回。它的行为取决于当前的虚拟化模式。</p>
+<p>当以M模式或HS模式(即V&#x3D;0)执行时，SRET首先根据hstatus中的值确定新的特权模式是什么。SPV和地位。SPP，如表8.9中编码的。然后设置hstatus。SPV&#x3D;0，在sstatus中设置SPP&#x3D;0, SIE&#x3D;SPIE, SPIE&#x3D;1。最后，SRET设置前面确定的特权模式，并设置pc&#x3D;sepc。</p>
+<p>当以VS模式(即V&#x3D;1)执行时，SRET根据表8.10设置特权模式，在vsstatus中设置SPP&#x3D;0, SIE&#x3D;SPIE, SPIE&#x3D;1，最后设置pc&#x3D;vsepc。</p>
+<h1 id="AIA"><a href="#AIA" class="headerlink" title="AIA"></a>AIA</h1><h2 id="1-新增的CSR"><a href="#1-新增的CSR" class="headerlink" title="1.  新增的CSR"></a>1.  新增的CSR</h2><h2 id="1-1-miselect与mireg间接访问的寄存器"><a href="#1-1-miselect与mireg间接访问的寄存器" class="headerlink" title="1.1 miselect与mireg间接访问的寄存器"></a>1.1 miselect与mireg间接访问的寄存器</h2><p>miselect 0x350<br>        mireg     0x351</p>
+<img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V中断/image-20230613102149237-1730798017566-75.png" alt="image-20230613102149237">
+
+<p>0x30-0x3F major interrupt priorites</p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230613102619528-1730798017566-74.png" alt="image-20230613102619528"></p>
+<p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/RISC-V%E4%B8%AD%E6%96%AD/image-20230613102127993-1730798017566-76.png" alt="image-20230613102127993"></p>
+<blockquote>
+<p>0x00 - 0x20 reserved</p>
+<p>0x30 - 0x3F major interrupt priotites 主要中断优先级</p>
+<blockquote>
+<p>0x30  iprio0  每8bit代表一个中断的优先级</p>
+<p>0x31  iprio1</p>
+<p>……</p>
+<p>0x3F  iprio15</p>
+</blockquote>
+<p>0x40 - 0x6F reserved</p>
+<p>0x70 - 0xFF external interrupts(only with an IMSIC) 外部中断</p>
+<blockquote>
+<p>0x70 eidelivery  外部中断递交使能寄存器</p>
+<p>0x72 eithreshold 外部中断使能门限寄存器</p>
+<p>0x80 eip0 外部中断挂起</p>
+<p>……</p>
+<p>0xBF eip63</p>
+<p>0xC0 eie0  外部中断使能</p>
+<p>……</p>
+<p>0xFF eie64</p>
+</blockquote>
+</blockquote>
+<h2 id="1-2-mtopei-mtopi"><a href="#1-2-mtopei-mtopi" class="headerlink" title="1.2  mtopei &#x2F; mtopi"></a>1.2  mtopei &#x2F; mtopi</h2><p>0x35C         mtopei      Machine top external interrupt(only with an IMSIC)<br>        0xFB0         mtopi        Machine top interrupt</p>
+<p>&#x3D;&#x3D;<strong>*topei CSR (mtopei, stopei或vstopei)的值表示中断文件当前最高优先级的挂起并启用的中断</strong>&#x3D;&#x3D;，如果eithreshold不为零，则该中断也超过其eithreshold寄存器指定的优先级阈值。具有较低标识号的中断具有较高的优先级。</p>
+<p>&#x3D;&#x3D;<strong>在*topei CSR中报告的中断标识是外部中断的次要标识。</strong>&#x3D;&#x3D;</p>
+<p><strong>机器级CSR mtopi是只读的，宽度为MXLEN。读取mtopi返回有关机器级别的最高优先级挂起并启用的中断的信息</strong>；mtopi的值不受CSR状态中全局中断使能MIE的影响。</p>
+<h2 id="APLIC"><a href="#APLIC" class="headerlink" title="APLIC"></a>APLIC</h2><h3 id="内存映射寄存器"><a href="#内存映射寄存器" class="headerlink" title="内存映射寄存器"></a>内存映射寄存器</h3><p>APLIC支持的每个中断域，都有一个专用的内存映射控制区域，用于管理该域中的中断。<strong>这个控制区域的大小是4kib的倍数</strong>，并与4kib地址边界对齐。<strong>最小有效控制区域为16 KiB</strong></p>
+<p>从偏移的0x4000开始,一个中断域的控制区域可以<strong>选择有一个中断交付控制(IDC)结构</strong>，一个对每个潜在的hart指数在范围0到某个最大值，至少与中断域的最大hart指数值一样大。<strong>只有当域被配置为直接中断时，IDC结构才会被使用，而不是由MSIs转发</strong>。一个中断域只支持MSIs中断转发，而不是通过APLIC直接传递的中断不需要IDC结构在其控制区域。</p>
+<table>
+<thead>
+<tr>
+<th>offset</th>
+<th>register name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0x0000</td>
+<td>domaincfg</td>
+<td>中断域的全局使能 、交付模式和数据大小端</td>
+</tr>
+<tr>
+<td>0x0004  - 0x0FFC</td>
+<td>sourcecfg[<strong>1-1023</strong>]</td>
+<td>控制中断源在该域的<strong>模式</strong>和到<strong>子域的委托</strong>，最多配置1023个源</td>
+</tr>
+<tr>
+<td>0x1BC0 - 0x1BC4</td>
+<td>mmsiaddrcfg&#x2F;mmsiaddrcfgh</td>
+<td>机器级中断域选择性地提供用于确定 传出MSI的写地址的参数</td>
+</tr>
+<tr>
+<td>0x1BC8 - 0x1BCC</td>
+<td>smsiaddrcfg&#x2F;smsiaddrcfgh</td>
+<td>选择性地提供管理级域使用的参数，以确定写传出MSI的地址</td>
+</tr>
+<tr>
+<td>0x1C00 - 0x1C7C</td>
+<td>setip[<strong>0-31</strong>]</td>
+<td>设置和读取中断挂起位，每bit代表一个中断是否挂起，<br>最大是1023（1024-1，中断标识0无效）</td>
+</tr>
+<tr>
+<td>0x1CDC</td>
+<td>setipnum</td>
+<td>将32位值i写入寄存器setipnum，则可能会将源i的挂起位设置为1，读0</td>
+</tr>
+<tr>
+<td>0x1D00 - 0x1D7C</td>
+<td>in_clrip[<strong>0-31</strong>]</td>
+<td>读返回整流输入值，写清除相应挂起位</td>
+</tr>
+<tr>
+<td>0x1DDC</td>
+<td>clripnum</td>
+<td>写入32位值i将尽可能清除源i的挂起位，读0</td>
+</tr>
+<tr>
+<td>0x1E00 - 0x1E7C</td>
+<td>setie[<strong>0-31</strong>]</td>
+<td>设置和读取中断使能位，每bit代表一个中断是否使能</td>
+</tr>
+<tr>
+<td>0x1EDC</td>
+<td>setienum</td>
+<td>写入值i会将源i的使能位设置为1，读0</td>
+</tr>
+<tr>
+<td>0x1F00 - 0x1F7C</td>
+<td>clrie[<strong>0-31</strong>]</td>
+<td>写清除相应使能位，读0</td>
+</tr>
+<tr>
+<td>0x1FDC</td>
+<td>clrienum</td>
+<td>写入值i会清除源i的使能位，读0</td>
+</tr>
+<tr>
+<td>0x2000</td>
+<td>setipnum_le</td>
+<td>设置中断挂起位，按数字小端，同setipnum，系统为大端时才需要实现</td>
+</tr>
+<tr>
+<td>0x2004</td>
+<td>setipnum_be</td>
+<td>设置中断挂起位，按数字大端，同setipnum，系统为小端时才需要实现</td>
+</tr>
+<tr>
+<td>0x3000</td>
+<td>genmsi</td>
+<td>将临时MSI从APLIC发送到hart</td>
+</tr>
+<tr>
+<td>0x3004 - 0x3FFC</td>
+<td>target[<strong>1-1023</strong>]</td>
+<td>决定来自源的中断被发送信号或转发到哪个hart，<strong>直传模式下的优先级</strong></td>
+</tr>
+<tr>
+<td>0x4000-0x401C</td>
+<td>IDC[0]</td>
+<td>对应索引号为0的hart</td>
+</tr>
+<tr>
+<td>0x4020-0x403C</td>
+<td>IDC[1]</td>
+<td>对应索引号为1的hart</td>
+</tr>
+<tr>
+<td>……</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="4-8-APLIC直接中断交付"><a href="#4-8-APLIC直接中断交付" class="headerlink" title="4.8 APLIC直接中断交付"></a>4.8 APLIC直接中断交付</h3><h4 id="IDC-Interrupt-delivery-control-结构"><a href="#IDC-Interrupt-delivery-control-结构" class="headerlink" title="IDC (Interrupt delivery control)结构"></a>IDC (Interrupt delivery control)结构</h4><p>只有APLIC直接向hart提交中断才会用到</p>
+<table>
+<thead>
+<tr>
+<th>offset</th>
+<th>register name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0x00</td>
+<td>idelivery</td>
+<td>控制是否将针对相应hart的中断交付给hart</td>
+</tr>
+<tr>
+<td>0x04</td>
+<td>iforce</td>
+<td>用于测试，强制一个中断被断言到相应的hart。</td>
+</tr>
+<tr>
+<td>0x08</td>
+<td>ithreshold</td>
+<td>决定了 向相应hart发出中断的 最小中断优先级(最大优先级数值)</td>
+</tr>
+<tr>
+<td>0x18</td>
+<td>topi</td>
+<td>表示当前针对当前hart的最高优先级的挂起和启用中断</td>
+</tr>
+<tr>
+<td>0x1c</td>
+<td>claimi</td>
+<td><strong>claimi</strong>与topi具有相同的值，读取**<code>claimi</code><strong>同时具有</strong>清除所报告的中断标识的挂起位**的副作用</td>
+</tr>
+</tbody></table>
+<h1 id="A1"><a href="#A1" class="headerlink" title="A1"></a>A1</h1><hr>
+<p>chatgpt：</p>
+<p>在超标量处理器中，这些缩写通常代表着不同的功能单元或组件。以下是它们在超标量处理器中可能代表的部件：</p>
+<ol>
+<li><strong>DEC</strong>: Decoder，解码器，负责解码指令并确定执行路径。</li>
+<li><strong>DTU</strong>: Data Transfer Unit，数据传输单元，负责数据传输操作。</li>
+<li><strong>FEXU</strong>: Floating-Point Execution Unit，浮点执行单元，用于执行浮点运算。</li>
+<li><strong>IEXY</strong>: Integer Execution Unit，整数执行单元，用于执行整数运算。</li>
+<li><strong>IFU</strong>: Instruction Fetch Unit，指令获取单元，负责从内存中获取指令。</li>
+<li><strong>ISS</strong>: Instruction Scheduler，指令调度器，负责对指令进行动态调度以提高执行效率。</li>
+<li><strong>L2C</strong>: Level 2 Cache，二级缓存，用于提供更快的数据访问速度。</li>
+<li><strong>LSU</strong>: Load-Store Unit，负责加载和存储数据的单元，用于执行内存操作。</li>
+<li><strong>MMU</strong>: Memory Management Unit，内存管理单元，负责虚拟地址到物理地址的映射和内存保护。</li>
+<li><strong>REN</strong>: Reorder Engine，重排序引擎，负责处理乱序执行指令。</li>
+<li><strong>ROB</strong>: Reorder Buffer，重排序缓冲区，用于存储乱序执行指令的结果。</li>
+<li><strong>SHR</strong>: Shared Resource，共享资源，指多个功能单元之间共享的资源，如寄存器文件、执行端口等。</li>
+</ol>
+<hr>
+<h2 id="module-分析"><a href="#module-分析" class="headerlink" title="module 分析"></a>module 分析</h2><p>ding_cdc_syncn_cpu和ding_cdc_syncn_sys内部实现是一样的</p>
+<h1 id="SGEI"><a href="#SGEI" class="headerlink" title="SGEI"></a>SGEI</h1><p>SGEI 是Supervisor level guest 外部中断，在使能H扩展后，硬件通过mideleg[12]自动委托到HS</p>
+<p><strong>当能够触发一个SGEI时，会trap到HS模式，SGEI永远不会trap到M模式</strong></p>
+<p>当hgeip被拉高时，可能会触发SGEI中断，也可能触发VSEI中断，具体触发哪种中断，由hgeie和hstatus.VGEIN决定:<br>hgeie设置为1时，会触发SGEI中断，由HS处理，当hgeie设置为0，且hstatus.VGEIN对应位设置为1时会触发VSEI中断直接由对应的vCPU处理，在一个vCPU未投入运行时，配置hgeie对于这个CPU有效(hgeie&#x3D;1)，在一个VCPU投入运行之前，hypervisor可I以配置VGEIN的值是这个vCPU的编号，配置加hgeie对于这个vCPU无效(hgeie&#x3D;0)，在这样的配置下，当这个vCPU对应的VS中断到来时，中断被直通到guest，当来的不是这个vCPU的VS中断时，在HS触发S_GEXT中断</p>
+<h1 id="虚拟中断注入"><a href="#虚拟中断注入" class="headerlink" title="虚拟中断注入"></a>虚拟中断注入</h1><p>Hypervisor扩展定义了额外的csr用于隔离VM和VMM能访问到的资源</p>
+<h2 id="HS-VS"><a href="#HS-VS" class="headerlink" title="HS-&gt;VS"></a>HS-&gt;VS</h2><h3 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h3><p>实现没有VM能够直接控制的中断控制器（为了隔离与保护）时，VMM必须为VM模拟中断控制器。</p>
+<h3 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h3><p>VMM通过写hvip向VM注入虚拟中断，<strong>硬件</strong>在满足以下条件时：</p>
+<ol>
+<li>当前特权等级为VS，或VU（通过VMM中断注入，不会在VU中，只有实现虚拟中断直通，才有可能从VU态trap到VS）</li>
+<li>VSIP和VSIE相应的bit都为高（hideleg肯定也为高），且vsstatus.SIE&#x3D;&#x3D;1</li>
+</ol>
+<p>会产生一个VS-level的trap（<strong>硬件</strong>需要实现如下操作）：</p>
+<ol>
+<li><strong>vstvec</strong>：PC跳到vstvec的地址</li>
+<li><strong>vsepc</strong>：当前PC值保存到vsepc</li>
+<li><strong>vscause</strong>：保存中断原因</li>
+<li><strong>vsscrath</strong>：保存上下文空间的指针 &#x2F;&#x2F; todo how to use</li>
+<li>vsstatus：保修改一些状态位</li>
+<li>。。。。。。</li>
+</ol>
+<blockquote>
+<p>在VM的VS-level的中断处理函数访问hypervisor需要模拟的操作时，会触发虚拟指令异常（从而又trap到HS模式模式，由HS进行模拟）。VM的中断处理函数不会感知到相应硬件的变化，</p>
+</blockquote>
+<p>在中断处理函数中（<strong>软件</strong>）：</p>
+<ol>
+<li>保存之前执行流的上下文（通用寄存器。。。保存到VM的堆栈中）</li>
+<li>读cause判断是异常还是中断并调用相应的中断处理函数<ol>
+<li>如果需要访问PLIC等不支持虚拟化的外部中断控制器，则需要VMM为VM模拟外部中断控制器（期间会触发多次异常，cpu在HS和VS多次切换，以上场景会发生多次）</li>
+</ol>
+</li>
+<li>中断处理完成后返回</li>
+<li>恢复之前执行流的上下文（通用寄存器。。。从VM的堆栈中恢复）</li>
+<li>执行sret，回到之前的执行流</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/RISC-V/" rel="tag"># RISC-V</a>
+              <a href="/tags/%E4%B8%AD%E6%96%AD/" rel="tag"># 中断</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/06/RISC-V%E7%89%B9%E6%9D%83%E6%9E%B6%E6%9E%84/" rel="prev" title="RISC-V 特权架构">
+                  <i class="fa fa-angle-left"></i> RISC-V 特权架构
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/11/06/RISC-V%E9%80%9A%E8%AF%86/" rel="next" title="RISC-V通识">
+                  RISC-V通识 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu JInlin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+
+</body>
+</html>

@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/312127.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/312127.svg">
   <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
 <link rel="stylesheet" href="/css/main.css">
@@ -18,24 +17,24 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="PCIe简介PCIe是基于PCI总线进一步演进出来的点对点，高速串行总线协议（使用SerDes） PCIe根据实现 分为事务层、数据链路层、物理层3个层次 PCIe的架构主要由五个部分组成：Root Complex，PCIe Bus，Endpoint，Port and Bridge，Switch。其整体架构呈现一个树状结构，如下图所示：    设计主要关注RC、switch、EP，目前市面上 对于">
+    <meta name="description" content="收集了一些PCIe的资料">
 <meta property="og:type" content="article">
 <meta property="og:title" content="PCIe">
 <meta property="og:url" content="http://example.com/2024/09/24/PCIe/index.html">
-<meta property="og:site_name" content="WJL&#39;s Blog">
-<meta property="og:description" content="PCIe简介PCIe是基于PCI总线进一步演进出来的点对点，高速串行总线协议（使用SerDes） PCIe根据实现 分为事务层、数据链路层、物理层3个层次 PCIe的架构主要由五个部分组成：Root Complex，PCIe Bus，Endpoint，Port and Bridge，Switch。其整体架构呈现一个树状结构，如下图所示：    设计主要关注RC、switch、EP，目前市面上 对于">
+<meta property="og:site_name" content="WJL">
+<meta property="og:description" content="收集了一些PCIe的资料">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/09/24/PCIe/1727155307697.jpg">
-<meta property="og:image" content="http://example.com/2024/09/24/PCIe/image-20240924144216635.png">
-<meta property="og:image" content="http://example.com/2024/09/24/PCIe/image-20240924144233256.png">
+<meta property="og:image" content="http://example.com/2024/09/24/PCIe/PCIe/1727155307697-1730798125697-1.jpg">
+<meta property="og:image" content="http://example.com/2024/09/24/PCIe/PCIe/image-20240924144216635-1730798125697-3.png">
+<meta property="og:image" content="http://example.com/2024/09/24/PCIe/PCIe/image-20240924144233256-1730798125697-5.png">
 <meta property="article:published_time" content="2024-09-24T05:06:12.000Z">
-<meta property="article:modified_time" content="2024-09-26T05:45:01.163Z">
+<meta property="article:modified_time" content="2024-11-15T03:24:28.122Z">
 <meta property="article:author" content="Wu JInlin">
 <meta property="article:tag" content="PCIe">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/2024/09/24/PCIe/1727155307697.jpg">
+<meta name="twitter:image" content="http://example.com/2024/09/24/PCIe/PCIe/1727155307697-1730798125697-1.jpg">
 
 
 <link rel="canonical" href="http://example.com/2024/09/24/PCIe/">
@@ -45,7 +44,7 @@
 <script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/09/24/PCIe/","path":"2024/09/24/PCIe/","title":"PCIe"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>PCIe | WJL's Blog</title>
+<title>PCIe | WJL</title>
   
 
 
@@ -78,9 +77,10 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <p class="site-title">WJL's Blog</p>
+      <p class="site-title">WJL</p>
       <i class="logo-line"></i>
     </a>
+      <p class="site-subtitle" itemprop="description">Fighting forgetfulness</p>
   </div>
 
   <div class="site-nav-right">
@@ -117,31 +117,33 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#PCIe%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">PCIe简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E5%B1%82%E8%AF%B7%E6%B1%82"><span class="nav-number">2.</span> <span class="nav-text">事务层请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4"><span class="nav-number">2.1.</span> <span class="nav-text">内存空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4"><span class="nav-number">2.2.</span> <span class="nav-text">配置空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO%E7%A9%BA%E9%97%B4"><span class="nav-number">2.3.</span> <span class="nav-text">IO空间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E8%BE%93%E5%B1%82"><span class="nav-number">3.</span> <span class="nav-text">传输层</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#PCIe%E7%AE%80%E4%BB%8B"><span class="nav-text">PCIe简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E5%B1%82%E8%AF%B7%E6%B1%82"><span class="nav-text">事务层请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4"><span class="nav-text">内存空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4"><span class="nav-text">配置空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO%E7%A9%BA%E9%97%B4"><span class="nav-text">IO空间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E8%BE%93%E5%B1%82"><span class="nav-text">传输层</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu JInlin"
+      src="/images/20241114140630.jpg">
   <p class="site-author-name" itemprop="name">Wu JInlin</p>
-  <div class="site-description" itemprop="description"></div>
+  <div class="site-description" itemprop="description">个人博客</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -171,18 +173,18 @@
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/09/24/PCIe/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/20241114140630.jpg">
       <meta itemprop="name" content="Wu JInlin">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="WJL's Blog">
-      <meta itemprop="description" content="">
+      <meta itemprop="name" content="WJL">
+      <meta itemprop="description" content="个人博客">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="PCIe | WJL's Blog">
-      <meta itemprop="description" content="">
+      <meta itemprop="name" content="PCIe | WJL">
+      <meta itemprop="description" content="收集了一些PCIe的资料">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -204,7 +206,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-09-26 13:45:01" itemprop="dateModified" datetime="2024-09-26T13:45:01+08:00">2024-09-26</time>
+      <time title="修改时间：2024-11-15 11:24:28" itemprop="dateModified" datetime="2024-11-15T11:24:28+08:00">2024-11-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -219,6 +221,7 @@
   
 </div>
 
+            <div class="post-description">收集了一些PCIe的资料</div>
         </div>
       </header>
 
@@ -228,8 +231,7 @@
     <div class="post-body" itemprop="articleBody"><h2 id="PCIe简介"><a href="#PCIe简介" class="headerlink" title="PCIe简介"></a>PCIe简介</h2><p>PCIe是基于PCI总线进一步演进出来的点对点，高速串行总线协议（使用SerDes）</p>
 <p>PCIe根据实现 分为事务层、数据链路层、物理层3个层次</p>
 <p>PCIe的架构主要由五个部分组成：Root Complex，PCIe Bus，Endpoint，Port and Bridge，Switch。其整体架构呈现一个树状结构，如下图所示：</p>
-<img src="/2024/09/24/PCIe/1727155307697.jpg" class="" width="1727155307697">
-
+<p><img src="/2024/09/24/PCIe/PCIe/1727155307697-1730798125697-1.jpg" alt="1727155307697"></p>
 <blockquote>
 <p>设计主要关注RC、switch、EP，目前市面上 对于控制器IP有单独的RC&#x2F;EP，也有可配置的IP（同一个IP可以配置成RC或EP），需要结合serdes使用。</p>
 <p>USB、SATA物理层也是使用serdes，有些serdes IP可以共用</p>
@@ -242,16 +244,10 @@
 <li><strong>Message</strong></li>
 </ol>
 <p>前三种分别用于访问内存空间、IO空间、配置空间，这三种请求在PCI或者PCI-X时代就有了；最后的Message请求是PCIe新加的。在PCI或者PCI-X时代，像中断、错误以及电源管理相关信息，都是通过边带信号（sideband signal）进行传输的，但PCIe干掉了这些边带信号线，所有的通讯都是走带内信号，即通过Packet传输，因此，过去一些由边带信号线传输的数据，比如中断信息、错误信息等，现在就交由Message来传输了。</p>
-<img src="/2024/09/24/PCIe/image-20240924144216635.png" class="" title="image-20240924144216635">
-
+<p><img src="/2024/09/24/PCIe/PCIe/image-20240924144216635-1730798125697-3.png" alt="image-20240924144216635"></p>
 <p>Posted 不需要返回应答包</p>
 <p>Non-Posted 需要返回应答包</p>
-<img src="/2024/09/24/PCIe/image-20240924144233256.png" class="" title="image-20240924144233256">
-
-
-
-
-
+<p><img src="/2024/09/24/PCIe/PCIe/image-20240924144233256-1730798125697-5.png" alt="image-20240924144233256"></p>
 <h3 id="内存空间"><a href="#内存空间" class="headerlink" title="内存空间"></a>内存空间</h3><p>设备可能有自己的内存，比如独立显卡都有独立的显存；核显会调用host的内存当做显存来用。</p>
 <p>设备的物理空间，可以通过内存映射（Memory map）的方式映射到Host的主存，有些空间还可以映射到Host的IO空间（如果Host存在IO空间的话）。但新的PCIe设备（区别于Legacy PCIe设备）只支持内存映射，之所以还存在访问IO空间的TLP，完全是为了照顾那些老设备。以后IO映射的方式会逐渐取消，为减轻学习压力，我们以后看到IO 相关的东西，大可或略之</p>
 <h3 id="配置空间"><a href="#配置空间" class="headerlink" title="配置空间"></a>配置空间</h3><p>PCIe的RC、switch和EP设备都有配置空间，也是通过mmap映射到host的内存空间</p>
@@ -274,13 +270,13 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2024/09/13/Intel-DSA-spec/" rel="prev" title="intel-data-streaming-accelerator-spec">
-                  <i class="fa fa-angle-left"></i> intel-data-streaming-accelerator-spec
+                <a href="/2024/09/13/Intel-DSA-spec/" rel="prev" title="Intel data streaming accelerator spec">
+                  <i class="fa fa-angle-left"></i> Intel data streaming accelerator spec
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2024/10/01/HP-Z2-G4/" rel="next" title="HP Z2 G4">
-                  HP Z2 G4 <i class="fa fa-angle-right"></i>
+                <a href="/2024/10/08/Intel-DSA-%E7%9B%B8%E5%85%B3/" rel="next" title="Intel DSA 相关">
+                  Intel DSA 相关 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
@@ -346,6 +342,9 @@
 
 
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"http://example.com/2024/09/24/PCIe/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
 
 </body>
 </html>

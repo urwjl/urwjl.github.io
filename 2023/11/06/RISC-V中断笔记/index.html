@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/312127.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/312127.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="RISC-V 中断笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RISC-V中断笔记">
+<meta property="og:url" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="WJL">
+<meta property="og:description" content="RISC-V 中断笔记">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/image-20220612180146138-1730797993316-1.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/image-20240627165950116-1730797993316-3.png">
+<meta property="og:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/image-20240627170950085-1730797993316-5.png">
+<meta property="article:published_time" content="2023-11-06T05:52:39.000Z">
+<meta property="article:modified_time" content="2024-11-15T03:24:28.122Z">
+<meta property="article:author" content="Wu JInlin">
+<meta property="article:tag" content="RISC-V">
+<meta property="article:tag" content="中断">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/image-20220612180146138-1730797993316-1.png">
+
+
+<link rel="canonical" href="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/","path":"2023/11/06/RISC-V中断笔记/","title":"RISC-V中断笔记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>RISC-V中断笔记 | WJL</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">WJL</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fighting forgetfulness</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0"><span class="nav-text">RISC-V中断笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%AD%E6%96%AD%E7%9B%B8%E5%85%B3CSR"><span class="nav-text">1 中断相关CSR</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-M%E7%BA%A7%E5%88%ABcsr"><span class="nav-text">1.1 M级别csr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-S%E7%BA%A7%E5%88%ABcsr"><span class="nav-text">1.2 S级别csr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3"><span class="nav-text">1.3</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-text">2 中断处理流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-M%E7%BA%A7%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-text">2.1 M级中断处理流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-S%E7%BA%A7%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-text">2.2 S级中断处理流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vsip%E3%80%81vsie"><span class="nav-text">vsip、vsie</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AIA"><span class="nav-text">AIA</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hypervisor"><span class="nav-text">hypervisor</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#hvictl-0x609-RW"><span class="nav-text">hvictl (0x609) RW</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vstopi-0xEB0-RO"><span class="nav-text">vstopi (0xEB0) RO</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu JInlin"
+      src="/images/20241114140630.jpg">
+  <p class="site-author-name" itemprop="name">Wu JInlin</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/20241114140630.jpg">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="RISC-V中断笔记 | WJL">
+      <meta itemprop="description" content="RISC-V 中断笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RISC-V中断笔记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-11-06 13:52:39" itemprop="dateCreated datePublished" datetime="2023-11-06T13:52:39+08:00">2023-11-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 11:24:28" itemprop="dateModified" datetime="2024-11-15T11:24:28+08:00">2024-11-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RISC-V/" itemprop="url" rel="index"><span itemprop="name">RISC-V</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RISC-V/%E4%B8%AD%E6%96%AD/" itemprop="url" rel="index"><span itemprop="name">中断</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">RISC-V 中断笔记</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="RISC-V中断笔记"><a href="#RISC-V中断笔记" class="headerlink" title="RISC-V中断笔记"></a>RISC-V中断笔记</h1><p>在riscv中一共定义了4种状态中断，对于hart层面，hart包含<em>local</em>中断源和<em>global</em>中断源</p>
+<ul>
+<li>而<em>local</em>中断只有<strong>Timer</strong>和<strong>Software</strong>中断两种  (CLINT) 每个hart有只属于自己的中断</li>
+<li>而<em>global</em>中断则称为<strong>extended  interrupts</strong>   (PLIC) 可以分配给任意一个hart</li>
+<li>还有调试中断<strong>Debug Interrupt</strong>（暂不介绍）</li>
+</ul>
+<p>硬件上不支持中断嵌套：<strong>RISC-V中不存在高优先级中断可以打断低优先级中断的硬件支持</strong></p>
+<p><strong>RISC-V中规定进入和退出异常机制中没有硬件自动保存和恢复上下文的操作，软件需要明确地使用指令进行上下文的保存和恢复</strong></p>
+<p>当工作在M态时可以通过<code>SRET</code>指令跳到S态，<strong>xRET 将 pc 设置为存储在 xepc 寄存器中的值</strong>。</p>
+<h2 id="1-中断相关CSR"><a href="#1-中断相关CSR" class="headerlink" title="1 中断相关CSR"></a>1 中断相关CSR</h2><table>
+    <thead>
+        <tr><th>Function
+            </th><th>Machine
+            </th><th>Supervisor
+            </th><th>Hypervisor
+            </th><th>Virtual Supervisor
+                <tbody>
+                    <tr><td><strong><em>Trap</em></strong></td><td> </td><td> </td><td> </td><td> 
+                    </td></tr><tr><td>Trap Vector Base Address
+                        </td><td>mtvec
+                        </td><td>stvec
+                        </td><td> 
+                        </td><td>vstvec
+                    </td></tr><tr><td>Trap Delegation
+                        </td><td>medeleg and mideleg
+                        </td><td> 
+                        </td><td>hedeleg, hideleg
+                        </td><td> 
+                    </td></tr><tr><td>Interrupt
+                        </td><td>mip, mie
+                        </td><td>sip, sie
+                        </td><td>hvip, hip, hie
+                        </td><td>vsip, vsie
+                    </td></tr><tr><td>Hypervisor Guest External Interrupt
+                        </td><td> 
+                        </td><td> 
+                        </td><td>hgeip, hgeie
+                        </td><td> 
+                    </td></tr><tr><td>Exception Program Counter
+                        </td><td>mepc
+                        </td><td>sepc
+                        </td><td> 
+                        </td><td>vsepc
+                    </td></tr><tr><td>Cause
+                        </td><td>mcause
+                        </td><td>scause
+                        </td><td> 
+                        </td><td>vscause
+                    </td></tr><tr><td>Trap Value
+                        </td><td>mtval
+                        </td><td>stval
+                        </td><td>htval
+                        </td><td>vstval
+                    </td></tr><tr><td>Trap Instruction
+                        </td><td>mtinst
+                        </td><td> 
+                        </td><td>htinst
+                        </td><td> 
+                    </td></tr><tr><td>Status
+                        </td><td>mstatus, mstatush
+                        </td><td>sstatus
+                        </td><td>hstatus
+                        </td><td>vsstatus
+</td></tr></tbody></th></tr></thead></table>
+
+
+
+
+
+
+<h3 id="1-1-M级别csr"><a href="#1-1-M级别csr" class="headerlink" title="1.1 M级别csr"></a>1.1 M级别csr</h3><p>八个控制状态寄存器（CSR）是机器模式下异常处理的必要部分：</p>
+<ol>
+<li>mtvec（Machine Trap-Vector Base-Address）它保存发生异常时处理器需要跳转到的地址。&#x3D;&#x3D;中断或异常处理函数的入口&#x3D;&#x3D; </li>
+<li>mepc（Machine Exception PC）它<strong>指向</strong>发生异常的指令。&#x3D;&#x3D;对于中断而言，退出时会跳到mepc的下一条尚未执行的指令&#x3D;&#x3D;</li>
+<li>mcause（Machine Exception Cause）它指示发生异常的种类。</li>
+<li>mie（Machine Interrupt Enable）它指出处理器目前能处理和忽略的中断。</li>
+<li>mip（Machine Interrupt Pending）它列出目前正准备处理的中断。 &#x3D;&#x3D;硬件上PLIC输出的信号会体现到mip相应寄存器D端&#x3D;&#x3D;</li>
+<li>mtval（Machine Trap Value）它保存了陷入（trap）的附加信息：地址例外中出错 的地址、发生非法指令例外的指令本身，对于其他异常，它的值为 0。 </li>
+<li>mscratch（Machine Scratch）它暂时存放一个字大小的数据。&#x3D;&#x3D;为异常或中断子程序提供临时变量空间&#x3D;&#x3D; </li>
+<li>mstatus（Machine Status）它保存全局中断使能，以及许多其他的状态</li>
+</ol>
+<p>两个中断异常委托寄存器只在实现S模式时有效</p>
+<ol>
+<li>medeleg 委托同步异常</li>
+<li>mideleg 委托异步异常：中断</li>
+</ol>
+<h3 id="1-2-S级别csr"><a href="#1-2-S级别csr" class="headerlink" title="1.2 S级别csr"></a>1.2 S级别csr</h3><p>当一个陷阱被委托到S模式时:</p>
+<ul>
+<li><code>scause</code>写入陷阱原因;</li>
+<li><code>sepc</code>寄存器写入产生陷阱的指令的虚拟地址;</li>
+<li><code>stval</code>寄存器写入使用特定于异常的数据;</li>
+<li><code>mstatus.SPP</code>字段写入发生trap时所处的特权模式;</li>
+<li><code>mstatus.SPIE</code>字段写入发生trap时<code>mstatus.SIE</code>的值;</li>
+<li>并且<code>mstatus.SIE</code>字段被清除。</li>
+<li><code>mcause</code>、<code>mepc</code>和<code>mtval</code>寄存器以及<code>mstatus</code>的MPP和MPIE字段不被写。</li>
+</ul>
+<h3 id="1-3"><a href="#1-3" class="headerlink" title="1.3"></a>1.3</h3><h2 id="2-中断处理流程"><a href="#2-中断处理流程" class="headerlink" title="2 中断处理流程"></a>2 中断处理流程</h2><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/RISC-V中断笔记/image-20220612180146138-1730797993316-1.png" alt="img" style="zoom:80%;">
+
+<h3 id="2-1-M级中断处理流程"><a href="#2-1-M级中断处理流程" class="headerlink" title="2.1 M级中断处理流程"></a>2.1 M级中断处理流程</h3><p>首先<strong>软件</strong>需要初始化CSR寄存器：</p>
+<ol>
+<li>mie：使能相应的中断</li>
+<li>mtvec：配置中断函数入口地址</li>
+<li>mstatus：使能全局中断</li>
+</ol>
+<p>然后当<strong>硬件</strong>收到一个有效的中断信号后：</p>
+<ol>
+<li>更新mepc、mcause、mstatus的值，（可能会更新mtval）</li>
+<li>PC跳转到mtvec配置的地址，进入中断处理函数</li>
+</ol>
+<p><strong>中断处理函数</strong>需要：</p>
+<ol>
+<li>保存上下文</li>
+<li>读mcause判断是什么中断然后进行跳转到相应的处理函数</li>
+<li>处理完后恢复上下文</li>
+<li>执行<code>MRET</code>指令退出中断</li>
+</ol>
+<p><strong>硬件</strong>执行<code>MRET</code>指令</p>
+<ol>
+<li>更新mstatus的值</li>
+<li>更新PC为mepc的值，并跳转</li>
+</ol>
+<h3 id="2-2-S级中断处理流程"><a href="#2-2-S级中断处理流程" class="headerlink" title="2.2 S级中断处理流程"></a>2.2 S级中断处理流程</h3><blockquote>
+<p>默认情况下，所有的中断、异常处理都需要trap到M模式进行处理，但是在Linux环境下，大多数的中断都是在内核处理，也就是S态，所以需要将中断直接委托到S态进行处理，减少M-&gt;S-&gt;M的2次特权切换操作</p>
+</blockquote>
+<p>软件初始化</p>
+<ol>
+<li>需要额外配置mideleg和medeleg，将中断或异常委托到S级</li>
+<li>sie：使能相应中断</li>
+<li>stvec：配置中断函数入口地址</li>
+<li>sstatus：使能全局中断</li>
+</ol>
+<p>然后当<strong>硬件</strong>工作在<strong>S或者U模式下</strong>并收到一个被委托到S级的有效的中断信号后：</p>
+<ol>
+<li>更新sepc、scause、sstatus的值，（可能会更新stval）</li>
+<li>PC跳转到stvec配置的地址，进入中断处理函数</li>
+</ol>
+<p><strong>中断处理函数</strong>需要：</p>
+<ol>
+<li>保存上下文</li>
+<li>读是cause判断是什么中断然后进行跳转到相应的处理函数</li>
+<li>处理完后恢复上下文</li>
+<li>执行<code>SRET</code>指令退出中断</li>
+</ol>
+<p><strong>硬件</strong>执行<code>SRET</code>指令</p>
+<ol>
+<li>更新sstatus的值</li>
+<li>更新PC为sepc的值，并跳转</li>
+</ol>
+<h2 id="vsip、vsie"><a href="#vsip、vsie" class="headerlink" title="vsip、vsie"></a>vsip、vsie</h2><ul>
+<li><p>当hideleg的第10位为零时，vsip.SEIP和vsie.SEIE为只读零。否则，vsip.SEIP和vsie.SEIE是hip.VSEIP和hie.VSEIE的别名。</p>
+</li>
+<li><p>当hideleg的第6位为零时，vsip.STIP和vsie.STIE为只读零。否则，vsip.STIP和vsie.STIE是hip.VSTIP和hie.VSTIE的别名。</p>
+</li>
+<li><p>当hideleg的第2位为零时，vsip.SSIP和vsie.SSIE为只读零。否则，vsip.SSIP和vsie.SSIE是hip.VSSIP和hie.VSSIE的别名。</p>
+</li>
+</ul>
+<p>对于 vsie 只有当hideleg相应的位为1，vsie才是可写的，而且是hie的别名</p>
+<p><strong>在hvip中</strong><br><strong>设置VSEIP&#x3D;1断言一个VS级外部中断;</strong><br><strong>设置VSTIP&#x3D;1断言一个VS级定时器中断;</strong><br><strong>设置VSSIP&#x3D;1断言一个VS级软件中断。</strong></p>
+<p>vsip中的SEIP什么时候会拉高？</p>
+<p>对于 vsip 只有当hideleg相应的位为1，vsip才可能是1，而且是hip的别名</p>
+<p>位<code>hip.VSEIP</code>和<code>hie.VSEIE</code>是VS级<strong>外部中断</strong>的中断挂起和中断使能位。<strong>VSEIP在hip中是只读的</strong>，是这些中断源的逻辑或：</p>
+<ul>
+<li>位<code>hvip.VSEIP</code>；</li>
+<li>由<code>hstatus.VGEIN</code>选择的<code>hgeip</code>的比特；</li>
+<li>以及指向VS-level的任何其他平台特定的外部中断信号。&#x2F;&#x2F;目前实现没有</li>
+</ul>
+<p>位<code>hip.VSTIP</code>和<code>hie.VSTIE</code>是VS级<strong>定时器</strong>中断的中断挂起和中断使能位。<strong>VSTIP在hip中是只读的</strong>，并且是<code>hvip.VSTIP</code>和指向VS电平的任何其他特定于平台的定时器中断信号的逻辑或。</p>
+<p>位<code>hip.VSSIP</code>和<code>hie.VSSIE</code>是VS级<strong>软件</strong>中断的中断挂起和中断使能位。<code>hip</code>中的<code>VSSIP</code>是<code>hvip</code>中相同位的别名（<strong>可写</strong>）。</p>
+<p><strong>hvien 的位 12:0 是保留的并且必须是只读零</strong></p>
+<h1 id="AIA"><a href="#AIA" class="headerlink" title="AIA"></a>AIA</h1><h2 id="hypervisor"><a href="#hypervisor" class="headerlink" title="hypervisor"></a>hypervisor</h2><h3 id="hvictl-0x609-RW"><a href="#hvictl-0x609-RW" class="headerlink" title="hvictl (0x609) RW"></a>hvictl (0x609) RW</h3><p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/image-20240627165950116-1730797993316-3.png" alt="image-20240627165950116"></p>
+<p><strong>所有<code>hvictl</code>字段共同影响 csr vstopi (Virtual Supervisor Top Interrupt)的值</strong>，从而影响当一个中断traps to VS-mode时，vscause记录中断标识(interrupt identity)。</p>
+<p><code>hvictl</code>.<code>VTI</code> 控制VS的 csr 访问是否会触发<strong>虚拟指令异常</strong></p>
+<p>当VTI&#x3D;1时：</p>
+<ol>
+<li>VS-mode显式访问 csr <code>sip</code>, <code>sie</code>会导致<strong>虚拟指令异常</strong></li>
+<li>对于任何给定的 csr ，如果在某些情况下，对寄存器的写入可能会导致vsip位从1变为0，不包括用于外部中断(SEIP)的第9位，那么当<strong>VTI</strong> &#x3D; 1时，对于guest写入该寄存器的任何尝试也会引发<strong>虚拟指令异常</strong>。</li>
+<li>特别是，如果寄存器vstimecmp(从扩展名Sstc)实现，那么尝试从VS-mode写入stimecmp 会在<strong>VTI</strong> &#x3D; 1时导致<strong>虚拟指令异常</strong>。</li>
+<li>对于标准本地中断(主要标识13-23和32-47)和软件中断(SSI)， vsip中相应的中断挂起位被定义为<strong>“粘性”</strong>，这意味着guest只能通过直接写入sip(实际上是vsip)来清除它们。在标准定义的中断中，只剩下定时器中断(STI)，可以通过向vstimemp写入一个新值在vsip中清除它。</li>
+</ol>
+<p>同时忽略对 csr 的访问</p>
+<h3 id="vstopi-0xEB0-RO"><a href="#vstopi-0xEB0-RO" class="headerlink" title="vstopi (0xEB0) RO"></a>vstopi (0xEB0) RO</h3><p><img src="/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/image-20240627170950085-1730797993316-5.png" alt="image-20240627170950085"></p>
+<p>vstopi 返回有关 <strong>VS 级别最高优先级中断的信息</strong>，这些中断是从这些候选者中找到的（以 + 号为前缀）：</p>
+<p>当vsip[9]和vsie[9]都是1时，首先判断 hstatus.VGEIN </p>
+<p>vs优先级配置：</p>
+<ol>
+<li>如果hvictl配置了相应中断的优先级，则参考hvictl的配置</li>
+<li>其次查看hviprio1和hviprio2是否配置了相应的优先级</li>
+<li>否则按默认的优先级顺序</li>
+</ol>
+<p>hvictl&gt;hviprio&gt;默认</p>
+<p>默认优先级：</p>
+<p>MEI、MSI、MTI、SEI、SSI、STI、SGEI、VSEI、VSSI、VSTI</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://tinylab.org/riscv-irq-pipeline-introduction/">RISC-V 异常处理流程介绍</a></li>
+<li><a target="_blank" rel="noopener" href="https://rcore-os.cn/rCore-Tutorial-Book-v3/chapter2/4trap-handling.html">实现特权级的切换 rCore-Tutorial-Book 第三版</a></li>
+<li><a target="_blank" rel="noopener" href="https://dingfen.github.io/risc-v/2020/08/05/riscv-privileged.html">RISC- V 特权架构介绍</a></li>
+<li><a target="_blank" rel="noopener" href="https://rcore-os.cn/rCore-Tutorial-deploy/docs/lab-1/guide/part-2.html">RISC-V 与中断相关的寄存器和指令</a></li>
+<li><a target="_blank" rel="noopener" href="https://five-embeddev.com/quickref/interrupts.html">Interrupt Quick Reference</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/RISC-V/" rel="tag"># RISC-V</a>
+              <a href="/tags/%E4%B8%AD%E6%96%AD/" rel="tag"># 中断</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/06/RISC-V%E9%80%9A%E8%AF%86/" rel="prev" title="RISC-V通识">
+                  <i class="fa fa-angle-left"></i> RISC-V通识
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/11/06/RISC-V_aclint/" rel="next" title="RISC-V aclint">
+                  RISC-V aclint <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu JInlin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"http://example.com/2023/11/06/RISC-V%E4%B8%AD%E6%96%AD%E7%AC%94%E8%AE%B0/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+
+</body>
+</html>

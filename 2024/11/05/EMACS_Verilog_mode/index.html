@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/312127.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/312127.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="快捷键 **C-c C-a** 之后，实现AUTO机制，快捷键 **C-c C-k** 可取消AUTO效果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EMACS_Verilog_mode">
+<meta property="og:url" content="http://example.com/2024/11/05/EMACS_Verilog_mode/index.html">
+<meta property="og:site_name" content="WJL">
+<meta property="og:description" content="快捷键 **C-c C-a** 之后，实现AUTO机制，快捷键 **C-c C-k** 可取消AUTO效果。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-11-05T08:43:55.000Z">
+<meta property="article:modified_time" content="2024-11-15T03:24:28.118Z">
+<meta property="article:author" content="Wu JInlin">
+<meta property="article:tag" content="EMACS">
+<meta property="article:tag" content="Verilog">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/11/05/EMACS_Verilog_mode/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/11/05/EMACS_Verilog_mode/","path":"2024/11/05/EMACS_Verilog_mode/","title":"EMACS_Verilog_mode"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>EMACS_Verilog_mode | WJL</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">WJL</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fighting forgetfulness</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#EMACS-Verilog-mode"><span class="nav-text">EMACS_Verilog_mode</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AUTOARG"><span class="nav-text">AUTOARG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AUTOINPUT"><span class="nav-text">AUTOINPUT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AUTOOUTPU"><span class="nav-text">AUTOOUTPU</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AUTOINOUT"><span class="nav-text">AUTOINOUT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AUTOREG"><span class="nav-text">AUTOREG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AUTOWIRE"><span class="nav-text">AUTOWIRE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AUTOINSTPARAM"><span class="nav-text">AUTOINSTPARAM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AUTO-TEMPLATE"><span class="nav-text">AUTO_TEMPLATE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E5%AE%9E%E4%BE%8B%E5%90%8D%E4%B8%AD%E9%97%B4%E4%B8%80%E6%AE%B5%E6%8D%A2%E6%88%90%E5%B0%8F%E5%86%99%E5%B9%B6%E5%B5%8C%E5%85%A5%E5%88%B0%E4%BE%8B%E5%8C%96%E7%9A%84%E7%AB%AF%E5%8F%A3%E5%90%8D%E4%B8%8A"><span class="nav-text">将实例名中间一段换成小写并嵌入到例化的端口名上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Verilog-auto-output-ignore-regexp"><span class="nav-text">Verilog-auto-output-ignore-regexp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Emacs-verilog-mode-for-unused-interface"><span class="nav-text">Emacs verilog-mode for unused interface</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#verilog-auto-inst-param-value"><span class="nav-text">verilog-auto-inst-param-value</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#define%E9%97%AE%E9%A2%98%EF%BC%88%E5%A6%82%E6%9E%9CAUTO%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9%E4%B8%8D%E6%B6%89%E5%8F%8Adefine%EF%BC%8C%E5%8F%AF%E5%BF%BD%E7%95%A5%EF%BC%89"><span class="nav-text">define问题（如果AUTO相关内容不涉及define，可忽略）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#include-file%E9%97%AE%E9%A2%98%EF%BC%88%E5%A6%82%E6%9E%9CAUTO%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9%E4%B8%8D%E6%B6%89%E5%8F%8Ainclude%EF%BC%8C%E5%8F%AF%E5%BF%BD%E7%95%A5%EF%BC%89"><span class="nav-text">include file问题（如果AUTO相关内容不涉及include，可忽略）</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu JInlin"
+      src="/images/20241114140630.jpg">
+  <p class="site-author-name" itemprop="name">Wu JInlin</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/05/EMACS_Verilog_mode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/20241114140630.jpg">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="EMACS_Verilog_mode | WJL">
+      <meta itemprop="description" content="快捷键 **C-c C-a** 之后，实现AUTO机制，快捷键 **C-c C-k** 可取消AUTO效果。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          EMACS_Verilog_mode
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-11-05 16:43:55" itemprop="dateCreated datePublished" datetime="2024-11-05T16:43:55+08:00">2024-11-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 11:24:28" itemprop="dateModified" datetime="2024-11-15T11:24:28+08:00">2024-11-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/EMACS/" itemprop="url" rel="index"><span itemprop="name">EMACS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/EMACS/Verilog/" itemprop="url" rel="index"><span itemprop="name">Verilog</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">快捷键 **C-c C-a** 之后，实现AUTO机制，快捷键 **C-c C-k** 可取消AUTO效果。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="EMACS-Verilog-mode"><a href="#EMACS-Verilog-mode" class="headerlink" title="EMACS_Verilog_mode"></a>EMACS_Verilog_mode</h1><p>快捷键 <strong>C-c C-a</strong> 之后，实现AUTO机制，快捷键 <strong>C-c C-k</strong> 可取消AUTO效果。</p>
+<h2 id="AUTOARG"><a href="#AUTOARG" class="headerlink" title="AUTOARG"></a>AUTOARG</h2><p>自动声明端口</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> sub_md(<span class="comment">/*AUTOARG*/</span>);</span><br><span class="line"><span class="keyword">input</span>           din_a;</span><br><span class="line"><span class="keyword">input</span>           din_b;</span><br><span class="line"><span class="keyword">output</span> [<span class="number">1</span>:<span class="number">0</span>]    dout_a;</span><br><span class="line"></span><br><span class="line"><span class="keyword">wire</span> [<span class="number">1</span>:<span class="number">0</span>]      dout_a;</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> dout_a[<span class="number">1</span>:<span class="number">0</span>] = &#123;din_b,din_a&#125;;</span><br><span class="line"><span class="keyword">endmodule</span> <span class="comment">// sub_md</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="AUTOINPUT"><a href="#AUTOINPUT" class="headerlink" title="AUTOINPUT"></a>AUTOINPUT</h2><p>自动声明<strong>input</strong>接口</p>
+<h2 id="AUTOOUTPU"><a href="#AUTOOUTPU" class="headerlink" title="AUTOOUTPU"></a>AUTOOUTPU</h2><p>自动声明<strong>output</strong>接口</p>
+<h2 id="AUTOINOUT"><a href="#AUTOINOUT" class="headerlink" title="AUTOINOUT"></a>AUTOINOUT</h2><p>自动声明<strong>inout</strong>接口</p>
+<h2 id="AUTOREG"><a href="#AUTOREG" class="headerlink" title="AUTOREG"></a>AUTOREG</h2><p>自动声明<strong>reg</strong>变量</p>
+<h2 id="AUTOWIRE"><a href="#AUTOWIRE" class="headerlink" title="AUTOWIRE"></a>AUTOWIRE</h2><p>自动声明<strong>wire</strong>变量</p>
+<h2 id="AUTOINSTPARAM"><a href="#AUTOINSTPARAM" class="headerlink" title="AUTOINSTPARAM"></a>AUTOINSTPARAM</h2><p>自动填充参数列表</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> InstModule;</span><br><span class="line">   <span class="keyword">parameter</span> PARAM1 = <span class="number">1</span>;</span><br><span class="line">   <span class="keyword">parameter</span> PARAM2 = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">endmodule</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">module</span> ModnameTest;</span><br><span class="line">   InstModule #(<span class="comment">/*AUTOINSTPARAM*/</span></span><br><span class="line">         <span class="comment">// Parameters</span></span><br><span class="line">         <span class="variable">.PARAM1</span>  (PARAM1),</span><br><span class="line">         <span class="variable">.PARAM2</span>  (PARAM2))</span><br><span class="line">     instName</span><br><span class="line">       (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">        ...);</span><br></pre></td></tr></table></figure>
+
+<h2 id="AUTO-TEMPLATE"><a href="#AUTO-TEMPLATE" class="headerlink" title="AUTO_TEMPLATE"></a>AUTO_TEMPLATE</h2><p>如果一个模块被实例化多次，你可以使用verilog的 <strong>generate</strong> 语法，也可以使用Emacs verilog-mode的 <strong>AUTO_TEMPLATE</strong> 和 <strong>AUTOINST</strong> 。Verilog-mode向上索引最近的模板，这样对于一个子模块可以写多个模板，只需要将模板写在实例化之前即可。</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* psm_mas AUTO_TEMPLATE (</span></span><br><span class="line"><span class="comment">        .PTL_MAPVALIDX          (PTL_MAPVALID[@]),</span></span><br><span class="line"><span class="comment">        .PTL_BUS                (PTL_BUSNEW[]),</span></span><br><span class="line"><span class="comment">        ); */</span></span><br><span class="line">psm_mas ms2 (<span class="comment">/*AUTOINST*/</span>);</span><br></pre></td></tr></table></figure>
+
+<p>AUTO效果：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">psm_mas ms2 (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">    <span class="comment">// Outputs</span></span><br><span class="line">    <span class="variable">.INSTDATAOUT</span>     (INSTDATAOUT),</span><br><span class="line">    <span class="variable">.PTL_MAPVALIDX</span>   (PTL_MAPVALID[<span class="number">2</span>]),   <span class="comment">// Templated</span></span><br><span class="line"></span><br><span class="line">    <span class="variable">.PTL_BUS</span>         (PTL_BUSNEW[<span class="number">3</span>:<span class="number">0</span>]),   <span class="comment">// Templated</span></span><br><span class="line">    ....</span><br></pre></td></tr></table></figure>
+
+<p><strong>@</strong> 字符非常有用，他将被实例名的末尾数字代替（不限于1位数字），比如ms2，@替换为2。AUTO机制把模板中的 <strong>[]</strong> 替换为子模块中该信号真实的字段范围，比如 <strong>PTL_BUSNEW[]</strong> 替换成了 <strong>PTL_BUSNEW[3:0]</strong> ，因为子模块中PTL_BUSNEW信号声明就是 [3:0]。这样写的好处就是子模块的修改自动响应到顶层模块。（其实如果端口信号位宽一致，实例化端口也可以不指明位宽字段，不过为了便于维护和减少出错，建议指明位宽字段）</p>
+<p>神奇的 <strong>@</strong> 不仅支持数字，还可以支持字母，这需要在模板做以下操作（模板支持正则表达式）：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* InstModule AUTO_TEMPLATE &quot;_\([a-z]+\)&quot; (</span></span><br><span class="line"><span class="comment">                .ptl_mapvalidx		(@_ptl_mapvalid),</span></span><br><span class="line"><span class="comment">                .ptl_mapvalidp1x	(ptl_mapvalid_@),</span></span><br><span class="line"><span class="comment">                );</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">        InstModule ms2_FOO (<span class="comment">/*AUTOINST*/</span>);</span><br><span class="line">        InstModule ms2_BAR (<span class="comment">/*AUTOINST*/</span>);</span><br></pre></td></tr></table></figure>
+
+<p>AUTO效果如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">InstModule ms2_FOO (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">            <span class="comment">// Outputs</span></span><br><span class="line">            <span class="variable">.ptl_mapvalidx</span>		(FOO_ptl_mapvalid),</span><br><span class="line">            <span class="variable">.ptl_mapvalidp1x</span>		(ptl_mapvalid_FOO));</span><br><span class="line">        InstModule ms2_BAR (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">            <span class="comment">// Outputs</span></span><br><span class="line">            <span class="variable">.ptl_mapvalidx</span>		(BAR_ptl_mapvalid),</span><br><span class="line">            <span class="variable">.ptl_mapvalidp1x</span>		(ptl_mapvalid_BAR));</span><br></pre></td></tr></table></figure>
+
+<p>在AUTO_TEMPLATE中指定简单的线名称并不能够解决所有需求，尤其是在多个实例化中使用同一信号不同数据位时。因此，Verilog-Mode允许你编写一个程序来进行计算并为实例化端口进行命名，如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* InstModule AUTO_TEMPLATE (</span></span><br><span class="line"><span class="comment">     .a(in[@&quot;(+ (* 8 @) 7)&quot;:@&quot;(* 8 @)&quot;]),</span></span><br><span class="line"><span class="comment">     );*/</span></span><br><span class="line"></span><br><span class="line">InstModule u_a0 (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">                 <span class="comment">// Inputs</span></span><br><span class="line">                 <span class="variable">.a</span>                     (in[<span class="number">7</span>:<span class="number">0</span>]));               <span class="comment">// Templated</span></span><br><span class="line">InstModule u_a1 (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">                 <span class="comment">// Inputs</span></span><br><span class="line">                 <span class="variable">.a</span>                     (in[<span class="number">15</span>:<span class="number">8</span>]));              <span class="comment">// Templated</span></span><br><span class="line">InstModule u_a2 (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">                 <span class="comment">// Inputs</span></span><br><span class="line">                 <span class="variable">.a</span>                     (in[<span class="number">23</span>:<span class="number">16</span>]));             <span class="comment">// Templated</span></span><br><span class="line">InstModule u_a3 (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">                 <span class="comment">// Inputs</span></span><br><span class="line">                 <span class="variable">.a</span>                     (in[<span class="number">31</span>:<span class="number">24</span>]));             <span class="comment">// Templated</span></span><br></pre></td></tr></table></figure>
+
+<p>这里对上述Lisp代码部分解释一下， 也就是 <strong>@”(+ (* 8 @) 7)”:@”(* 8 @)”</strong> ：</p>
+<ul>
+<li>基础结构为 <strong>@””</strong> 代表**@**为输入参数，引号内为计算处理</li>
+<li>每个括号内容为一步计算，形如 <strong>(* 8 @)</strong> ，意思是 <strong>@<strong>参数乘</strong>8</strong></li>
+<li><strong>(+ (* 8 @) 7)</strong> 就是将 <strong>(* 8 @)</strong> 的结果加<strong>7</strong></li>
+</ul>
+<h2 id="将实例名中间一段换成小写并嵌入到例化的端口名上"><a href="#将实例名中间一段换成小写并嵌入到例化的端口名上" class="headerlink" title="将实例名中间一段换成小写并嵌入到例化的端口名上"></a>将实例名中间一段换成小写并嵌入到例化的端口名上</h2><p>使用<strong>downcase</strong>将后面的字符进行小写化，<strong>upcase</strong>换成大写</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*clk_ctrl  AUTO_TEMPLATE &quot;clk_ctrl_\([A-z]+[0-9]?$\)&quot; (</span></span><br><span class="line"><span class="comment">	.clk 				(ref_clk),</span></span><br><span class="line"><span class="comment">	.resetn 			(rst_n),</span></span><br><span class="line"><span class="comment">	.soften				(reg_@&quot;(downcase \&quot;@\&quot;)&quot;_enable),</span></span><br><span class="line"><span class="comment">	.clk_qreqn			(@QREQn),</span></span><br><span class="line"><span class="comment">	.clk_qacceptn		(@QACCEPTn),</span></span><br><span class="line"><span class="comment">	.clk_qactive		(@QACTIVE),</span></span><br><span class="line"><span class="comment">	.clk_qdeny			(@QDENY),</span></span><br><span class="line"><span class="comment">	.clken_o 			(@_clk_en),</span></span><br><span class="line"><span class="comment">);</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">clk_ctrl clk_ctrl_SCLK(</span><br><span class="line">	<span class="comment">/*AUTOINST*/</span></span><br><span class="line">    <span class="comment">//Outputs</span></span><br><span class="line">    <span class="variable">.clk_qreqn</span>			(SCLKQREQn),</span><br><span class="line">    <span class="variable">.clken_o</span>			(SCLK_clk_en),</span><br><span class="line">    <span class="comment">//Inputs</span></span><br><span class="line">    <span class="variable">.clk</span>				(ref_clk),</span><br><span class="line">    <span class="variable">.resetn</span>				(rst_n),</span><br><span class="line">    <span class="variable">.soften</span>				(reg_sclk_enable),</span><br><span class="line">    <span class="variable">.clk_qacceptn</span>		(SCLKQACCEPTn),</span><br><span class="line">    <span class="variable">.clk_qactive</span>		(SCLKACTIVE),</span><br><span class="line">    <span class="variable">.clk_qdeny</span>			(SCLKQDENY));</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Verilog-auto-output-ignore-regexp"><a href="#Verilog-auto-output-ignore-regexp" class="headerlink" title="Verilog-auto-output-ignore-regexp"></a>Verilog-auto-output-ignore-regexp</h2><p>忽略output的端口声明，多个字符用 <strong>\\|</strong> 进行分割，需要使用两个反斜杠对|进行转义。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//Localvariables:</span><br><span class="line">//verilog-auto-output-ignore-regexp: <span class="string">&quot;ex_out_port\\|ot_out_port&quot;</span></span><br><span class="line">//END:</span><br></pre></td></tr></table></figure>
+
+<h3 id="Emacs-verilog-mode-for-unused-interface"><a href="#Emacs-verilog-mode-for-unused-interface" class="headerlink" title="Emacs verilog-mode for unused interface"></a><a target="_blank" rel="noopener" href="http://skiffc.blogspot.com/2017/10/emacs-verilog-mode-for-unused-interface.html">Emacs verilog-mode for unused interface</a></h3><p>在SOC整合的时候, 偶尔会有需要将不用的interface input tie 0, output floating.<br>参考这个<a target="_blank" rel="noopener" href="https://www.veripool.org/boards/15/topics/1565-Verilog-mode-how-to-assign-all-0-to-input-and-floating-all-output">网页</a>的资讯, 正确的用法如下, 写在AUTO_TEMPLATE中：</p>
+<blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.foo.* (@&quot;(if (string= vl-dir \\&quot;input\\&quot;) (concat vl-width \\&quot;&#x27;b0\\&quot;)) \\&quot;\\&quot;&quot;),</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="verilog-auto-inst-param-value"><a href="#verilog-auto-inst-param-value" class="headerlink" title="verilog-auto-inst-param-value"></a>verilog-auto-inst-param-value</h2><figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> InstModule;</span><br><span class="line">   # (<span class="keyword">parameter</span> WIDTH = <span class="number">32</span>)</span><br><span class="line">   (<span class="keyword">output</span> <span class="keyword">wire</span> [WIDTH-<span class="number">1</span>:<span class="number">0</span>] out);</span><br><span class="line"><span class="keyword">endmodule</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">module</span> ModnameTest;</span><br><span class="line">   InstModule <span class="variable">#(.WIDTH(16))</span></span><br><span class="line">     instName</span><br><span class="line">       (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">        <span class="comment">// Outputs                                                                    </span></span><br><span class="line">        <span class="variable">.out</span>   (out[<span class="number">15</span>:<span class="number">0</span>]));</span><br><span class="line"><span class="keyword">endmodule</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Local Variables:                                                                 </span></span><br><span class="line"><span class="comment">// verilog-auto-inst-param-value:t                                                  </span></span><br><span class="line"><span class="comment">// End:                                                                             </span></span><br><span class="line">Contrast <span class="keyword">this</span> <span class="keyword">with</span> the <span class="keyword">default</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">module</span> ModnameTest;</span><br><span class="line">   InstModule <span class="variable">#(.WIDTH(16))</span></span><br><span class="line">     instName</span><br><span class="line">       (<span class="comment">/*AUTOINST*/</span></span><br><span class="line">        <span class="comment">// Outputs                                                                    </span></span><br><span class="line">        <span class="variable">.out</span>   (out[WIDTH-<span class="number">1</span>:<span class="number">0</span>]));</span><br><span class="line"><span class="keyword">endmodule</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Local Variables:                                                                 </span></span><br><span class="line"><span class="comment">// verilog-auto-inst-param-value:nil</span></span><br><span class="line"><span class="comment">// End:                                                             </span></span><br></pre></td></tr></table></figure>
+
+<h2 id="define问题（如果AUTO相关内容不涉及define，可忽略）"><a href="#define问题（如果AUTO相关内容不涉及define，可忽略）" class="headerlink" title="define问题（如果AUTO相关内容不涉及define，可忽略）"></a>define问题（如果AUTO相关内容不涉及define，可忽略）</h2><p>使用AUTOINST或AUTOSENSE时，有些场景中信号会带有define，这时候需要verilog-mode将define信息读进来，才可以正确完成AUTO功能。使用如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Local Variables:</span></span><br><span class="line"><span class="comment">// eval:(verilog-read-defines)</span></span><br><span class="line"><span class="comment">// eval:(verilog-read-defines &quot;group_standard_includes.v&quot;)</span></span><br><span class="line"><span class="comment">// End:</span></span><br></pre></td></tr></table></figure>
+
+<p>第一行是读取当前文件中的define，第二行是读取define文件。</p>
+<h2 id="include-file问题（如果AUTO相关内容不涉及include，可忽略）"><a href="#include-file问题（如果AUTO相关内容不涉及include，可忽略）" class="headerlink" title="include file问题（如果AUTO相关内容不涉及include，可忽略）"></a>include file问题（如果AUTO相关内容不涉及include，可忽略）</h2><p>出于速度原因，Verilog-Mode不会自动读取include文件。这意味着include文件中定义的常量将不被作为AUTOSENSE的常量。解决方法如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Local Variables:</span></span><br><span class="line"><span class="comment">// eval:(verilog-read-includes)</span></span><br><span class="line"><span class="comment">// End:</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EMACS/" rel="tag"># EMACS</a>
+              <a href="/tags/Verilog/" rel="tag"># Verilog</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/05/RISC-V_%E5%BC%80%E6%BA%90core/" rel="prev" title="RISC-V 开源core">
+                  <i class="fa fa-angle-left"></i> RISC-V 开源core
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/11/05/Design_Compiler%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="next" title="Design Compiler常用命令">
+                  Design Compiler常用命令 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu JInlin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"http://example.com/2024/11/05/EMACS_Verilog_mode/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+
+</body>
+</html>

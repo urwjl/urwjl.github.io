@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/312127.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/312127.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="收集了一些DPU信息">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DPU信息整理">
+<meta property="og:url" content="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/index.html">
+<meta property="og:site_name" content="WJL">
+<meta property="og:description" content="收集了一些DPU信息">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/e2100-network-subsystem-highlights-left-1730798208568-334.png">
+<meta property="og:image" content="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/e2100-compute-complex-highlights-1730798208568-335.png">
+<meta property="og:image" content="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/QQ_1728955871808-1730798208568-336.png">
+<meta property="og:image" content="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/QQ_1728955892276-1730798208568-337.png">
+<meta property="og:image" content="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/QQ_1728957005289-1730798208568-338.png">
+<meta property="og:image" content="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/image-20241015095533508-1730798208568-339.png">
+<meta property="article:published_time" content="2024-10-15T02:04:42.000Z">
+<meta property="article:modified_time" content="2024-11-15T03:24:28.118Z">
+<meta property="article:author" content="Wu JInlin">
+<meta property="article:tag" content="intel">
+<meta property="article:tag" content="IPU">
+<meta property="article:tag" content="DPU">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/e2100-network-subsystem-highlights-left-1730798208568-334.png">
+
+
+<link rel="canonical" href="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/","path":"2024/10/15/DPU信息整理/","title":"DPU信息整理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>DPU信息整理 | WJL</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">WJL</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fighting forgetfulness</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#DPU"><span class="nav-text">DPU</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#by-zhihu-xiajinjin"><span class="nav-text">by-zhihu-xiajinjin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Intel-IPU"><span class="nav-text">Intel IPU</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BF%E9%87%8C%E4%BA%91%E4%B8%AD%E7%9A%84DPU"><span class="nav-text">阿里云中的DPU</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8B%B1%E4%BC%9F%E8%BE%BE-NVIDIA-DPU"><span class="nav-text">英伟达(NVIDIA)DPU</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Programmable-Datapath-Accelerator-%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-text">Programmable Datapath Accelerator 的作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AMD"><span class="nav-text">AMD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pensando-Salina-400-DPU"><span class="nav-text">Pensando Salina 400 DPU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pensando-Pollara-400-AI-NIC"><span class="nav-text">Pensando Pollara 400 AI NIC</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu JInlin"
+      src="/images/20241114140630.jpg">
+  <p class="site-author-name" itemprop="name">Wu JInlin</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/20241114140630.jpg">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="DPU信息整理 | WJL">
+      <meta itemprop="description" content="收集了一些DPU信息">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DPU信息整理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-10-15 10:04:42" itemprop="dateCreated datePublished" datetime="2024-10-15T10:04:42+08:00">2024-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 11:24:28" itemprop="dateModified" datetime="2024-11-15T11:24:28+08:00">2024-11-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/intel/" itemprop="url" rel="index"><span itemprop="name">intel</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/intel/DPU/" itemprop="url" rel="index"><span itemprop="name">DPU</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">收集了一些DPU信息</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="DPU"><a href="#DPU" class="headerlink" title="DPU"></a>DPU</h1><p><a target="_blank" rel="noopener" href="https://www.ithome.com/0/635/764.htm">科普：火遍全网的 DPU 到底是什么（2022&#x2F;08）</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.datacenterknowledge.com/data-center-hardware/data-processing-units-what-are-dpus-and-why-do-you-want-them-">数据处理单元：什么是 DPU 以及为什么需要它们？(2023&#x2F;05)</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.iccsz.com/site/cn/News/2024/05/29/20240529023151071616.htm">DPU技术的进步与未来创新（2024&#x2F;05）</a> </p>
+<h2 id="by-zhihu-xiajinjin"><a href="#by-zhihu-xiajinjin" class="headerlink" title="by-zhihu-xiajinjin"></a>by-zhihu-xiajinjin</h2><p>cloud上DPU当下希望offload的feature及其坊间的关键词按照ABCDEF的一个渐进性顺序罗列出来，当真正做的时候，你会发现，它们之间是存在相当多的无法统一的矛盾的。</p>
+<p><strong>A：网管，即数据中心大型组网下的启动发现、路由策略、拥塞控制、故障处理、加解密等。重要的相关词包括：P4、ECN、DC-QCN、crypto等。</strong></p>
+<p><strong>B：虚拟化，即数据中心存在众多租户时，为租户提供虚拟的PC模型的机制。重要的相关词包括：多租户、IaaS、OVS、virtIO、迁移、隔离、SGX、Vxlan、overlay等</strong></p>
+<p><strong>C：存算分离，即数据中心disaggregation的第一步，把storage池化后，但又提供一种storage像PC一样在身边的感受的特征。重要的相关词包括：SDI、NoF(NvMe over fabric)、KV storage、软ROCE等。</strong></p>
+<p><strong>D：集群通信，数据中心走向另一面，把一定规模的设备整合向单一用户或应用提供服务的形态，主要针对高性能计算(HPC)为主。重要的关键词包括：MPI、硬ROCE、&lt;1us、高pps、HPC上云等。</strong></p>
+<p><strong>E：Full disaggregated，即数据中心再进一步资源整合，以池化的异构资源池方式提供服务给客户，客户不再感知硬件具体形态，或者把整个DC看做单一的PC。重要的关键词包括：datacenter as a computer、disaggregated datacenter、SaaS、serverless、pool、RPC等。</strong></p>
+<p><strong>F：边缘计算，极端的pool结构，把CPU&#x2F;GPU&#x2F;DPU合为一体，放弃完备的虚拟机可用性，用极简的融合方案提供单纯的特定算力，即只做RPC服务化的计算单元。重要的关键词包括：EDGE、AI+DPU、免host等。</strong></p>
+<p><strong>除开A～F，不同形态还会有一些场景差异化的特性，包括security、reliability等等。</strong></p>
+<p>简单来讲：<strong>越偏向于AB的是IPU，而越偏向于EF的是DPU。</strong></p>
+<p>再说，如果用DPU的CPU卸载host的CPU……有啥能效收益呢？ 是，以前intel的CPU每个CORE卖得贵，但现在AMD和ARM砸场子之后，host的CPU早已变得廉价了。<strong>所以，DPU是一个DSA！</strong></p>
+<p>在DSA的黄金十年，你得用DSA的思维来做DPU。</p>
+<p><strong>A：fixed function，以IPSEC、compression为例子，虽然有flow、stateful等变化，但协议本身已经相对稳定，这些固定功能，做成inline的hardware accelerator处理是最佳选择。</strong></p>
+<p><strong>B：stateless数据流，以parser、match、flow table、statistics为特征，OVS的数据面就是典型业务，需要灵活可编程的行为适配不同cloud vendor的需求，这里以P4语法处理器或FPGA为最佳。</strong></p>
+<p><strong>C：stateful数据流，以需要可编程的上下文查找及一定的divergence能力，以security、存算分离以及RDMA为典型业务，这里的诉求是最难的，最好是有某种netwroking processor，如果能容忍一定业务抖动，CPU魔改或者RISC-V扩展ISA也可能能用。</strong></p>
+<p><strong>D：控制流，包括各种业务管理、异常处理、以及DPU本身的host等诉求，这其实是最简单的，可以用若干图灵完备的大核，典型就是ARM neoverse N1&#x2F;N2，也是大家通常的选择。</strong></p>
+<p>举几个例子：</p>
+<p>intel的Mt.even，用HAC做了A，然后基于收购的barefoot的P4处理器做B，用ARM N1做了D，而C不好处理应该是被部分硬化部分融入N1了。</p>
+<p>intel的Oak springs canyon，则是用FPGA直接把A、B用可编程硬化方式吃掉，而用外挂的的xeon CPU做D，C也是通过上下某种方式隐藏掉。</p>
+<p>nvidia的blufield是做得最完美的，用HAC做A，用ASAP2（替代P4）做B，用16个SMT16的可编程PE做C，最后用ARM N1做D。</p>
+<blockquote>
+<p>首先，无论是DPU还是IPU都是在网络接口上的设备，其业务处理的核心是基于带宽的package，以太网天生具有大包&#x2F;小包、单流&#x2F;多流、stateful&#x2F;stateless等多种网络特征。要最简单来看，用一堆的通用CPU来处理是最便利的，但是，绝对不行！作为CPU领域的高级打工人，这事在我脑海里不知道已经盘算过多少次了，确实不行，要真行我能放过这块肉？^[1]^</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/412267070">[1] 再写一下DPU的一个重要的根技术 </a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/409507738">[2]写一下DPU（长文）</a></p>
+<h2 id="Intel-IPU"><a href="#Intel-IPU" class="headerlink" title="Intel IPU"></a><strong>Intel IPU</strong></h2><p>英特尔(Intel)IPU是一种配备了硬化加速器和以太网连接的先进网络设备。它利用紧密耦合的专用可编程核心来加速和管理基础设施功能。IPU实现基础设施卸载，并充当运行基础设施应用程序的主机控制点，提供了额外的安全层。将所有基础设施服务从服务器卸载到IPU中，释放服务器CPU资源，并为云服务提供商提供了一个独立且安全的控制点。</p>
+<p><a target="_blank" rel="noopener" href="https://www.intel.cn/content/www/cn/zh/products/details/network-io/ipu/adapter-e2100.html">E2100</a></p>
+<p><img src="/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/e2100-network-subsystem-highlights-left-1730798208568-334.png" alt="网络子系统亮点"></p>
+<p><img src="/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/e2100-compute-complex-highlights-1730798208568-335.png" alt="计算复合体亮点"></p>
+<p><img src="/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/QQ_1728955871808-1730798208568-336.png" alt="QQ_1728955871808"></p>
+<p><img src="/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/QQ_1728955892276-1730798208568-337.png" alt="QQ_1728955892276"></p>
+<h2 id="阿里云中的DPU"><a href="#阿里云中的DPU" class="headerlink" title="阿里云中的DPU"></a><strong>阿里云中的DPU</strong></h2><p>阿里云是DPU技术探索的前沿。在2022年的阿里云峰会上，他们发布了基于神龙架构开发的云基础架构处理器CIPU。CIPU继承了其前身MoC卡(卡上微服务器)的功能和定位，与DPU的定义相吻合。MoC卡具有独立的I&#x2F;O、存储和处理单元，并处理网络、存储和设备虚拟化任务。MoC卡经历了四个发展阶段：</p>
+<ol>
+<li>第一代和第二代MoC卡解决计算虚拟化的零开销挑战，通过软件实现了网络和存储虚拟化。</li>
+<li>第三代MoC卡引入了增强的网络转发功能，显著提高了网络性能。</li>
+<li>第四代MoC卡实现了网络和存储操作的完全硬件卸载，并支持RDMA功能。</li>
+</ol>
+<p>  阿里云的CIPU专为飞天系统设计，对于构建新一代综合软硬件云计算架构系统至关重要。</p>
+<h2 id="英伟达-NVIDIA-DPU"><a href="#英伟达-NVIDIA-DPU" class="headerlink" title="英伟达(NVIDIA)DPU"></a><strong>英伟达(NVIDIA)DPU</strong></h2><p><a target="_blank" rel="noopener" href="https://www.nvidia.com/en-us/networking/products/data-processing-unit/">NVIDIA 的 BlueField 系列 DPU </a></p>
+<p><img src="/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/QQ_1728957005289-1730798208568-338.png" alt="QQ_1728957005289"></p>
+<p><a target="_blank" rel="noopener" href="https://resources.nvidia.com/en-us-accelerated-networking-resource-library/datasheet-nvidia-bluefield">https://resources.nvidia.com/en-us-accelerated-networking-resource-library/datasheet-nvidia-bluefield</a></p>
+<p><img src="/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/image-20241015095533508-1730798208568-339.png" alt="image-20241015095533508"></p>
+<h3 id="Programmable-Datapath-Accelerator-的作用"><a href="#Programmable-Datapath-Accelerator-的作用" class="headerlink" title="Programmable Datapath Accelerator 的作用"></a>Programmable Datapath Accelerator 的作用</h3><p>NVIDIA 的 DPU 可编程数据路径加速器（Programmable Datapath Accelerator）允许用户通过软件定义的数据路径逻辑来优化数据的处理方式。这种灵活性使得 DPU 能够适应不断变化的应用需求，并支持定制的处理逻辑。可编程的部分可以包括：</p>
+<ul>
+<li><strong>数据包处理逻辑的定制</strong>：用户可以编写特定的程序来优化不同网络协议的处理。例如，用户可以加速特定的路由、负载均衡或深度数据包检测（DPI）等网络任务。</li>
+<li><strong>高效的数据流管理</strong>：DPU 能够根据用户定义的规则动态调整数据流处理的优先级，从而提高网络传输的效率。</li>
+<li><strong>存储操作的优化</strong>：针对不同存储协议或数据类型，DPU 可以定制特定的存储操作路径，从而减少延迟并提高吞吐量。</li>
+</ul>
+<p>用户通过 DOCA（Data-Centric Acceleration）SDK 来开发和部署基于 DPU 的加速应用。</p>
+<h2 id="AMD"><a href="#AMD" class="headerlink" title="AMD"></a>AMD</h2><p>IT之家 2024 年 10 月 16 日消息，AMD 刚刚推出了两款 Pensando 产品，即 Pensando Salina 400 DPU 和 Pensando Pollara 400 AI NIC，旨在增强 AI 网络和基础设施。</p>
+<h3 id="Pensando-Salina-400-DPU"><a href="#Pensando-Salina-400-DPU" class="headerlink" title="Pensando Salina 400 DPU"></a>Pensando Salina 400 DPU</h3><p>AMD Pensando Salina 400 DPU（数据处理单元）是该系列 DPU 芯片的第三代产品，性能和带宽相当于上一代的两倍，有助于处理海量的 AI 数据负载、传输和高效率业务。</p>
+<p>据介绍，Salina 400 DPU 能够管理从软件定义网络（SDN）、防火墙和加密到负载平衡和网络地址转换（NAT）的一切，同时还有助于减少存储以释放 CPU 资源。</p>
+<h3 id="Pensando-Pollara-400-AI-NIC"><a href="#Pensando-Pollara-400-AI-NIC" class="headerlink" title="Pensando Pollara 400 AI NIC"></a>Pensando Pollara 400 AI NIC</h3><p><a target="_blank" rel="noopener" href="https://www.amd.com/content/dam/amd/en/documents/pensando-technical-docs/product-briefs/pensando-pollara-400-product-brief.pdf">Athe Pensando Pollara 400 AI NIC</a> 是一种专门设计用于支持 AI 和 HPC 系统复杂数据传输需求的网络接口卡。</p>
+<p>据 AMD 称，这款新 NIC 是首款符合超高速以太网联盟 (UEC) 标准的 NIC，与之前的产品相比，其 AI 性能提升了足足六倍。</p>
+<p>Pollara 400 NIC 将使用专用处理器优化 AI 网络，并结合了智能多路径，可以跨多个路由调整数据流来避免拥塞。此外，它还支持路径感知拥塞控制，可以将数据重新路由以使其绕过拥塞的路径，并保持网络以最佳速度运行。IT之家注意到，NIC 还具备快速故障转移功能，以便能够更快地检测和绕过网络故障，从而保持 GPU 之间的通信保持高水平。</p>
+<p>扩展性方面，AMD 表示 Pollara 400 NIC 可以管理大型 AI 集群网络而不会增加延迟，从而能够使得 AI 基础设施更加可靠。</p>
+<p>除此之外，Pollara 400 NIC 同样符合 UEC 规范。目前，UEC 已包括 97 个成员，预计明年将发布其 1.0 规范。该规范将基于现有以太网标准，重用大部分原始技术。</p>
+<p>AI 和 HPC 工作负载将采用不同的配置文件以匹配其特殊需求，但通过创建单独的协议，UEC 可以提高性能并确保以太网技术仍然可行。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/intel/" rel="tag"># intel</a>
+              <a href="/tags/IPU/" rel="tag"># IPU</a>
+              <a href="/tags/DPU/" rel="tag"># DPU</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/08/IC%E9%AA%8C%E8%AF%81/" rel="prev" title="常用Emulator简介">
+                  <i class="fa fa-angle-left"></i> 常用Emulator简介
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/10/25/SGDMA%E4%B8%8E%E6%99%AE%E9%80%9ADMA/" rel="next" title="SGDMA与普通DMA">
+                  SGDMA与普通DMA <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu JInlin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"http://example.com/2024/10/15/DPU%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/312127.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/312127.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="RISC-V 高级中断架构AIA spec的翻译，基于RC3版本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RISC-V AIA">
+<meta property="og:url" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/index.html">
+<meta property="og:site_name" content="WJL">
+<meta property="og:description" content="RISC-V 高级中断架构AIA spec的翻译，基于RC3版本">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230608092736850-1686534967274-14.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230608113729790-1686534967274-15.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230213141250997-1686534967274-16.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20240326143547077.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230606114042584-1686534967274-17.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230213153204201.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230213153844133.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230606154502244-1686534967275-18.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230711092053226.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230608161158573-1686534967275-19.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230104163806112.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612104653786.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612104042921.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612104305650.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230214140003085.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612111210029.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612114635348.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612143809363.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612144045503.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612144225186.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612151453192.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612152030933.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612153519840.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614134036636.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614134126829.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612154645189.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612155646428.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612155637972.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612160237569.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612160251943.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612162450220.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612163457619.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612163846771.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612171027659.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612171530251-1686561331234-1.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612172711313.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612181302350.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612181758178.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230613153335071.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230613153532447.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230221153958624.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230221154153222.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230221154213347.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230221154259732.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230613184454501.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614085133331.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614085305292.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614090555518.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614092540183.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614092547769.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614092656193.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614093009936.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614093129025.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227102457899.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230605110700101-1685934440859-1-1685934453486-3.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227102715077.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227102743188.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230605160717667-1686534967277-21.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227104643115.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230605165204453-1686534967277-22.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227110632591.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614100546666.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614100720056.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614100941336.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614101801890.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614101825741.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614101844856.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614102442012.png">
+<meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614103054402.png">
+<meta property="article:published_time" content="2024-11-01T05:52:39.000Z">
+<meta property="article:modified_time" content="2024-11-15T03:24:28.122Z">
+<meta property="article:author" content="Wu JInlin">
+<meta property="article:tag" content="RISC-V">
+<meta property="article:tag" content="中断">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230608092736850-1686534967274-14.png">
+
+
+<link rel="canonical" href="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/","path":"2024/11/01/RISC-V_AIA_架构规范/","title":"RISC-V AIA"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>RISC-V AIA | WJL</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">WJL</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fighting forgetfulness</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RISC-V-AIA-Spec-RC3"><span class="nav-text">RISC-V AIA Spec RC3</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9A%E7%AE%80%E4%BB%8B"><span class="nav-text">第一章：简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-aia%E7%9B%AE%E6%A0%87"><span class="nav-text">1.1 aia目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-Limits"><span class="nav-text">1.2 Limits</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-%E4%B8%BB%E8%A6%81%E7%BB%84%E4%BB%B6%E6%A6%82%E8%BF%B0"><span class="nav-text">1.3 主要组件概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-1-External-interrupts-without-IMSICs"><span class="nav-text">1.3.1 External interrupts without IMSICs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-2-External-interrupts-with-IMSICs"><span class="nav-text">1.3.2 External interrupts with IMSICs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-3-Other-interrupts"><span class="nav-text">1.3.3 Other interrupts</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-%E4%B8%AD%E6%96%AD%E6%A0%87%E8%AF%86%EF%BC%88interrupt-identities%EF%BC%89at-a-hart"><span class="nav-text">1.4 中断标识（interrupt identities）at a hart</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-%E9%80%89%E6%8B%A9%E6%8E%A5%E6%94%B6%E4%B8%AD%E6%96%AD%E7%9A%84harts"><span class="nav-text">1.5 选择接收中断的harts</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-6-%E6%8C%87%E4%BB%A4%E9%9B%86%E6%89%A9%E5%B1%95Smaia%E5%92%8CSsaia-ISA-extensions-Smaia-and-Ssaia"><span class="nav-text">1.6 指令集扩展Smaia和Ssaia\ISA extensions Smaia and Ssaia</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9A%E5%A2%9E%E5%8A%A0%E7%9A%84CSR"><span class="nav-text">第二章：增加的CSR</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Machine-level-CSRs"><span class="nav-text">2.1 Machine-level CSRs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-Supervisor-level-CSRs"><span class="nav-text">2.2 Supervisor-level CSRs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Hypervisor-and-VS-CSRs"><span class="nav-text">2.3 Hypervisor and VS CSRs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-%E8%99%9A%E6%8B%9F%E6%8C%87%E4%BB%A4%E5%BC%82%E5%B8%B8-Virtual-instruction-exceptions"><span class="nav-text">2.4 虚拟指令异常 Virtual instruction exceptions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-Access-control-by-the-state-enable-CSRs"><span class="nav-text">2.5  Access control by the state-enable CSRs</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AIMSIC"><span class="nav-text">第三章：IMSIC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6%E5%92%8C%E6%A0%87%E8%AF%86-Interrupt-files-and-interrupt-identities"><span class="nav-text">3.1 中断文件和标识 Interrupt files and interrupt identities</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-MSI%E7%BC%96%E7%A0%81"><span class="nav-text">3.2 MSI编码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-%E4%B8%AD%E6%96%AD%E4%BC%98%E5%85%88%E7%BA%A7"><span class="nav-text">3.3 中断优先级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-%E5%A4%8D%E4%BD%8D%E5%92%8C%E6%98%BE%E7%A4%BA%E7%8A%B6%E6%80%81"><span class="nav-text">3.4 复位和显示状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6%E7%9A%84%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F"><span class="nav-text">3.5 中断文件的内存区域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-6-%E5%A4%9A%E4%B8%AA%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E7%9A%84%E6%8E%92%E5%88%97"><span class="nav-text">3.6 多个中断文件内存区域的排列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-7-%E9%80%9A%E8%BF%87IMSIC%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD%E7%9A%84csr"><span class="nav-text">3.7 通过IMSIC外部中断的csr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-8-%E9%97%B4%E6%8E%A5%E8%AE%BF%E9%97%AE%E7%9A%84%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-text">3.8 间接访问的中断文件寄存器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-1-%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD%E9%80%92%E4%BA%A4%E4%BD%BF%E8%83%BD%E5%AF%84%E5%AD%98%E5%99%A8-eidelivery"><span class="nav-text">3.8.1 外部中断递交使能寄存器 (eidelivery)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-2-%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD%E4%BD%BF%E8%83%BD%E9%97%A8%E9%99%90%E5%AF%84%E5%AD%98%E5%99%A8-eithreshold"><span class="nav-text">3.8.2 外部中断使能门限寄存器(eithreshold)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-3-%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD%E6%8C%82%E8%B5%B7%E5%AF%84%E5%AD%98%E5%99%A8-eip0-eip63"><span class="nav-text">3.8.3 外部中断挂起寄存器(eip0-eip63)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-4-%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD%E4%BD%BF%E8%83%BD%E5%AF%84%E5%AD%98%E5%99%A8-eie0-eie63"><span class="nav-text">3.8.4 外部中断使能寄存器(eie0-eie63)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-9-Top-%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%ADCSRs-mtopei-stopei-vstopei"><span class="nav-text">3.9 Top 外部中断CSRs (mtopei, stopei, vstopei)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-10-%E4%B8%AD%E6%96%AD%E4%BA%A4%E4%BB%98%E5%92%8C%E5%A4%84%E7%90%86"><span class="nav-text">3.10 中断交付和处理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E7%AB%A0%EF%BC%9AAPLIC"><span class="nav-text">第四章：APLIC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%E4%B8%AD%E6%96%AD%E6%BA%90%E5%92%8C%E6%A0%87%E8%AF%86"><span class="nav-text">4.1 中断源和标识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-%E4%B8%AD%E6%96%AD%E5%9F%9F"><span class="nav-text">4.2  中断域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-Hart-%E7%B4%A2%E5%BC%95"><span class="nav-text">4.3 Hart 索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-%E5%8D%95%E5%9F%9F%E4%B8%AD%E6%96%AD%E6%8E%A7%E5%88%B6%E6%A6%82%E8%BF%B0"><span class="nav-text">4.4 单域中断控制概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-5-%E4%B8%AD%E6%96%AD%E5%9F%9F%E7%9A%84%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E6%8E%A7%E5%88%B6%E5%8C%BA%E5%9F%9F"><span class="nav-text">4.5 中断域的内存映射控制区域</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-1-%E5%9F%9F%E9%85%8D%E7%BD%AE-domaincfg"><span class="nav-text">4.5.1 域配置(domaincfg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-2-%E6%BA%90%E9%85%8D%E7%BD%AE-sourcecfg-1-sourcecfg-1023"><span class="nav-text">4.5.2 源配置(sourcecfg[1] -sourcecfg [1023])</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-3-%E6%9C%BA%E5%99%A8%E7%BA%A7MSI%E5%9C%B0%E5%9D%80%E9%85%8D%E7%BD%AE-mmsiaddrcfg%E5%92%8Cmmsiaddrcfgh"><span class="nav-text">4.5.3 机器级MSI地址配置(mmsiaddrcfg和mmsiaddrcfgh)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-4-%E7%AE%A1%E7%90%86%E7%BA%A7MSI%E5%9C%B0%E5%9D%80%E9%85%8D%E7%BD%AE-smsiaddrcfg%E5%92%8Csmsiaddrcfgh"><span class="nav-text">4.5.4 管理级MSI地址配置(smsiaddrcfg和smsiaddrcfgh)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-5-%E8%AE%BE%E7%BD%AE%E4%B8%AD%E6%96%AD%E6%8C%82%E8%B5%B7%E4%BD%8D-setip-0-setip-31"><span class="nav-text">4.5.5 设置中断挂起位(setip[0] -setip [31])</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-6-%E8%AE%BE%E7%BD%AE%E4%B8%AD%E6%96%AD%E6%8C%82%E8%B5%B7%E4%BD%8Dby-number-setipnum"><span class="nav-text">4.5.6 设置中断挂起位by number(setipnum)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-7-%E6%95%B4%E6%B5%81%E8%BE%93%E5%85%A5%EF%BC%8C%E6%B8%85%E9%99%A4%E6%8C%82%E8%B5%B7%E4%B8%AD%E6%96%AD%E4%BD%8D-in-clrip-0-in-clrip-31"><span class="nav-text">4.5.7 整流输入，清除挂起中断位(in_clrip[0]-in_clrip[31])</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-8-%E6%8C%89%E4%BD%8D%E6%95%B0%E6%B8%85%E9%99%A4%E4%B8%AD%E6%96%AD%E6%8C%82%E8%B5%B7-clripnum"><span class="nav-text">4.5.8 按位数清除中断挂起(clripnum)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-9-%E8%AE%BE%E7%BD%AE%E4%B8%AD%E6%96%AD%E4%BD%BF%E8%83%BD%E4%BD%8D-setie-0-setie-31"><span class="nav-text">4.5.9 设置中断使能位(setie[0] -setie [31])</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-10-%E6%8C%89%E4%BD%8D%E6%95%B0%E8%AE%BE%E7%BD%AE%E4%B8%AD%E6%96%AD%E4%BD%BF%E8%83%BD-setienum"><span class="nav-text">4.5.10 按位数设置中断使能 (setienum)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-11-%E6%B8%85%E9%99%A4%E4%B8%AD%E6%96%AD%E4%BD%BF%E8%83%BD%E4%BD%8D-clrie-0-clrie-31"><span class="nav-text">4.5.11 清除中断使能位 (clrie[0] -clrie [31])</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-12-%E6%8C%89%E4%BD%8D%E6%95%B0%E6%B8%85%E9%99%A4%E4%B8%AD%E6%96%AD%E4%BD%BF%E8%83%BD-clrienum"><span class="nav-text">4.5.12 按位数清除中断使能 (clrienum)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-13-%E8%AE%BE%E7%BD%AE%E4%B8%AD%E6%96%AD%E6%8C%82%E8%B5%B7%E4%BD%8D%EF%BC%8C%E6%8C%89%E6%95%B0%E5%AD%97%E5%B0%8F%E7%AB%AF-setipnum-le"><span class="nav-text">4.5.13 设置中断挂起位，按数字小端 (setipnum_le)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-14-%E8%AE%BE%E7%BD%AE%E4%B8%AD%E6%96%AD%E6%8C%82%E8%B5%B7%E4%BD%8D%EF%BC%8C%E6%8C%89%E6%95%B0%E5%AD%97%E5%A4%A7%E7%AB%AF-setipnum-be"><span class="nav-text">4.5.14 设置中断挂起位，按数字大端(setipnum_be)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-15-%E7%94%9F%E6%88%90MSI-genmsi"><span class="nav-text">4.5.15 生成MSI (genmsi)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-16-%E4%B8%AD%E6%96%AD%E7%9B%AE%E6%A0%87-target-1-target-1023"><span class="nav-text">4.5.16 中断目标(target[1]-target[1023])</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%89%E6%95%88%E6%BA%90%EF%BC%8C%E7%9B%B4%E6%8E%A5%E4%BA%A4%E4%BB%98%E6%A8%A1%E5%BC%8F-Active-source-direct-delivery-mode"><span class="nav-text">有效源，直接交付模式 Active source, direct delivery mode</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%89%E6%95%88%E6%BA%90%EF%BC%8CMSI%E4%BA%A4%E4%BB%98%E6%A8%A1%E5%BC%8F-Active-source-MSI-delivery-mode"><span class="nav-text">有效源，MSI交付模式 Active source, MSI delivery mode</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-6-%E5%A4%8D%E4%BD%8D"><span class="nav-text">4.6 复位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-7-%E5%AF%B9%E4%B8%AD%E6%96%AD%E6%8C%82%E8%B5%B7%E4%BD%8D%E7%9A%84%E6%98%8E%E7%A1%AE%E5%BD%B1%E5%93%8D"><span class="nav-text">4.7 对中断挂起位的明确影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-8-APLIC%E7%9B%B4%E6%8E%A5%E4%B8%AD%E6%96%AD%E4%BA%A4%E4%BB%98"><span class="nav-text">4.8 APLIC直接中断交付</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-1-IDC-Interrupt-delivery-control-%E7%BB%93%E6%9E%84"><span class="nav-text">4.8.1 IDC (Interrupt delivery control)结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-8-1-1-%E4%B8%AD%E6%96%AD%E4%BA%A4%E4%BB%98%E4%BD%BF%E8%83%BD-Interrupt-delivery-enable-idelivery"><span class="nav-text">4.8.1.1 中断交付使能 Interrupt delivery enable (idelivery)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-8-1-2-%E4%B8%AD%E6%96%AD%E5%BC%BA%E5%88%B6-iforce"><span class="nav-text">4.8.1.2 中断强制 (iforce)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-8-1-3-%E4%B8%AD%E6%96%AD%E4%BD%BF%E8%83%BD%E9%98%88%E5%80%BC-ithreshold"><span class="nav-text">4.8.1.3 中断使能阈值(ithreshold)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-8-1-4-Top%E4%B8%AD%E6%96%AD-topi"><span class="nav-text">4.8.1.4 Top中断(topi)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-8-1-5-Claim-top%E4%B8%AD%E6%96%AD-claimi"><span class="nav-text">4.8.1.5 Claim top中断(claimi)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-2-%E4%B8%AD%E6%96%AD%E4%BA%A4%E4%BB%98%E5%92%8C%E5%A4%84%E7%90%86"><span class="nav-text">4.8.2 中断交付和处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-9-%E4%B8%AD%E6%96%ADMSI%E8%BD%AC%E5%8F%91"><span class="nav-text">4.9 中断MSI转发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-9-1-%E5%87%BA%E7%AB%99MSI%E7%9A%84%E5%9C%B0%E5%9D%80%E5%92%8C%E6%95%B0%E6%8D%AE"><span class="nav-text">4.9.1 出站MSI的地址和数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-9-2-%E5%AF%B9%E7%94%B5%E5%B9%B3%E6%95%8F%E6%84%9F%E4%B8%AD%E6%96%AD%E6%BA%90%E7%9A%84%E7%89%B9%E6%AE%8A%E8%80%83%E8%99%91"><span class="nav-text">4.9.2 对电平敏感中断源的特殊考虑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-9-3-%E5%90%8C%E6%AD%A5hart%E4%B8%8EAPLIC%E7%9A%84%E4%BA%A4%E4%BA%92"><span class="nav-text">4.9.3 同步hart与APLIC的交互</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9AM%E7%BA%A7%E5%92%8CS%E7%BA%A7%E4%B8%AD%E6%96%AD"><span class="nav-text">第五章：M级和S级中断</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-%E5%AE%9A%E4%B9%89%E7%9A%84%E4%B8%BB%E8%A6%81%E4%B8%AD%E6%96%AD%E5%92%8C%E9%BB%98%E8%AE%A4%E4%BC%98%E5%85%88%E7%BA%A7"><span class="nav-text">5.1  定义的主要中断和默认优先级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-%E6%9C%BA%E5%99%A8%E7%BA%A7%E5%88%AB%E7%9A%84%E4%B8%AD%E6%96%AD"><span class="nav-text">5.2  机器级别的中断</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-1-%E5%9C%A8%E6%9C%BA%E5%99%A8%E7%BA%A7%E5%88%AB%E9%85%8D%E7%BD%AE%E4%B8%BB%E8%A6%81%E4%B8%AD%E6%96%AD%E7%9A%84%E4%BC%98%E5%85%88%E7%BA%A7"><span class="nav-text">5.2.1 在机器级别配置主要中断的优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-2-%E6%9C%BA%E5%99%A8top%E4%B8%AD%E6%96%ADCSR-mtopi"><span class="nav-text">5.2.2 机器top中断CSR (mtopi)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-%E4%B8%BB%E7%AE%A1%E7%BA%A7%E5%88%AB%E7%9A%84%E4%B8%AD%E6%96%AD%E8%BF%87%E6%BB%A4%E5%92%8C%E8%99%9A%E6%8B%9F%E4%B8%AD%E6%96%AD"><span class="nav-text">5.3  主管级别的中断过滤和虚拟中断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-4-%E4%B8%BB%E7%AE%A1%E7%BA%A7%E5%88%AB%E7%9A%84%E4%B8%AD%E6%96%AD"><span class="nav-text">5.4  主管级别的中断</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-1-%E5%9C%A8%E4%B8%BB%E7%AE%A1%E7%BA%A7%E5%88%AB%E9%85%8D%E7%BD%AE%E4%B8%BB%E8%A6%81%E4%B8%AD%E6%96%AD%E7%9A%84%E4%BC%98%E5%85%88%E7%BA%A7"><span class="nav-text">5.4.1 在主管级别配置主要中断的优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-2-%E4%B8%BB%E7%AE%A1top%E4%B8%AD%E6%96%ADCSR-stopi"><span class="nav-text">5.4.2 主管top中断CSR (stopi)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-5-WFI%EF%BC%88%E7%AD%89%E5%BE%85%E4%B8%AD%E6%96%AD%EF%BC%89%E6%8C%87%E4%BB%A4"><span class="nav-text">5.5  WFI（等待中断）指令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E5%85%AD%E7%AB%A0%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84%E4%B8%AD%E6%96%AD%EF%BC%88VS%E7%BA%A7%EF%BC%89"><span class="nav-text">第六章：虚拟机的中断（VS级）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-%E5%B8%A6%E6%9C%89guest-interrupt-files%E7%9A%84-VS-%E7%BA%A7%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD"><span class="nav-text">6.1.带有guest interrupt files的 VS 级外部中断</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-1-guest-OS%E7%9B%B4%E6%8E%A5%E6%8E%A7%E5%88%B6%E8%AE%BE%E5%A4%87"><span class="nav-text">6.1.1 guest OS直接控制设备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-2-%E5%B0%86%E8%99%9A%E6%8B%9Fhart%E8%BF%81%E7%A7%BB%E5%88%B0%E4%B8%8D%E5%90%8C%E7%9A%84-guest-interrupt-files"><span class="nav-text">6.1.2 将虚拟hart迁移到不同的 guest interrupt files</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-%E6%B2%A1%E6%9C%89-guest-interrupt-file%E7%9A%84-VS-%E7%BA%A7%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD"><span class="nav-text">6.2 没有 guest interrupt file的 VS 级外部中断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-VS%E7%BA%A7%E7%9A%84%E4%B8%AD%E6%96%AD"><span class="nav-text">6.3. VS级的中断</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-1-%E5%9C%A8VS%E7%BA%A7%E5%88%AB%E9%85%8D%E7%BD%AE%E4%B8%BB%E8%A6%81%E4%B8%AD%E6%96%AD%E7%9A%84%E4%BC%98%E5%85%88%E7%BA%A7"><span class="nav-text">6.3.1 在VS级别配置主要中断的优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-2-VS%E7%BA%A7%E7%9A%84%E8%99%9A%E6%8B%9F%E4%B8%AD%E6%96%AD"><span class="nav-text">6.3.2 VS级的虚拟中断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-3-%E8%99%9A%E6%8B%9F%E7%AE%A1%E7%90%86%E7%BA%A7top%E4%B8%AD%E6%96%AD-CSR-vstopi"><span class="nav-text">6.3.3 虚拟管理级top中断 CSR(vstopi)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-4-VS-%E6%A8%A1%E5%BC%8F%E7%9A%84%E4%B8%AD%E6%96%AD%E9%99%B7%E9%98%B1"><span class="nav-text">6.3.4 VS 模式的中断陷阱</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%83%E7%AB%A0%EF%BC%9A-%E5%A4%84%E7%90%86%E5%99%A8%E9%97%B4%E4%B8%AD%E6%96%AD-IPI"><span class="nav-text">第七章： 处理器间中断 (IPI)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E5%85%AB%E7%AB%A0%EF%BC%9A-IOMMU-%E6%94%AF%E6%8C%81-MSI-%E5%88%B0%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="nav-text">第八章： IOMMU 支持 MSI 到虚拟机</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#8-1-IOMMU%E8%AE%BE%E5%A4%87%E8%83%8C%E6%99%AF%E4%BF%A1%E6%81%AF"><span class="nav-text">8.1 IOMMU设备背景信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-2-%E8%AE%BE%E5%A4%87%E7%9A%84MSI%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2"><span class="nav-text">8.2 设备的MSI地址转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-%E9%A9%BB%E7%95%99%E5%86%85%E5%AD%98%E7%9A%84%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6"><span class="nav-text">8.3 驻留内存的中断文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-1-%E9%A9%BB%E7%95%99%E5%86%85%E5%AD%98%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6%E7%9A%84%E6%A0%BC%E5%BC%8F"><span class="nav-text">8.3.1 驻留内存中断文件的格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-2-%E5%B0%86%E4%BC%A0%E5%85%A5%E7%9A%84MSI%E8%AE%B0%E5%BD%95%E5%88%B0%E9%A9%BB%E7%95%99%E5%86%85%E5%AD%98%E7%9A%84%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6%E4%B8%AD"><span class="nav-text">8.3.2 将传入的MSI记录到驻留内存的中断文件中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-3-%E4%BD%BF%E7%94%A8%E5%8E%9F%E5%AD%90%E6%9B%B4%E6%96%B0%E7%9A%84%E9%A9%BB%E7%95%99%E5%86%85%E5%AD%98%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6"><span class="nav-text">8.3.3 使用原子更新的驻留内存中断文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-4-%E4%BD%BF%E7%94%A8%E9%A9%BB%E7%95%99%E5%86%85%E5%AD%98%E7%9A%84%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6%E8%80%8C%E4%B8%8D%E8%BF%9B%E8%A1%8C%E5%8E%9F%E5%AD%90%E6%9B%B4%E6%96%B0"><span class="nav-text">8.3.4 使用驻留内存的中断文件而不进行原子更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-5-%E4%B8%BA%E6%8E%A5%E6%94%B6%E9%80%9A%E7%9F%A5MSI%E5%88%86%E9%85%8D-guest-interrupt-file"><span class="nav-text">8.3.5 为接收通知MSI分配 guest interrupt file</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-4-%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%AD%E6%96%AD%E6%96%87%E4%BB%B6%E9%A1%B5%E9%9D%A2%E5%9C%B0%E5%9D%80%E8%AF%86%E5%88%AB"><span class="nav-text">8.4 虚拟机中断文件页面地址识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-5-MSI%E9%A1%B5%E8%A1%A8"><span class="nav-text">8.5 MSI页表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-5-1-MSI-PTE%EF%BC%8C%E5%9F%BA%E6%9C%AC%E7%BF%BB%E8%AF%91%E6%A8%A1%E5%BC%8F"><span class="nav-text">8.5.1 MSI PTE，基本翻译模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-5-2-MSI-PTE-MRIF%E6%A8%A1%E5%BC%8F"><span class="nav-text">8.5.2 MSI PTE, MRIF模式</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu JInlin"
+      src="/images/20241114140630.jpg">
+  <p class="site-author-name" itemprop="name">Wu JInlin</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/20241114140630.jpg">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="RISC-V AIA | WJL">
+      <meta itemprop="description" content="RISC-V 高级中断架构AIA spec的翻译，基于RC3版本">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RISC-V AIA
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-11-01 13:52:39" itemprop="dateCreated datePublished" datetime="2024-11-01T13:52:39+08:00">2024-11-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-15 11:24:28" itemprop="dateModified" datetime="2024-11-15T11:24:28+08:00">2024-11-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RISC-V/" itemprop="url" rel="index"><span itemprop="name">RISC-V</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/RISC-V/%E4%B8%AD%E6%96%AD/" itemprop="url" rel="index"><span itemprop="name">中断</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">RISC-V 高级中断架构AIA spec的翻译，基于RC3版本</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="RISC-V-AIA-Spec-RC3"><a href="#RISC-V-AIA-Spec-RC3" class="headerlink" title="RISC-V AIA Spec RC3"></a>RISC-V AIA Spec RC3</h1><h1 id="第一章：简介"><a href="#第一章：简介" class="headerlink" title="第一章：简介"></a>第一章：简介</h1><h2 id="1-1-aia目标"><a href="#1-1-aia目标" class="headerlink" title="1.1 aia目标"></a>1.1 aia目标</h2><ol>
+<li>基于RISC-V特权架构的中断处理功能，最大限度地减少现有功能的替换。</li>
+<li><strong>除了基本的有线中断外，还为RISC-V系统提供了直接使用PCI Express和其他设备标准所使用的消息信号中断(MSI)的设施。</strong></li>
+<li>对于有线中断，定义一个新的平台级中断控制器(高级PLIC，或APLIC)，它对每个权限级别(如RISC-V机器和主管级别)都有独立的控制接口；并且可以为支持MSI系统，将有线中断转换为MSI。</li>
+<li><strong>aplic为每个特权级别提供独立的控制接口，并且可以将有线中断转换为MSI</strong>。</li>
+<li>扩展RISC-V节点的本地中断框架。</li>
+<li><strong>将本地中断和外部中断一起配置优先级</strong>；</li>
+<li><strong>实现了hypervisor拓展，可以为 virtual machine(VM)虚拟化的这些相同的 interrupt 设施提供足够的帮助</strong></li>
+<li><strong>借助IOMMU，提高虚拟机中运行的guest OS直接控制设备的机会和能力，同时最大限度地减少hypervisor的参与</strong>。</li>
+<li><strong>避免让中断硬件限制虚拟机的数量</strong>。</li>
+<li>通过在速度、效率和实现灵活性之间的最佳折衷来实现上述所有功能。</li>
+</ol>
+<p>高级中断架构的这个初始版本主要侧重于满足更大的高性能 RISC-V 系统的需求。当前AIA没有定义以下的功能，这些功能可以减少实时系统中的中断响应时间，但是不太适合高速处理器核；</p>
+<ol>
+<li>为 hart 中的每个中断源提供一个单独的trap入口地址；</li>
+<li>在 interrupt trap 进入时自动堆叠寄存器值，并在退出时恢复；</li>
+<li>基于优先级自动抢占（嵌套）中断。</li>
+</ol>
+<p>这样的特性优化较小的和&#x2F;或实时系统可以作为后续扩展开发，无论是单独或作为本文档的中断架构的未来版本的一部分。</p>
+<h2 id="1-2-Limits"><a href="#1-2-Limits" class="headerlink" title="1.2 Limits"></a>1.2 Limits</h2><p>在其当前版本中，RISC-V高级中断架构可以支持多达16,384个hart的RISC-V对称多处理(SMP)系统。如果hart是64位(RV64)并且实现了hypervisor扩展，并且如果高级中断体系结构的所有特性也被完全实现，那么对于每个物理hart可能有多达63个有效虚拟hart和潜在的数千个额外的空闲(交换)虚拟hart，其中每个虚拟hart可以直接控制一个或多个物理设备。</p>
+<p>表1.1总结了物理和虚拟中断数量的主要限制，以及高级中断体系结构可能支持的不同中断标识的数量。</p>
+<blockquote>
+<p>我们假设任何一台RISC-V计算机(或集群或分布式系统中的任何单个节点)具有数千个物理hart，可能需要适应机器特定组织的中断基础设施，我们不试图预测。</p>
+</blockquote>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230608092736850-1686534967274-14.png" alt="image-20230608092736850"></p>
+<h2 id="1-3-主要组件概述"><a href="#1-3-主要组件概述" class="headerlink" title="1.3 主要组件概述"></a>1.3 主要组件概述</h2><p>RISC-V系统的信令(signaling)中断总体架构取决于它主要是为消息信号中断(MSI)还是为更传统的有线中断构建的。<strong>在完全支持MSI的系统中，每个hart都有一个传入MSI控制器(IMSIC)，作为hart自己的私有中断控制器，用于外部中断</strong>。相反，在主要基于传统有线中断的系统中，hart没有IMSIC。较大的系统，特别是那些带有PCI设备的系统，可以通过向hart提供IMSIC来完全支持MSI，而许多较小的系统可能仍然最好使用有线中断和不带IMSIC的更简单的hart。</p>
+<h3 id="1-3-1-External-interrupts-without-IMSICs"><a href="#1-3-1-External-interrupts-without-IMSICs" class="headerlink" title="1.3.1 External interrupts without IMSICs"></a>1.3.1 External interrupts without IMSICs</h3><p>当RISC-V硬件没有IMSIC时，外部中断通过专用wires发送到harts。在这种情况下，高级平台级中断控制器(APLIC)充当中断的传统中央集线器，为每个hart路由和优先处理外部中断，如图1.1所示。中断可以有选择地路由到每个hart的机器级或主管级。APLIC在第4章中详细说明。</p>
+<p>如果没有 IMSIC，当前的AIA不支持向虚拟机直接发送外部中断信号，即使 RISC-V 实现了特权架构的hypervisor扩展。这样必须将中断发送到对应的hypervisor，然后hypervisor可以选择将虚拟中断注入虚拟机。</p>
+<blockquote>
+<p>如果harts实现了虚拟机管理程序扩展，那么是否应该允许APLIC将外部中断路由为虚拟机管理程序扩展的guest external interrupts，从而允许将中断直接交付给虚拟机，而无需在虚拟机管理程序级别处理每个信号中断，这是一个正在进行的研究主题。现在，我们假设需要向虚拟机发送外部中断的直接信号的系统将具有IMSIC。</p>
+</blockquote>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230608113729790-1686534967274-15.png" alt="image-20230608113729790"></p>
+<h3 id="1-3-2-External-interrupts-with-IMSICs"><a href="#1-3-2-External-interrupts-with-IMSICs" class="headerlink" title="1.3.2 External interrupts with IMSICs"></a>1.3.2 External interrupts with IMSICs</h3><p>为了能够接收消息信号中断 (MSI)，每个 RISC-V hart 必须有一个传入 MSI 控制器 (IMSIC)，如图 1.2 所示。<strong>从根本上说，消息信号中断只是对特定地址的内存写入</strong>。为此，每个 IMSIC 都在机器的地址空间中分配了一个或多个不同的地址，并且当以预期格式对这些地址之一进行写入时，接收 IMSIC 会将写入解释为相应 hart 的外部中断。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230213141250997-1686534967274-16.png" alt="image-20230213141250997"></p>
+<p>因为所有IMSIC在机器的物理地址空间中都有唯一的地址，所以每个IMSIC都可以从任何具有写权限的agent(hart或设备)接收MSI writes。IMSIC 为机器和主管级别的MSI提供了单独的地址，部分原因是可以<strong>通过控制不同地址上的写权限来分别授予或拒绝在每个特权级别上的产生中断信号的能力</strong>，部分原因是为了更好地支持虚拟化(假装一个特权级别是更高级别)。用于具有特定特权级别的hart的MSI记录在IMSIC的<em>interrupt file</em>，该文件主要由<strong>中断挂起(interrupt pending)数组</strong>和与之相匹配的<strong>中断使能(interrupt-enable)数组</strong>组成，后者指示hart当前准备接收哪些单独的中断。</p>
+<p>IMSIC单元在第3章中有完整的定义。RISC-V高级中断架构使用的MSI格式在该章第3.2节中进行了描述。</p>
+<p><strong>当RISC-V系统中的hart具有IMSIC时，系统通常仍然包含APLIC，但其角色发生了变化。</strong>与图1.1中直接通过线路向hart发送中断信号不同，<strong>APLIC将传入的有线中断转换为MSI写入，并通过它们的IMSIC单元发送给hart。</strong>根据软件设置的APLIC配置，每个MSI被发送到单个目标hart。</p>
+<p>如果RISC-V硬件实现了特权体系结构的hypervisor扩展，IMSIC可能有额外的 <em>guest interrupt files</em> ，用于向虚拟机交付中断。除了关于IMSIC的第3章之外，请参阅第6章，其中专门介绍了对虚拟机的中断。如果系统还包含一个IOMMU来执行由I&#x2F;O设备进行的内存访问的地址转换，那么来自这些相同设备的MSI可能需要特殊处理。这个主题在第8章“IOMMU对MSI到虚拟机的支持”中讨论。</p>
+<h3 id="1-3-3-Other-interrupts"><a href="#1-3-3-Other-interrupts" class="headerlink" title="1.3.3 Other interrupts"></a>1.3.3 Other interrupts</h3><p>除了来自I&#x2F;O设备的外部中断之外，RISC-V特权体系结构还为hart指定了一些其他主要的中断类。特权架构的定时器中断仍然完全支持，软件中断至少仍然部分支持，尽管两者都没有出现在图1.1和1.2中。有关软件中断的详细信息，请参阅第7章“处理器间中断(IPIs)”。</p>
+<p>高级中断体系结构在hart上增加了对本地中断的大量支持，因此hart本质上是在响应异步事件(通常是错误)时中断自己。本地中断仍然包含在hart中(或接近hart)，因此像标准的RISC-V定时器和软件中断一样，它们不通过APLIC或IMSIC。</p>
+<h2 id="1-4-中断标识（interrupt-identities）at-a-hart"><a href="#1-4-中断标识（interrupt-identities）at-a-hart" class="headerlink" title="1.4 中断标识（interrupt identities）at a hart"></a>1.4 中断标识（interrupt identities）at a hart</h2><p>RISC-V 特权架构为每个中断原因提供了一个不同的主要标识号(<strong>Major identity</strong>)，即在中断陷阱中自动写入 CSR <code>mcause</code> 或 <code>scause</code> 的异常代码。</p>
+<p>由特权架构标准化的中断原因的主要标识号范围为 0-15，而 16 及更高的标识号则可正式用于平台标准或定制用途。<br>高级中断架构对 <strong>16-23</strong> 和 <strong>32-47</strong> 范围内的标识号拥有更多权限，而 <strong>24-31</strong> 范围内的标识号和 <strong>48 及以上的所有主要标识号</strong>仍可自由定制使用。</p>
+<p>表 1.2 列出了经此扩展的所有主要中断标识的特点</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20240326143547077.png" alt="image-20240326143547077"></p>
+<p>表 1.2：hart 上所有中断原因的主要和次要标识。主要标识 0-15 属于 RISC-V 特权架构的权限。</p>
+<p>大多数 I&#x2F;O 设备的中断通过 hart 的外部中断控制器传送到 hart，该控制器可以是 hart 的 IMSIC（图 1.2）或 APLIC（图 1.1）。</p>
+<p>如表 1.2 所示，给定特权级别的外部中断都共享一个主标识号：11 表示机器级别，9 表示管理级别，10 表示 VS 级别。来自不同原因的外部中断在硬件上通过外部中断控制器提供的次要标识号来区分。</p>
+<p>除了外部中断之外，其他中断原因也可能有自己的次要标识。然而，本文档只需要讨论与外部中断相关的次要标识。</p>
+<p><strong>高级中断体系结构定义的本地中断及其处理主要在第5章“机器和supervisor level的中断”中介绍。</strong></p>
+<h2 id="1-5-选择接收中断的harts"><a href="#1-5-选择接收中断的harts" class="headerlink" title="1.5 选择接收中断的harts"></a>1.5 选择接收中断的harts</h2><p><strong>每个信号中断只传递给某个hart的某个特权级别，通常由软件确定</strong>。与其他一些体系结构不同，RISC-V高级中断体系结构没有定义标准硬件机制让中断广播或多播到多个hart。</p>
+<p>对于<strong>本地中断</strong>，以及<strong>软件注入到较低权限级别的任何“虚拟”中断</strong>，这些中断在本质上完全是本地事务，其他hart永远不可见。</p>
+<p>RISC-V特权架构的定时器中断也独特地绑定到单个hart。</p>
+<p>对于hart从hart外部的源接收到的其他中断，<strong>每个由软件配置的中断信号(无论是通过电线还是通过MSI传递)都只能传递到单个hart</strong>。</p>
+<p>要向多个hart发送一个处理器间中断(IPI)，发起hart只需要执行一个循环，向每个目标hart发送一个单独的IPI。对于到单个目的地hart的ipi，请参见第7章。</p>
+<blockquote>
+<p>与接收端处理这些中断的共同开销相比，源端将单个ipi发送到多个目的地所花费的资源总是微不足道的。</p>
+<p>因此，为IPI多播提供一种自动化机制，最多只能适度地减少系统的总工作量。对于数量非常多的hart，用于IPI多播的硬件机制必须处理软件如何精确地指定每次使用的预期目标集的问题，而且，IPI的实际物理交付可能与软件版本没有太大差异。</p>
+<p>我们不排除将来为组播IPI提供可选硬件机制的可能性，但前提是在实际使用中能够证明其显著优势。截至2020年，Linux已经被观察到不使用多播IPI硬件，即使在具有多播IPI硬件的系统上也是如此。</p>
+</blockquote>
+<p><strong>在极少数的情况下，来自I&#x2F;O设备的单个中断需要传达到多个hart，则必须将中断发送到单个hart，然后该hart可以通过ipi向其他hart发送信号。</strong></p>
+<blockquote>
+<p>我们认为，对多个hart进行I&#x2F;O中断通信的需求是非常罕见的，因此在这种情况下，对多播的标准化硬件支持是不合理的。</p>
+<p>除了多播交付之外，其他架构还支持中断的“1-of-N”交付选项，即硬件从配置的N个hart集合中选择单个目标hart，其目标是在hart之间实现中断处理的自动负载平衡。</p>
+<p>2010年代的实验对1-of-N模式在实践中的效用提出了质疑，表明软件通常比实际芯片中实现的硬件算法在负载平衡方面做得更好。因此，Linux被修改为即使在具有1-of-N中断传递的系统上也不再使用它。</p>
+<p>我们仍然对中断处理的硬件负载平衡可能对某些特定市场(如网络)有益的争论持开放态度。然而，到目前为止，在这方面所做的声明并不能证明在所有RISC-V服务器中都需要支持1-of-N交付。有了更多的证据，某种1-of-N的输送机制可能会成为未来的选择。</p>
+</blockquote>
+<blockquote>
+<p>RISC-V的原始平台级中断控制器(PLIC)是可配置的，因此每个中断源向hart的任何子集(可能是所有hart)发出外部中断信号。</p>
+<p>当多个hart从PLIC上的单个原因接收外部中断时，第一个在PLIC上声明中断的hart是负责服务它的hart。通常这会建立一个竞争，配置为接收多播中断的hart子集都同时接收外部中断陷阱，并竞争成为第一个在PLIC上请求中断的hart子集。</p>
+<p>其目的是提供一种形式的1-of-N中断交付。然而，对于所有未能赢得索赔的hart来说，中断陷阱变成了浪费的努力。</p>
+<p>由于已经给出的原因，&#x3D;&#x3D;<strong>Advanced PLIC支持将每个信号中断仅发送到软件选择的单个hart，而不是发送到多个hart。</strong>&#x3D;&#x3D;</p>
+</blockquote>
+<h2 id="1-6-指令集扩展Smaia和Ssaia-ISA-extensions-Smaia-and-Ssaia"><a href="#1-6-指令集扩展Smaia和Ssaia-ISA-extensions-Smaia-and-Ssaia" class="headerlink" title="1.6 指令集扩展Smaia和Ssaia\ISA extensions Smaia and Ssaia"></a>1.6 指令集扩展Smaia和Ssaia\ISA extensions Smaia and Ssaia</h2><p>高级中断体系结构(AIA)为RISC-V指令集体系结构(ISA)的扩展定义了两个名称，一个用于机器级执行环境，另一个用于管理器级环境。对于机器级环境，扩展Smaia包含AIA为hart指定的所有特权级别上的所有添加的csr和中断响应行为的所有修改。对于主管级环境，除了不包括机器级csr和主管级不直接可见的行为外，扩展Ssaia本质上与Smaia相同。</p>
+<p>扩展Smaia和Ssaia只涵盖那些影响ISA的AIA特性。尽管以下内容在本文中作为AIA的一部分进行了描述或讨论，但Smaia或Ssaia并不包含这些内容，因为这些组件被归类为非isa: api、IOMMUs以及除向IMSIC写入之外用于启动处理器间中断的任何机制。</p>
+<p>正如在后面的章节中所揭示的那样，AIA添加的csr和行为的确切集合，因此由Smaia或Ssaia暗示，取决于基本ISA的XLEN (RV32或RV64)，取决于是否实现s模式和hypervisor扩展，以及hart是否具有IMSIC。但是，没有为每个可能的有效子集提供单独的AIA扩展名。相反，不同的组合可以从所指示的特性的交集中推断出来(例如RV64I + S-mode + Smaia，但没有hypervisor扩展)。</p>
+<p>像编译器和汇编器这样的软件开发工具不需要关心是否存在一个IMSIC，而应该只允许尝试访问IMSIC csr(在第2章和第3章中描述)，如果指定了Smaia或Ssaia。如果没有实际的IMSIC，这种尝试可能会陷入困境，但这对开发工具来说不是问题。</p>
+<h1 id="第二章：增加的CSR"><a href="#第二章：增加的CSR" class="headerlink" title="第二章：增加的CSR"></a>第二章：增加的CSR</h1><p>对于RISC-V hart可以接收interrupt traps 的每个特权级别，高级中断体系结构增加了用于中断控制和处理的csr。</p>
+<h2 id="2-1-Machine-level-CSRs"><a href="#2-1-Machine-level-CSRs" class="headerlink" title="2.1 Machine-level CSRs"></a><strong>2.1 Machine-level CSRs</strong></h2><p>表2.1列出了为机器级别添加的csr。每个寄存器的大小都是MXLEN位。</p>
+<p>对于RV32，表中列出的高半csr扩展寄存器midleg、mie、mvien、mvip和mip，以支持总共64种中断原因。每个低半寄存器(例如midelegh)覆盖中断号0-31，每个中断号占1bit，而它的高半伙伴(midelegh)覆盖中断号32-63，同样每个中断号占1bit。对于RV64，单个64位CSR (midleg)覆盖相同的中断号集合，0-63。<strong>高级中断体系结构要求RV32存在这些高半csr，但它们可能都只是只读零。</strong></p>
+<p>CSR <code>miselect</code> 和 <code>mireg</code> 提供了一个窗口，用于访问多个寄存器。<code>miselect </code>的值决定了当前可以通过CSR <code>mireg</code> 访问哪个寄存器。 未实现 IMSIC，则 <code>miselect</code> 必须至少能够保存 0 到 0x3F 范围内的任何 6 位值。当实现 IMSIC 时，<code>miselect</code> 必须能够保存 0 到 0xFF 范围内的任何 8 位值。</p>
+<p>在0到0xFF范围内，<code>miselect</code>的值目前按如下子范围分配:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230606114042584-1686534967274-17.png" alt="image-20230606114042584"></p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230213153204201.png" alt="image-20230213153204201"></p>
+<p><code>miselect</code>也可能支持0x00-0xFF范围之外的值，尽管目前没有为0xFF以上的值分配标准寄存器</p>
+<p><code>miselect</code>的最高有效位(位MXLEN - 1 &#x3D; 1)被指定为自定义使用，可能用于通过<code>mireg</code>访问自定义寄存器。如果更改了MXLEN，则<code>miselect</code>的最高有效位移动到新位置，保留其先前的值。<code>miselect</code>不需要实现支持任何自定义值</p>
+<p>当<code>miselect</code>是一个保留范围内的数字(当前为0x00-0x2F、0x40-0x6F，或大于0xFF的数字，而不是指定用于自定义使用)时，尝试访问<code>mireg</code>会引发非法指令异常。</p>
+<p>通常，外部中断的范围<strong>0x70-0xFF</strong>只有在<strong>实现了IMSIC时</strong>才会存在;否则，当<code>miselect</code>在此范围内时，试图访问<code>mireg</code>也会导致非法指令异常。外部中断区域的内容记录在IMSIC的第3章中。</p>
+<p><strong>CSR <code>mtopei</code>也仅在实现IMSIC时才存在，因此在第3章中与间接访问的IMSIC寄存器一起记录</strong>。</p>
+<p>CSR <code>mtopi</code>报告正在挂起并在机器级别启用的最高优先级中断，如章节5.2.2所述。</p>
+<blockquote>
+<p>When S-mode is implemented, CSRs mvien and mvip (together with their high-half partners for RV32) support interrupt filtering and virtual interrupts for supervisor level. These facilities are explained in Section 5.3.</p>
+</blockquote>
+<p>当实现S模式时，CSR <code>mvien</code>和<code>mvip</code>(连同RV32的高位寄存器)支持&#x3D;&#x3D;supervisor级别的中断过滤（<em>interrupt filtering</em>）和虚拟中断&#x3D;&#x3D;。这些工具将在第5.3节中解释。</p>
+<h2 id="2-2-Supervisor-level-CSRs"><a href="#2-2-Supervisor-level-CSRs" class="headerlink" title="2.2 Supervisor-level CSRs"></a>2.2 Supervisor-level CSRs</h2><p>表2.2列出了在hart实现s模式时添加的主管级csr。每个寄存器的大小都是SXLEN位。这些寄存器的功能都与它们的机器级对应寄存器相匹配。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230213153844133.png" alt="image-20230213153844133"></p>
+<p>通过<code>siselect/sireg</code>窗口访问的寄存器空间与机器级的寄存器空间是分开的，但与机器级的寄存器空间是平行的，用于管理器级中断而不是机器级中断。在0到0xFF范围内为<code>siselect</code>分配的值再次如下:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230606154502244-1686534967275-18.png" alt="image-20230606154502244"></p>
+<p>&#x3D;&#x3D;<strong>为了获得最大的兼容性，无论是否存在IMSIC，建议<code>siselect</code>至少支持9位范围(0到0x1FF)。</strong>&#x3D;&#x3D;</p>
+<blockquote>
+<p>因为VS CSR的<code>vsiselect</code>(章节2.3)总是至少有9位，并且像其他VS CSR一样，<code>vsiselect</code>在虚拟机(VS模式或VU模式)中执行时替代<code>siselect</code>，为<code>siselect</code>实现更小的范围将允许软件发现它不在虚拟机中运行。</p>
+</blockquote>
+<p>与<code>miselect</code>一样，<code>siselect</code>设置了最高有效位(位SXLEN - 1 &#x3D; 1)的值被指定为自定义使用。如果更改了SXLEN，则<code>siselect</code>的最高有效位移动到新位置，保留其先前的值。实现不需要支持<code>siselect</code>的任何自定义值。</p>
+<p>当<code>siselect</code>是一个保留范围内的数字(当前为0x00-0x2F、0x40-0x6F，或高于0xFF的数字，而不是指定用于自定义使用)，或者在没有IMSIC的情况下，在0x70-0xFF范围内，尝试访问<code>sireg</code>将引发非法指令异常(除非在虚拟机中执行，下一节将介绍)。</p>
+<p><code>stopi</code>报告最高优先级的中断，该中断正在等待并为supervisor level启用，如章节5.4.2所述。</p>
+<h2 id="2-3-Hypervisor-and-VS-CSRs"><a href="#2-3-Hypervisor-and-VS-CSRs" class="headerlink" title="2.3 Hypervisor and VS CSRs"></a>2.3 Hypervisor and VS CSRs</h2><p>如果一个hart实现了特权架构的hypervisor扩展，那么表2.3中列出的hypervisor和VS csr也会被添加。VS csr都是VSXLEN位宽，而hypervisor csr都是HSXLEN位宽。(HSXLEN只是hypervisor扩展S模式的SXLEN的另一个名称)。</p>
+<p>表中的新虚拟机管理程序 CSR（hvien、hvictl、hviprio1 和 hviprio2）增强了 hvip，以便将中断注入到 VS 级别。有关虚拟机中断的第 6 章介绍了这些寄存器的使用。</p>
+<p>新的 VS CSR（vsiselect、vsireg、vstopei 和 vstopi）均与主管 CSR 匹配，并在虚拟机（VS 模式或 VU 模式）中执行时替代这些主管 CSR。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230711092053226.png" alt="image-20230711092053226"></p>
+<p>无论是否实现了IMSIC,  <code>vissiselect</code>都需要至少支持0到0x1FF的9位范围。与<code>siselect</code>一样，具有最高有效位集(位VSXLEN - 1 &#x3D; 1)的<code>vsiselect</code>的值被指定为自定义使用。如果更改了VSXLEN，则<code>vsiselect</code>的最高有效位移动到新位置，保留其先前的值。</p>
+<p><code>vissiselect</code>可选择的寄存器空间比机器和主管级别更有限:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230608161158573-1686534967275-19.png" alt="image-20230608161158573"></p>
+<p>当<code>vsiselect</code>具有不可访问寄存器的编号时，包括大于0x1FF且没有最高有效位集的值，尝试从M模式或HS模式访问<code>vsireg</code>会引发非法指令异常，尝试从VS模式访问<code>sireg</code>(实际上是<code>vsireg</code>)会引发<strong>虚拟指令异常</strong>。</p>
+<blockquote>
+<p>即使大部分或全部空间不可访问(&#x3D;&#x3D;<strong>inaccessible</strong>&#x3D;&#x3D;)，也要求<code>vissiselect</code>的范围为0-0x1FF，这允许hypervisor在实现的范围内模拟间接访问的寄存器，包括将来可能在0x100-0x1FF位置标准化的寄存器。</p>
+</blockquote>
+<p><strong>外部中断寄存器的位置(编号0x70-0xFF)只有当<code>hstatus.VGEIN</code>是实现的guest external interrupts的编号而不是零时才能访问</strong>。如果VGEIN不是已实现的guest external interrupts的编号(包括未实现IMSIC的情况)，则<code>visiselect</code>的所有非自定义值指定一个不可访问的寄存器。</p>
+<p>同样的，当<code>hstatus.VGEIN</code>不是一个实现的guest external interrupts的编号，从 M模式或 HS 模式访问CSR <code>vstopei</code>的尝试会引发一个<strong>非法指令异常</strong>，从vs模式访问<code>stopei</code>的尝试会引发一个<strong>虚拟指令异常</strong>。</p>
+<p>除了高半CSR <code>hidelegh</code>，AIA 添加的hypervisor CSR，加上RV32的高半hypervisor CSR(hvien、hvictl、hviprio1和hviprio2)，增强了<code>hvip</code>，用于向VS级别注入中断。这些寄存器的使用将 在第6章虚拟机的中断 中讨论。</p>
+<h2 id="2-4-虚拟指令异常-Virtual-instruction-exceptions"><a href="#2-4-虚拟指令异常-Virtual-instruction-exceptions" class="headerlink" title="2.4 虚拟指令异常 Virtual instruction exceptions"></a>2.4 虚拟指令异常 Virtual instruction exceptions</h2><p>遵循hypervisor extension的默认规则，尝试从VS模式直接访问除vsireg以外的hypervisor或VS CSR，或从vu模式访问除sireg或vsireg以外的任何supervisor-level CSR(包括hypervisor和VS CSR)，通常不会引发<strong>非法指令异常</strong>，而是引发<strong>虚拟指令异常</strong>。详细信息请参见RISC-V特权架构。</p>
+<p><strong>读&#x2F;写CSR stopei或vstopei的指令被认为是HS允许的</strong>，除非以下所有情况都为真：</p>
+<ul>
+<li>hart具有IMSIC，</li>
+<li>实现了Smstateen扩展，</li>
+<li>并且mstateen0的位58为零。（请参阅下一节，2.5，关于mstateen0。）</li>
+</ul>
+<hr>
+<p>&#x3D;&#x3D;HS 可以读写 stopei和vstopei 除非 mstateen0 的bit 58 为0&#x3D;&#x3D;</p>
+<hr>
+<p>对于sireg和vsireg，请参阅上一节2.3和下一节2.5，了解何时需要使用虚拟指令异常而不是非法指令异常。</p>
+<h2 id="2-5-Access-control-by-the-state-enable-CSRs"><a href="#2-5-Access-control-by-the-state-enable-CSRs" class="headerlink" title="2.5  Access control by the state-enable CSRs"></a>2.5  Access control by the state-enable CSRs</h2><p>如果扩展Smstateen与高级中断架构(AIA)一起实现，则AIA添加3个bit state-enable寄存器<code>mstateen0</code>&#x2F;<code>mstateen0h</code>控制特权模式低于M模式的访问。</p>
+<p>[<a target="_blank" rel="noopener" href="https://drive.google.com/file/d/1M2o7OS0pEJAztA7OAg6ybrRjj0Yo-tCH/view]">https://drive.google.com/file/d/1M2o7OS0pEJAztA7OAg6ybrRjj0Yo-tCH/view]</a></p>
+<table>
+<thead>
+<tr>
+<th>bit</th>
+<th>描述</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bit 60</td>
+<td>CSRs <code>siselect</code>, <code>sireg</code>, <code>vsiselect</code>, and <code>vsireg </code></td>
+<td></td>
+</tr>
+<tr>
+<td>bit 59</td>
+<td>all other state added by the AIA and not controlled by bits 60 and 58</td>
+<td>所有由AIA添加且不受60位和58位控制的其他状态</td>
+</tr>
+<tr>
+<td>bit 58</td>
+<td>all IMSIC state, including CSRs <code>stopei </code> and <code>vstopei</code></td>
+<td>所有的IMSIC状态，包括csr <code>stopei </code>和<code>vstopei</code></td>
+</tr>
+</tbody></table>
+<p><strong>如果这些位在mstateen0中有一个为&#x3D;&#x3D;零&#x3D;&#x3D;，则尝试从比 M 模式特权更低的特权模式访问相应的状态将导致非法指令陷阱。</strong>与往常一样，启用状态的csr在 M模式下不影响任何状态的可访问性，只有在特权较少的模式下才会影响。有关更多解释，请参阅扩展Smstateen的文档。</p>
+<p>位 <strong>59</strong> 控制对AIA CSRs siph、sieh、stopi、hidelegh、hvien、hviph、hvictl、hviprio1&#x2F;hviprio1、hviprio2&#x2F;hviprio2h、vsiph、vsieh和vstopi的访问，以及通过siselect + sireg(第5.4.1节的iprio数组)访问的supervisor 中断优先级。</p>
+<p>只有当hart具有IMSIC时，才会在mstaten0 &#x2F; mstaten0h中实现位 <strong>58</strong> 。如果还实现了hypervisor扩展，则该位不会影响hypervisorcsr hgeip和hgeie的行为或可访问性，也不会影响hstatus的字段VGEIN。特别是，即使mstateen0的第58位为零，来自IMSIC的guest外部中断对hgeip中的 HS 模式仍然可见。</p>
+<blockquote>
+<p>早前，Smstateen的预批准草案称，当mstaten0的第58位为零时，hgeip和hgeie寄存器以及hstatus的VGEIN字段都是只读零。这种效应不再正确。</p>
+</blockquote>
+<p><strong>如果hart不具有IMSIC，则mstateen0的位58为只读零</strong>，但是Smstateen对访问不存在的IMSIC状态的尝试没有影响。</p>
+<blockquote>
+<p>这尤其意味着，当hart没有IMSIC时，尽管mstateen0的第58位为零，但以下情况会引发第2.3节所述的虚拟指令异常，而不是非法指令异常：</p>
+<ul>
+<li>尝试从VS模式访问sireg（真正的vsireg），而vsiselect的值在0x70–0xFF范围内；以及</li>
+<li>尝试从VS模式访问stopei（实际上是vstopei）。</li>
+</ul>
+</blockquote>
+<p>如果mstateen0的位 <strong>60</strong> 是1，那么不管任何其他mstateen位（包括mstateenO的位58和59）如何，对于从VS模式或VU模式直接访问vsireg的所有尝试以及从VU模式访问sireg的所有尝试，都会产生如第2.3节所述的虚拟指令异常。只有当mstateen0的第60位为零时，才会覆盖此行为。</p>
+<p>如果实现了虚拟机hypervisor扩展，在虚拟机hypervisorCSR hstateen0中也定义了相同的三个位，但只关注在特权模式VS和VU下执行的虚拟机可能访问的状态:</p>
+<table>
+<thead>
+<tr>
+<th>bit</th>
+<th>描述</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bit 60</td>
+<td>CSRs siselect and sireg (really vsiselect and vsireg)</td>
+<td></td>
+</tr>
+<tr>
+<td>bit 59</td>
+<td>CSRs siph and sieh (RV32 only) and stopi (really vsiph, vsieh, and vstopi)</td>
+<td>CSR siph 和 sieh（仅限 RV32）以及 stopi（实际上是 vsiph、vsieh 和 vstopi）</td>
+</tr>
+<tr>
+<td>bit 58</td>
+<td>all state of IMSIC guest interrupt files, including CSR stopei (really vstopei)</td>
+<td>IMSIC guest interrupt files的所有状态，<br>包括CSR stopei(实际上是vstopei)</td>
+</tr>
+</tbody></table>
+<p>如果这些位中的一个在hstateen0中为零，而在mstateen0中为一，那么尝试从VS或VU模式访问相应的状态会引发虚拟指令异常。</p>
+<p>（但请注意，对于高半csr siph和sieh，这仅适用于XLEN &#x3D; 32时。当XLEN &gt; 32时，试图访问siph或sieh会像往常一样引发非法指令异常，而不是虚拟指令异常。）</p>
+<p>如果第<strong>60</strong>位在mstaten0中是1，但在hstaten0中是0，那么所有从VS或vu模式访问siselect或sireg的尝试都会引发一个虚拟指令异常，而不是一个非法指令异常，无论vsiselect或任何其他mstateen位的值如何</p>
+<p>只有当hart具有IMSIC时，才会在hstaten0 中实现位<strong>58</strong>。此外，即使有一个IMSIC，位<strong>58</strong>可能(也可能不是)在hstateen0&#x2F;hstateen0h只读零，如果IMSIC没有guest interrupt files用于guest外部中断(第3章)。当这个位为零(无论是只读零还是设置为零)，虚拟机被阻止访问hart的IMSIC，就像当hstatus.VGEIN&#x3D; 0时一样。</p>
+<p>扩展Ssstateen被定义为Smstateen的主管级视图。因此，Ssstateen包含了上面为hstaten0定义的位，但不包含为mstaten0定义的位，因为机器级csr对主管级不可见。</p>
+<h1 id="第三章：IMSIC"><a href="#第三章：IMSIC" class="headerlink" title="第三章：IMSIC"></a>第三章：IMSIC</h1><p> IMSIC是一个可选的 RISC-V 硬件组件，它与 hart 紧密耦合，每个 hart 具有一个 IMSIC。 IMSIC 接收并记录 hart 的MSI，并在有待处理和启用的中断需要服务时向 hart 发出信号。</p>
+<p>IMSIC 在**机器的地址空间(machine’s address space)**中有一个或多个内存映射寄存器，用于接收 MSI。除了那些内存映射寄存器之外，软件主要通过附加的 hart 上的几个 RISC-V CSR 与 IMSIC 交互。</p>
+<p>在 RISC-V 系统中，MSI 不仅指向特定的 hart，还<strong>指向特定 hart 的特定特权级别</strong>。此外，当 hart 实现hypervisor扩展时，IMSIC 可以选择性地允许 MSI定向到特定的VS 级别的虚拟 hart。</p>
+<h2 id="3-1-中断文件和标识-Interrupt-files-and-interrupt-identities"><a href="#3-1-中断文件和标识-Interrupt-files-and-interrupt-identities" class="headerlink" title="3.1 中断文件和标识 Interrupt files and interrupt identities"></a>3.1 中断文件和标识 Interrupt files and interrupt identities</h2><p>在RISC-V系统中，<strong>MSI</strong>不仅指向特定的hart，而且<strong>指向特定hart的特定特权级别</strong>，例如机器级别或主管级别。此外，当一个hart实现hypervisor扩展时，<strong>IMSIC可以选择性地允许MSI在虚拟supervisor level(VS级别)被定向到特定的虚拟hart</strong>。</p>
+<p>对于每个特权级别和每个MSI可能指向的虚拟hart, hart的IMSIC包含一个单独的中断文件。假设一个hart实现了管理器模式，它的IMSIC至少有两个中断文件，一个用于机器级别，另一个用于supervisor level。当一个hart也实现了hypervisor扩展时，它的IMSIC可能会为虚拟hart提供额外的中断文件，称为guest interrupt files。一个IMSIC用于虚拟hart的guest interrupt files的数量正好是GEILEN，即支持的guest interrupt files的数量，由RISC-V特权体系结构为hypervisor扩展定义。</p>
+<p>每个单独的<strong>中断文件主要由两个数组组成</strong>，每个数组的比特长度相同，<strong>一个数组用于记录已经到达但尚未服务的MSI(中断挂起位)<strong>，另</strong>一个数组指定hart当前将接受哪些中断(中断使能位)<strong>。两个数组中的每个比特位都对应于不同的中断标识号，在一个中断文件中，不同来源的MSI可根据标识号区分。</strong>因为IMSIC是hart的外部中断控制器，中断文件的中断标识成为所连接的hart的外部中断的次要标识</strong>。</p>
+<p>一个中断文件支持的中断标识的数目(以及每个数组中有效比特位的数目)比64的倍数小1，<strong>最小可能是63，最大可能是2047</strong><br>(PS：单个eie&#x2F;eip 32bit * 64个 &#x3D; 2048bit，bit0无效)。</p>
+<blockquote>
+<p>平台标准可能会增加每个中断文件必须实现的中断标识的最小数目。</p>
+</blockquote>
+<p>当一个中断文件支持N个不同的中断标识时，它们之间是有效的标识号包括1和N。该范围内的标识号由interrupt files实现。超出此范围的数字将不被实现。<strong>数字0永远不是有效的中断标识</strong>。</p>
+<p>IMSIC硬件不假设一个中断文件的中断标识号和另一个中断文件的中断标识号之间有任何联系。&#x3D;&#x3D;软件通常期望在不同的中断文件上为不同的MSI源分配相同的中断标识号，而无需在不同的中断文件之间进行协调。&#x3D;&#x3D;因此，系统中<strong>可单独区分的MSI源的总数可能是单个中断文件上的中断标识数乘以系统中所有hart的中断文件总数的乘积。</strong></p>
+<p>系统中所有的中断文件大小不一定相同(实现相同数目的中断标识)。对于给定的hart，guest外部中断的中断文件必须都是相同大小的，但是机器级和管理器级的中断文件可能与guest外部中断的中断文件大小不同，彼此之间的中断文件大小也不同。同样，不同hart的中断文件大小也可能不同。</p>
+<p>平台可以为软件提供配置 IMSIC里的中断文件数量和&#x2F;或它们的大小的方法，例如允许在机器级用较小的中断文件交换到管理级的较大的中断文件，或者反之。<strong>任何此类可配置性都超出了本规范的范围</strong>。但是，我们建议只有<strong>在机器级别才能修改IMSIC中中断文件的数量和大小</strong>。</p>
+<h2 id="3-2-MSI编码"><a href="#3-2-MSI编码" class="headerlink" title="3.2 MSI编码"></a>3.2 MSI编码</h2><p>已建立的标准(特别是PCI和PCI Express)规定，来自设备的单个消息信号中断(MSI)的地址和值采用的<strong>32位对齐</strong>，都由<strong>软件</strong>在设备(或设备控制器)上<strong>配置</strong>。</p>
+<p>根据设备或控制器遵循的标准版本，地址可能被限制在较低的4-GiB(32位)范围内，写入的值可能被限制在16位范围内，较高的16位始终为零。</p>
+<p>当RISC-V hart具有IMSIC时，来自设备的MSI通常会直接发送到由软件选择的单个hart来处理中断(可能基于某些中断亲和策略)。一个MSI被定向到一个特定的特权级别，或者一个特定的虚拟hart。通过存在于接收hart的IMSIC中的相应中断文件。MSI写地址是物理连接到目标中断文件的特定字大小寄存器的物理地址。MSI写数据只是该中断文件中待挂起的中断的标识号(最终成为附加hart的外部中断的次要标识)。</p>
+<p>通过在设备上配置MSI的地址和数据，系统软件完全控制:</p>
+<ol>
+<li>哪个hart接收特定的设备中断，</li>
+<li>target的特权级别或虚拟hart，以及</li>
+<li>在目标中断文件中代表MSI的标识号。</li>
+</ol>
+<p>&#x3D;&#x3D;<strong>元素1和2，访问哪个中断文件是MSI地址决定的，而元素3由MSI数据确定。</strong>&#x3D;&#x3D;</p>
+<blockquote>
+<p>由于IMSIC可以支持的最大中断标识号是2047，因此MSI数据值的16位限制没有问题</p>
+</blockquote>
+<p>当实现了hypervisor扩展并且设备由guest operating system直接管理时，来自设备的MSI地址最初是guest physical addresses，因为它们是由guest physical addresses在设备上配置的。这些guest addresses必须由IOMMU进行转换，由hypervisor配置IOMMU，以便将这些MSI重定向到中断文件，以实现正确的guest external interrupts。有关此主题的更多信息，请参阅第8章。</p>
+<h2 id="3-3-中断优先级"><a href="#3-3-中断优先级" class="headerlink" title="3.3 中断优先级"></a>3.3 中断优先级</h2><p><strong>在单个中断文件中，&#x3D;&#x3D;中断优先级直接由中断标识号确定&#x3D;&#x3D;。</strong>&#x3D;&#x3D;<strong>较低的标识号具有较高的优先级</strong>&#x3D;&#x3D;。</p>
+<blockquote>
+<p>因为MSI让软件完全控制中断文件中标识号的分配，所以软件可以自由选择反映中断所需的相对优先级的标识号。</p>
+<p>如果中断文件包含一组优先级数字来分配给每个中断标识，那么软件确实可以更动态地调整中断优先级。然而，我们认为这种额外的灵活性不会经常被利用，不足以证明额外的硬件费用是合理的。事实上，对于目前使用MSI的许多系统，软件完全忽略中断优先级并表现得好像所有中断都具有相同的优先级是常见的做法。</p>
+</blockquote>
+<blockquote>
+<p>中断文件的最低标识号被赋予了最高的优先级，而不是相反的顺序，因为只有对于最高优先级的中断，才需要仔细管理优先级顺序，但是只有编号较低的标识(1到63(或者可能是1到255))才能保证存在于所有系统中。例如，考虑一个中断文件的最高优先级中断——可能是时间最关键的中断——总是标识号为1。如果优先级顺序颠倒，则最高优先级的中断将在不同的机器上具有不同的标识号，这取决于中断文件实现了多少标识。</p>
+<p>软件为最高优先级的中断分配固定标识号的能力被认为是值得的，因为中断优先级与自然数顺序相反可能会感到任何不适。</p>
+</blockquote>
+<h2 id="3-4-复位和显示状态"><a href="#3-4-复位和显示状态" class="headerlink" title="3.4 复位和显示状态"></a>3.4 复位和显示状态</h2><p>在复位IMSIC后，其中断文件的所有状态都变得有效和一致，但除此之外未指定，除了机器级和管理级中断文件的<code>eidelivery</code>寄存器，如第3.8.1节所述。</p>
+<p>如果一个IMSIC包含一个supervisor-level interrupt file ，并且附加hart上的软件启用了以前禁用的S模式(例如，通过将CSR misa的S位从0更改为1)，则supervisor-level interrupt file 的所有状态都是有效和一致的，但除此之外未指定。</p>
+<p>同样，如果一个IMSIC包含 <em>guest interrupt files</em> ，并且附加hart上的软件启用了以前禁用的hypervisor扩展(例如，通过将misa的H位从0更改为1)，则IMSIC的 <em>guest interrupt files</em> 的所有状态都是有效和一致的，但除此之外未指定。</p>
+<h2 id="3-5-中断文件的内存区域"><a href="#3-5-中断文件的内存区域" class="headerlink" title="3.5 中断文件的内存区域"></a>3.5 中断文件的内存区域</h2><p><strong>IMSIC中的每个中断文件都有一个或两个内存映射的32位寄存器，用于接收MSI写操作</strong>。这些内存映射寄存器位于一个自然对齐的4-KiB区域(一个页)的物理地址空间中，该空间存在于中断文件中，即每个中断文件一个页。</p>
+<p>中断文件的内存区域的布局如下:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230104163806112.png" alt="image-20230104163806112"></p>
+<p><strong>中断文件的 4-KiB 内存区域中的所有其他字节都是保留的，必须实现为只读零</strong>。</p>
+<p>在中断文件的内存区域内，只支持自然对齐的32位简单读写。对只读字节的写入将被忽略。对于其他形式的访问(其他大小、不对齐的访问或AMOs)， IMSIC实现最好报告访问错误或总线错误，否则必须忽略访问。</p>
+<p>如果i是一个已实现的中断标识号，将值i以little-endian字节顺序写入**seteipnum_le (Set External interrupt - pending bit by number, little-endian)**，将导致中断i的挂起位设置为1。如果写入的值不是以小端字节顺序实现的中断标识号，则忽略对seteipnum le的写入。</p>
+<p>对于支持大端字节顺序的系统，如果i是已实现的中断标识号，则将大端字节顺序的值i写入**seteipnum_be (Set External interrupt - pending bit by number, big-endian)**，会将中断i的挂起位设置为1。如果写入的值不是以大端字节顺序实现的中断标识号，则忽略对seteipnum be的写入。只支持小端字节顺序的系统可以选择忽略对seteipnum_be的所有写入。</p>
+<p>在大多数系统中，<code>seteipnum_le</code>是MSI指向这个中断文件的写端口。对于主要为大端字节顺序构建的系统，<code>seteipnum_be</code>可以作为从某些设备定向到该中断文件的MSI的写端口</p>
+<p><strong>对<code>seteipnum_le</code>或<code>seteipnum_be</code>的读取在所有情况下都返回零。</strong></p>
+<p>当不被忽略时，保证对中断文件的内存区域的写入最终反映在中断文件中，但不一定立即反映。对于单个中断文件，对其内存区域的多次写入(存储)的影响，尽管是任意延迟的，但总是以与RISC-V非特权ISA定义的存储的全局内存顺序相同的顺序发生。</p>
+<blockquote>
+<p>在大多数情况下，在完成对中断文件的内存区域的写入和对中断文件的写入之间的任何延迟与内存系统中的其他延迟是无法区分的。但是，如果hart写入自己的IMSIC的<code>seteipnum_le</code>或<code>seteipnum_be</code>寄存器，那么hart可能会看到存储指令完成和中断文件中中断挂起位的后续设置之间的延迟。</p>
+</blockquote>
+<h2 id="3-6-多个中断文件内存区域的排列"><a href="#3-6-多个中断文件内存区域的排列" class="headerlink" title="3.6 多个中断文件内存区域的排列"></a>3.6 多个中断文件内存区域的排列</h2><p>如前一节所述，IMSIC实现的每个中断文件都有自己的内存区域，占用物理地址空间的一个4KB页。根据下面的规则，在实际情况下，<strong>所有IMSIC的机器级中断文件的内存页都应该放在地址空间的一部分中，所有主管级和 <em>guest interrupt files</em> 的内存页也应该放在地址空间的另一部分中</strong></p>
+<blockquote>
+<p>将机器级中断文件与地址空间中的其他中断文件分开的主要原因是，实现物理内存保护(PMP)可以仅使用单个PMP表项就授予对所有管理员级和 <em>guest interrupt files</em> 的管理员级访问权限。如果机器级中断文件的内存页与低权限中断文件的内存页交错，则授予对所有非机器级中断文件的supervisor 访问所需的PMP表项的数量可能等于系统中的hart数量。</p>
+</blockquote>
+<p>如果一台机器的构造决定了hart被细分成组，每一组都被归到它自己的地址空间中，那么最好的方法就是将每一组hart的机器级中断文件分别定位在一起，同样地，将每一组hart的supervisor-level和guest中断文件分别定位在一起。下面将进一步讨论这种情况。</p>
+<blockquote>
+<p>系统可以在地址空间中将hart分成组，因为每个组存在于单独的芯片上(或多芯片模块中的小片)，并且将多个芯片的地址空间编织在一起是不切实际的。在这种情况下，授予对所有非机器级中断文件的supervisor 访问权限需要每个组占用一个PMP表项。</p>
+</blockquote>
+<p>为了在地址空间中定位中断文件的内存页，假设每个hart(或组中的每个hart)都有一个唯一的hart号，这个hart号可能与RISC-V特权体系结构分配给hart的唯一hart标识符(“hart id”)相关，也可能不相关。</p>
+<p>为了方便寻址，所有机器级中断文件(或单个hart组的所有中断文件)的内存页应安排为<strong>hart数h</strong>的<strong>机器级中断文件</strong>的地址由公式  A+h×2^c^ 给出，对于某些整数常数A和C。<strong>如果hart数最大为h<del>max</del><strong>，则设 <strong>k &#x3D;[log<del>2</del> (h<del>max</del> + 1)] ，表示任意hart数所需的位数</strong>。然后，</strong>基址A应该与 2^k+C^ 地址边界对齐</strong>，因此A + h × 2^c^总是等于A | (h × 2^c^)，其中竖条(|)表示按位逻辑或。</p>
+<p><strong>C的最小值是12</strong>，则2^C^是一个4kib页面的大小。如果C &gt; 12，则每个机器级中断文件的内存页的开始不仅与4-KiB页对齐，而且与更严格的2^C^地址边界对齐。在2^k+C^大小的地址范围A到A + 2^k+C^−1中，每个没有被机器级中断文件占用的4-KiB页都应该用只读零的32位字填充，这样任何对对齐字的读都返回零，任何对对齐字的写都被忽略。</p>
+<p>所有<strong>supervisor-level</strong> interrupt file (或单个hart组的所有中断文件)的内存页也应类似地安排，使得<strong>hart号h</strong>的supervisor-level interrupt file 的地址对于某些整数常数B和D为B + h × 2^D^，<strong>基址B与2^k+D^地址边界对齐</strong>。</p>
+<p>如果一个IMSIC实现了 <em>guest interrupt files</em> ，那么IMSIC的supervisor-level中断文件及其 <em>guest interrupt files</em> 的内存页应该是连续的，从最低地址的管理器级中断文件开始，然后是 <em>guest interrupt files</em> ，按 guest 中断号排序。从原理上讲，内存页应该连续排序为</p>
+<p>S, G1, G2, G3, . . .</p>
+<p>其中S是supervisor-level interrupt file 的页面，每个 G***<del>i</del>*** 是 guest 中断号<em><strong>i</strong></em>的中断文件的页面。因此，常数D为[log<del>2</del>(maximum GEILEN + 1)]+12，每个IMSIC的<strong>GEILEN是IMSIC实现的guest interrupt files的数量</strong>。</p>
+<p>在2^k+D^大小的地址范围B到B + 2^k+D^−1中，每一个没有被中断文件(主管级或访客级)占用的4kib页都应该用只读零的32位字填充。</p>
+<p>当系统将harts划分为组,每个在它自己的单独的部分地址空间,中断的内存页面地址文件应该遵循公式<strong>g×2^E^+A+h×2^C^</strong>计算机器级中断文件,和<strong>g×2^E^+B+ h×2^D^</strong>为主管级别中断文件,g是组数,h是一个组内harts数量，E是另一个整数常数<strong>E ≥ k +max(C, D)</strong> 但通常要大得多。如果最大的组号是g<del>max</del>，设 j &#x3D;[log<del>2</del> (g<del>max</del> + 1)]，表示任何组号所需的位数。除了分别是2^k+C^和2^k+D^的倍数外，A和B也应如此选择</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612104653786.png" alt="image-20230612104653786"></p>
+<p>其中&amp;符号表示按位逻辑与。这确保了:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612104042921.png" alt="image-20230612104042921"></p>
+<p>只期望在每个组内填充只读零页，而不是在单独的组之间填充。具体来说，如果g是0到2^j^−1之间的任意整数，则在地址范围内，</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612104305650.png" alt="image-20230612104305650"></p>
+<p>未被中断文件占用的页应该是只读零。</p>
+<p>参见4.9.1节，APLIC可以使用默认算法来确定出站MSI的目的地址，也应该是IMSIC中断文件的地址。</p>
+<h2 id="3-7-通过IMSIC外部中断的csr"><a href="#3-7-通过IMSIC外部中断的csr" class="headerlink" title="3.7 通过IMSIC外部中断的csr"></a>3.7 通过IMSIC外部中断的csr</h2><p>软件主要通过第2章介绍的csr访问hart的IMSIC。对于可以接收中断的每个实现的特权级别，都有一组单独的csr。机器级csr与IMSIC的机器级中断文件交互，而如果实现了主管模式，则主管级csr与IMSIC的supervisor-level interrupt file 交互。</p>
+<p>当IMSIC具有 <em>guest interrupt files</em> 时，VS CSR与单个 <em>guest interrupt files</em> 交互，该中断文件由CSR状态的VGEIN字段选择。</p>
+<p>对于机器级别，相关的 CSR 是 <code>miselect</code>、<code>mireg</code> 和 <code>mtopei</code>。当实现supervisor时，S级别的 CSR ：<code>siselect</code>、<code>sireg</code> 和 <code>stopei</code>。而在hypervisor extension实现时，对应的VS CSR有3个：<code>vsiselect</code>、<code>vsireg</code>、<code>vstopei</code>。</p>
+<p>如第2章所述，寄存器<code>miselect</code>和<code>mireg</code>提供了对额外机器级寄存器的间接访问。同样地，对于主管级的<code>siselect</code>和<code>sireg</code>，以及VS级的<code>vsiselect</code>和<code>sireg</code>也是如此。在任何情况下，*<em>0x70-0xFF范围内的</em>iselect CSR (<code>miselect</code>, <code>siselect</code>或<code>viseselect</code>)的值选择相应IMSIC中断文件的寄存器，机器级中断文件(<code>miselect</code>)，管理器级中断文件(<code>siselect</code>)或 <em>guest interrupt file</em> (<code>vsiselect</code>)**。</p>
+<p> &#x3D;&#x3D;在0x70–0xFF范围内设定<code>*iselect</code> CSR，通过<code>*ireg</code>可以选择相应的中断文件的寄存器进行间接访问。&#x3D;&#x3D;</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230214140003085.png" alt="image-20230214140003085"></p>
+<p><strong>寄存器编号 0x71 和 0x73–0x7F 被保留。选中时会读取返回0；忽略写入值。</strong></p>
+<p>寄存器 0x71和0x73-0x7F是保留的。当一个<em>*iselect CSR</em> 具有这些值之一时，从匹配的<em>*ireg CSR</em> (mireg, sireg或vsireg)读取返回零，并忽略对*ireg CSR的写入。(对于vsiselect和vsireg，所有的访问都取决于hstatus.VGEIN是guest interrupt files的有效编号。)</p>
+<ul>
+<li>寄存器eip0到eip63包含所有实现的中断标识的挂起位，统称为<em><strong>eip array</strong></em>。</li>
+<li>寄存器eie0到eie63包含相同中断标识的使能位，统称为<em><strong>eie array</strong></em>。</li>
+</ul>
+<p>间接访问的中断文件寄存器和csr mtopei、stopei和vstopei将在下两节中详细说明。</p>
+<h2 id="3-8-间接访问的中断文件寄存器"><a href="#3-8-间接访问的中断文件寄存器" class="headerlink" title="3.8 间接访问的中断文件寄存器"></a>3.8 间接访问的中断文件寄存器</h2><p>本节描述了通过*iselect CSR (miselect, siselect, or vsiselect)及其伙伴 *ireg CSR (mireg, sireg, or vsireg) 间接访问的中断文件的寄存器。</p>
+<p>对于每个中断文件，所有间接访问寄存器的宽度是用于访问这些寄存器的*ireg CSR的宽度，可以是MXLEN、SXLEN或VSXLEN。</p>
+<h3 id="3-8-1-外部中断递交使能寄存器-eidelivery"><a href="#3-8-1-外部中断递交使能寄存器-eidelivery" class="headerlink" title="3.8.1 外部中断递交使能寄存器 (eidelivery)"></a>3.8.1 外部中断递交使能寄存器 (eidelivery)</h3><p><code>eidelivery</code>是一个WARL寄存器，它<strong>控制来自此中断文件的中断是否从IMSIC传递到附加的hart</strong>，以便它们在hart的mip或hgeip CSR中显示为挂起的外部中断。寄存器传递<strong>也可以选择支持从PLIC(平台级中断控制器)或APLIC(高级PLIC)直接传递中断到附加的hart</strong>。目前为<code>eidelivery</code>定义了三个可能的值：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612111210029.png" alt="image-20230612111210029"></p>
+<p>如果eidelivery支持值0x4000_0000，那么系统中的<strong>特定PLIC或APLIC可以作为附加hart的备用外部中断控制器</strong>，<strong>具有与该中断文件相同的特权级别</strong>。当eidelivery为0x40000000时，中断文件的功能与eidelivery为0时相同，并且PLIC或APLIC取代中断文件，在此权限级别上提供挂起的外部中断。</p>
+<p><strong>Guest中断文件不支持eidelivery值0x4000_0000</strong>。</p>
+<p>Reset将eidelivery初始化为0x40000000(如果支持该值);否则，重置后eidedelivery的有效值(0或1)未指定。</p>
+<blockquote>
+<p>&#x3D;&#x3D;<strong>eidelivery value 0x40000000支持系统软件忽略IMSIC，并假设外部中断控制器是PLIC或APLIC。这样的软件也可能存在，因为它早于IMSIC的存在，或者因为绕过IMSIC被认为可以减少编程工作。</strong>&#x3D;&#x3D;</p>
+</blockquote>
+<h3 id="3-8-2-外部中断使能门限寄存器-eithreshold"><a href="#3-8-2-外部中断使能门限寄存器-eithreshold" class="headerlink" title="3.8.2 外部中断使能门限寄存器(eithreshold)"></a>3.8.2 外部中断使能门限寄存器(eithreshold)</h3><p>eithreshold是一个WLRL寄存器，它决定最小中断优先级(最大中断标识号)，允许中断从这个中断文件发送到附加的hart。如果N是该中断文件实现的最大中断标识号，eithreshold必须能够容纳0到N之间的所有值，包括0到N。</p>
+<p>当eithreshold是非零值 <em><strong>P</strong></em> 时，<strong>中断标识&gt;&#x3D;<em>P</em> 和不会产生信号中断</strong>，就好像这些标识没有启用一样，不管eie阵列中相应的中断启用位的设置如何。<strong>当eithreshold为零时，所有启用的中断标识都可以从中断文件发出中断信号</strong>。</p>
+<h3 id="3-8-3-外部中断挂起寄存器-eip0-eip63"><a href="#3-8-3-外部中断挂起寄存器-eip0-eip63" class="headerlink" title="3.8.3 外部中断挂起寄存器(eip0-eip63)"></a>3.8.3 外部中断挂起寄存器(eip0-eip63)</h3><p>当中断文件的寄存器为32位时(由对应特权级别的XLEN决定)，寄存器eipk包含标识号为k×32到k×32+31的中断的挂起位。对于在该范围内实现的中断标识i，中断i的挂起位是eip<em>k</em>的(i mod 32)位。</p>
+<p><strong>当中断文件的寄存器为64位时，奇数寄存器eip1, eip3，…eip63不存在</strong>。<br>在这种情况下，如果*iselect CSR是0x81-0xBF范围内的奇数值，则尝试访问匹配的 *ireg CSR会引发<strong>非法指令异常</strong>，除非在vs模式下进行，在这种情况下会引发虚拟指令异常。对于偶数k，寄存器eipk包含标识号为k×32到k×32 + 63的中断的待挂位。对于在该范围内实现的中断标识i，中断i的挂起位是eipk的(i mod 64)位。</p>
+<p>有效eip<em>k</em>寄存器中对应于不支持的中断标识的位 (例如eip0的位0)是只读零。</p>
+<h3 id="3-8-4-外部中断使能寄存器-eie0-eie63"><a href="#3-8-4-外部中断使能寄存器-eie0-eie63" class="headerlink" title="3.8.4 外部中断使能寄存器(eie0-eie63)"></a>3.8.4 外部中断使能寄存器(eie0-eie63)</h3><p>当中断文件的寄存器为32位时(由对应特权级别的XLEN决定)，寄存器eiek包含标识号为k × 32到k × 32 + 31的中断的启用位。对于在该范围内实现的中断标识i，中断i的使能位是eiek的位(i mod 32)。</p>
+<p><strong>当中断文件的寄存器为64位时，奇数寄存器eie1, eie3，…eie63不存在</strong>。<br>在这种情况下，如果*iselect CSR是0xC1-0xFF范围内的奇数值，则尝试访问匹配的 *ireg  CSR会引发<strong>非法指令异常</strong>，除非在vs模式下进行，在这种情况下会引发虚拟指令异常。对于偶数k，寄存器eiek包含标识号为k×32到k×32 + 63的中断的使能位。对于在该范围内实现的中断标识i，中断i的使能位是eiek的(i mod 64)位。</p>
+<p>有效eiek寄存器中不对应于支持的中断标识的位(例如eie0的位0)是只读零。</p>
+<h2 id="3-9-Top-外部中断CSRs-mtopei-stopei-vstopei"><a href="#3-9-Top-外部中断CSRs-mtopei-stopei-vstopei" class="headerlink" title="3.9 Top 外部中断CSRs (mtopei, stopei, vstopei)"></a>3.9 Top 外部中断CSRs (mtopei, stopei, vstopei)</h2><p><strong>CSR <code>mtopei</code>直接与IMSIC的机器级中断文件交互。如果实现了主管模式，CSR<code> stopei</code>直接与supervisor-level interrupt file 交互。如果实现了hypervisor扩展，并且hstatus.VGEIN是实现的guest interrupt files的编号，那么<code>vstopei</code>将与选择的guest interrupt files交互。</strong></p>
+<p>&#x3D;&#x3D;<strong>*topei CSR (mtopei, stopei或vstopei)的值表示中断文件当前最高优先级的挂起并启用的中断</strong>&#x3D;&#x3D;，如果eithreshold不为零，则该中断也超过其eithreshold寄存器指定的优先级阈值。具有较低标识号的中断具有较高的优先级。</p>
+<p>如果没有中断在中断文件的eip数组中挂起并且在其eie数组中启用，或者eithreshold不为零并且没有挂起并启用的中断的标识号小于eithreshold的值，则对<em>*topei CSR</em>的读取将返回零。否则，读*topei返回的值格式如下:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612114635348.png" alt="image-20230612114635348"></p>
+<p>所有其他位的位置都是零。</p>
+<p>&#x3D;&#x3D;<strong>在*topei CSR中报告的中断标识是外部中断的次要标识。</strong>&#x3D;&#x3D;</p>
+<blockquote>
+<p>从 *topei CSR中读取的冗余值与APLIC一致，后者以与上述相同的格式返回中断标识号及其优先级，但这两个组件彼此独立。</p>
+</blockquote>
+<p><strong>写*topei CSR通过清除中断文件中的挂起位来声明（claim）报告的中断标识。写入的值被忽略</strong>；相反，寄存器的当前可读值决定哪个中断挂起位被清除。具体来说，<strong>当写入一个*topei CSR时，如果寄存器值在比特26:16中具有中断标识i，那么中断文件的挂起位为中断i被清除</strong>。当*topei CSR的值为零时，对寄存器的写操作无效。</p>
+<p><strong>如果一条CSR指令(CSRRW、CSRRS或CSRRC)同时完成对*topei CSR的读和写操作，则读操作返回的值表示清除挂起的位</strong>。</p>
+<blockquote>
+<p>在没有同时读取以了解哪个中断被请求的情况下写入*topei CSR几乎总是一个错误。特别注意，如果对*topei寄存器的读取和随后对寄存器的写入是由两个单独的CSR指令完成的，那么在两个指令之间的中断文件中，更高优先级的中断可能会变为新挂起并启用，导致写入清除新中断的挂起位，而不是读取报告的那个。一旦新中断的挂起位被清除，中断就丢失了。</p>
+<p><strong>如果有必要首先读取一个*topei CSR，然后将中断作为单独的步骤声明（claim），则可以通过 <em>*siselect</em> 和 <em>*sireg</em> 清除eip数组中的挂起位来安全地声明，而不是写入*topei。</strong></p>
+</blockquote>
+<h2 id="3-10-中断交付和处理"><a href="#3-10-中断交付和处理" class="headerlink" title="3.10 中断交付和处理"></a>3.10 中断交付和处理</h2><p><strong>一个IMSIC的中断文件向附加的hart提供外部中断信号，每个中断文件一个中断信号</strong>。来自<strong>机器级中断文件的中断信号</strong>在CSR mip中显示<strong>为位MEIP</strong>，而来自<strong>管理器级中断文件的中断信号</strong>在mip和sip中显示<strong>为位SEIP</strong>。来自任何<strong><em>guest interrupt file</em> 的中断信号</strong>在<strong>hypervisor CSR hgeip中显示为有效位</strong>。</p>
+<p>当中断传递被中断文件的eideliver寄存器(eideliver &#x3D; 0)禁用时，来自中断文件的中断信号将保持非断言状态(false)。当中断文件的中断交付被启用(eidelivery &#x3D; 1)时，当且仅当中断文件有一个挂起并启用的中断，并且该中断也超过eithreshold指定的优先级阈值(如果不为零)时，它的中断信号被断言。</p>
+<p>通过IMSIC编写的<strong>专门用于外部中断的陷阱处理程序</strong>大致如下:</p>
+<ol>
+<li>保存处理器寄存器</li>
+<li>i &#x3D; 读取CSR mtopei或stopei，并同时写入用于<strong>清除</strong>中断（write simultaneously to <strong>claim</strong> the interrupt）</li>
+<li>i &#x3D; i&gt;&gt;16</li>
+<li>调用外部中断I的中断处理程序(次要标识)</li>
+<li>恢复处理器寄存器</li>
+<li>从陷阱返回</li>
+</ol>
+<p>第二步的mtopei或stopei的组合读写可以通过一条CSRRW机器指令完成;</p>
+<p><em><strong>csrrw rd, mtopei&#x2F;stopei, x0</strong></em></p>
+<p>其中rd是值i的目的寄存器。</p>
+<h1 id="第四章：APLIC"><a href="#第四章：APLIC" class="headerlink" title="第四章：APLIC"></a>第四章：APLIC</h1><p>在RISC-V系统中，平台级中断控制器(PLIC)处理通过wire而不是通过MSI发出信号的外部中断。当系统中的RISC-V hart没有IMSIC时，hart本身不支持MSI，并且所有到这些hart的外部中断都必须通过PLIC。但是，即使在具有IMSIC并且大多数中断都通过MSI通信的机器中，一些设备中断仍然由专用wire发出信号也是很常见的。特别是，对于不需要在系统中发起总线事务的设备(或设备控制器)，支持MSI的成本特别高，因此有线中断是一种节省的替代方案。与MSI不同，有线中断也继续得到所有当前计算机平台的普遍支持，这使得许多商业设备或控制器选择有线中断而不是MSI的另一个原因，除非实现像PCI Express这样的标准来规定MSI。</p>
+<p>本章指定了一种不向后兼容旧版本RISC-V的高级PLIC (Advanced PLIC)。完全符合高级中断体系结构需要APLIC。但是，可以构建一个可行的系统来代替旧的PLIC，假设只有连接到hart的wire中断，而不是MSI。</p>
+<blockquote>
+<p>我们打算最终提供一个用可移植SystemVerilog编写的APLIC的免费参数化实现示例，我们希望该示例无需修改即可适用于许多RISC-V系统。</p>
+</blockquote>
+<blockquote>
+<p>存在一个dual -PLIC规范草案，它是软件可配置的，可以充当原始RISC-V PLIC或APLIC。然而，在这个时候，RISC-V国际协会似乎不太可能批准双plic规范作为标准。</p>
+</blockquote>
+<p>在没有IMSIC的机器中，每个RISC-V hart只接受来自一个PLIC或APLIC的中断，该PLIC或APLIC是该hart的外部中断控制器。hart的外部中断控制器(PLIC或APLIC)通过专用连接(通常是一条线)向hart发送中断信号，对于hart可能接收中断的每个特权级别。(回顾第4页图1.1。)没有IMSIC的系统通常只有一个PLIC或APLIC，作为所有RISC-V hart的外部中断控制器。</p>
+<blockquote>
+<p>因为没有IMSIC的每个RISC-V hart都只有一个PLIC或APLIC作为其外部中断控制器，&#x3D;&#x3D;<strong>所以具有多个APLIC的系统必须将hart划分为不相连的子集，使每个APLIC作为hart的单独子集的外部中断控制器</strong>&#x3D;&#x3D;。虽然没有被禁止，&#x3D;&#x3D;<strong>但这种设计可能不如让所有hart共享一个APLIC有效</strong>&#x3D;&#x3D;。</p>
+</blockquote>
+<p><strong>使用IMSIC作为外部中断控制器的RISC-V hart只能以MSI的形式接收外部中断</strong>。在这种情况下，<strong>APLIC的作用是将有线中断转换为hart的MSI</strong>。(回顾第4页的图1.2。) 如上所述，APLIC将传入的线中断通过MSI转发给hart。</p>
+<p>当hart拥有支持MSI的IMSIC时，系统可能很容易包含多个用于将有线中断转换为MSI的APLIC，每个APLIC转发来自不同设备子集的中断。当一组设备在物理上彼此相距遥远时，甚至可能在单独的芯片上(包括多芯片模块中的小芯片)，可能更有可能出现多个APLIC。</p>
+<h2 id="4-1-中断源和标识"><a href="#4-1-中断源和标识" class="headerlink" title="4.1 中断源和标识"></a>4.1 中断源和标识</h2><p>单个APLIC支持固定数量的中断源，与APLIC上的一组物理传入中断线完全对应。大多数情况下，每个源的输入线连接到来自单个设备或设备控制器的输出中断线。(对于电平敏感中断，可以将多个设备或控制器的中断输出组合起来，以驱动APLIC上单个中断源的输入信号。中断源的入线也可以简单地tie1或者tie0，例如，如果源总是被配置为单独的（Detached）。参见4.5.2节对源模式的描述。)</p>
+<p>每个APLIC的中断源都有一个固定的唯一标识号，<strong>范围从1到N</strong>，其中N是APLIC上的源的总数。数字<strong>0在APLIC上不是一个有效</strong>的中断标识号。**一个APLIC可能支持的最大&#x3D;&#x3D;中断源数是1023&#x3D;&#x3D;**。</p>
+<p><strong>当APLIC将中断直接交付给具有给定特权级别的hart(而不是将中断作为MSI转发)时，APLIC是该特权级别hart的外部中断控制器，并且APLIC上的中断标识直接成为hart上外部中断的次要标识。</strong></p>
+<p>另一方面，<u><strong>当APLIC转发由MSI发出的中断时，&#x3D;&#x3D;软件会为每个源的出站MSI配置一个新的中断标识号&#x3D;&#x3D;</strong></u>。因此，在这种情况下，<u>给定APLIC上的源标识号仅区分该APLIC上的传入中断，而在APLIC之外没有相关性</u>。</p>
+<h2 id="4-2-中断域"><a href="#4-2-中断域" class="headerlink" title="4.2  中断域"></a>4.2  中断域</h2><p><strong>APLIC支持一个或多个中断域，每个中断域与一个特权级别(机器或主管级别)的RISC-V hart子集相关联</strong>。中断域中的hart是该域可以在相应的特权级别上传递中断的hart。在machine’s address space中，<strong>每个域都有自己的内存映射控制区域</strong>，该区域似乎控制着一个完整的、独立的应用程序接口，尽管实际上所有域接口一起访问一个合并的中断控制器</p>
+<p>图4.1到4.3描述了在RISC-V系统中由APLIC实现的中断域的一些可能的层次结构。</p>
+<p>第一个图表示一个最小的系统，它有一个不支持管理器模式的hart，在该hart上有一个机器级别的单一中断域。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612143809363.png" alt="image-20230612143809363"></p>
+<p>下图4.2显示了为对称多处理(symmetric multiprocessing, SMP)设计的大型系统的基本排列，其中有多个hart都实现了supervisor模式。在这种情况下，APLIC通常会为supervisor level提供一个单独的中断域，如图所示。<strong>这个 <em>supervisor-level interrupt domain</em> 允许在多个hart上以S模式运行的操作系统直接控制它接收到的中断，从而避免了调用M模式来执行该控制的需要</strong>。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612144045503.png" alt="image-20230612144045503"></p>
+<p>APLIC的中断域以树状层次结构排列，<strong>根域始终位于机器级别</strong>。<strong>进入的中断线首先到达根域(M)<strong>。然后，每个域可以选择性地将所有中断源或中断源的子集委托给层次结构中的子域。</strong>在给定的APLIC中，中断源号在所有域中都是不变的</strong>，因此源标识号i总是指每个域中的相同源，对应于传入线号i。对于根以下的中断域，未下放到该域的中断源在域中显示为未实现。</p>
+<p>图4.3显示了三个中断域的层次结构，两个在机器级别，一个在主管级别。图中的排列，当与PMP(物理内存保护)相结合时，允许机器级软件为hart 0隔离 超出了四个应用程序hart的范围的一系列中断，甚至在机器级也是如此。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612144225186.png" alt="image-20230612144225186"></p>
+<blockquote>
+<p>为了使中断域中的hart能够直接控制来自该域中的中断，hart必须由具有相同特权级别的软件协作控制。特别地，单个操作系统应该控制与一个管理级中断域相关联的所有hart。在图4.2和4.3的示例中， 在多个独立的操作系统之间 不能安全地分割 对APLIC的主管级中断域的控制。</p>
+<p>鉴于图中所描述的域层次结构，如果有必要为多个操作系统划分应用程序hart，则机器级软件将需要防止操作系统直接访问主管级中断域，而是提供SBI服务来控制APLIC中断，或者，模拟单独的主管级中断域的控制接口，每个操作系统一个。注意，这样的仿真可能仍然会使用APLIC的物理管理器级中断域，但是在机器级软件的控制下。</p>
+</blockquote>
+<p>APLIC的中断域层次结构满足以下规则:</p>
+<ul>
+<li>根域位于机器级别</li>
+<li><strong>任何主管级中断域的父域都是机器级域</strong>，<strong>至少包含相同的hart(但显然是在机器级)<strong>。</strong>父域在机器级别上可能有一组更大的hart</strong>。</li>
+<li>对于每个中断域，来自该域的中断均通过相同的方法（通过wire或通过 MSI）向 Hart 发出信号，而不是通过 Hart 之间的混合方法。</li>
+</ul>
+<p><strong>当RISC-V hart的外部中断控制器是APLIC而不是IMSIC时，hart在每个特权级别上只能在该APLIC的一个中断域中</strong>。</p>
+<p>另一方面，<strong>对于其外部中断控制器具有IMSIC的hart，在每个特权级别上可能处于多个APLIC中断域中，甚至是同一APLIC的中断域中，并且可能从机器中多个不同的APLICs接收MSI。</strong></p>
+<p>平台可以为软件提供一种方法，可以在任何给定的APLIC的多个中断域层次结构之间进行选择。任何这样的可配置性都超出了本规范的范围，但应该只适用于机器级别。</p>
+<h2 id="4-3-Hart-索引"><a href="#4-3-Hart-索引" class="headerlink" title="4.3 Hart 索引"></a>4.3 Hart 索引</h2><p>在给定的中断域中，**&#x3D;&#x3D;每个域&#x3D;&#x3D;的hart都有一个唯一的索引号**，范围从0到2^14^−1(&#x3D; 16,383)。</p>
+<p>与hart关联的域索引号可能与RISC-V特权架构分配给hart的唯一hart标识符(“hart ID”)有关系，也可能没有任何关系。</p>
+<p>两个不同的中断域可以对同一组hart使用完全不同的索引号。但是，如果任何一个APLIC的中断域都可以通过MSI转发中断，那么APLIC的所有机器级域都共享到hart的索引号的公共映射。</p>
+<blockquote>
+<p>为了提高效率，实现应该更倾向于使用小整数作为hart索引号。</p>
+</blockquote>
+<h2 id="4-4-单域中断控制概述"><a href="#4-4-单域中断控制概述" class="headerlink" title="4.4 单域中断控制概述"></a>4.4 单域中断控制概述</h2><p>由<strong>APLIC实现的每个中断域都有自己独立的物理控制接口</strong>，该接口在机器的地址空间中进行内存映射，<strong>允许通过PMP(物理内存保护)和基于页面的地址转换轻松地调节对每个域的访问</strong>。所有中断域的控制接口具有共同的结构。在大多数情况下，对软件来说，每个域似乎都是一个根域，在层次结构中，它上面的域没有可见性。</p>
+<p><strong>每个中断源在APLIC的每个单独的中断域具有以下组件</strong>:</p>
+<ul>
+<li><strong>源配置</strong>。这决定了特定的源是否在域中处于有效状态（active），如果是，则如何解释传入的信号，例如电平敏感或边缘敏感。对于域中处于非有效状态（inactive）的源，&#x3D;&#x3D;<strong>源配置控制对子域的任何委托</strong>&#x3D;&#x3D;。</li>
+<li><strong>中断挂起和中断启用位</strong>。对于非有效（inactive）源，这两个位是只读零。否则，pending位记录到达的中断，但尚未发出信号或转发，而enable位决定来自该源的中断是否应该当前交付，还是应该保持挂起。</li>
+<li><strong>目标选择</strong>。对于有效源（active），目标选择决定接收中断的hart以及作为MSI转发时中断的优先级或新中断标识。</li>
+</ul>
+<p>对于**&#x3D;&#x3D;直接将中断传递&#x3D;&#x3D;给hart而不是由MSI转发的中断域<strong>，该域</strong>有&#x3D;&#x3D;一组最终组件&#x3D;&#x3D;来控制将中断传递给hart，每个hart在域中有一个实例**。</p>
+<blockquote>
+<p>虽然具有多个中断域的APLIC可能看起来与上面列出的每个源状态(源配置等)重复一个等于域数量的因子，但实际上，APLIC实现可以利用每个源最终只在一个域中有效的事实。在没有委托特定中断源的所有域中，与该源相关联的状态显示为只读零，不需要物理寄存器位。</p>
+</blockquote>
+<h2 id="4-5-中断域的内存映射控制区域"><a href="#4-5-中断域的内存映射控制区域" class="headerlink" title="4.5 中断域的内存映射控制区域"></a>4.5 中断域的内存映射控制区域</h2><p>对于APLIC支持的每个中断 域，都有一个专用的内存映射控制区域，用于管理该域中的中断。<strong>这个控制区域的大小是4kB的倍数</strong>，并与4kB地址边界对齐。<strong>最小有效控制区域为16 kB</strong>。中断域的控制区域由一组32位寄存器填充。前16个kB包含表4.1中列出的寄存器。</p>
+<p>从偏移的0x4000开始,一个中断域的控制区域可以<strong>选择有一个中断交付控制(IDC)结构</strong>，一个对每个潜在的hart指数在范围0到某个最大值，至少与中断域的最大hart指数值一样大。&#x3D;&#x3D;<strong>只有当域被配置为直接中断时，IDC结构才会被使用，而不是由MSIs转发</strong>&#x3D;&#x3D;。一个中断域只支持MSIs中断转发，而不是通过APLIC直接传递的中断不需要IDC结构在其控制区域。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612151453192.png" alt="image-20230612151453192"></p>
+<p>第一个IDC结构(如果有的话)是索引号为0的hart;第二个是索引号为1的hart;等等。每个IDC结构为32字节，并具有以下定义的寄存器:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612152030933.png" alt="image-20230612152030933"></p>
+<p>IDC结构是连续封装的，每个结构32字节，因此从中断域控制区域的开始到它的第二个IDC结构(hart index 1)的偏移量，如果它存在，则为0x4020;第三个IDC结构(hart索引2)的偏移量，如果存在，则为0x4040;等。</p>
+<p>IDC结构的数组可能包括一些潜在的hart索引号，这些hart索引号不是域中的实际hart索引号。例如，第一个IDC结构总是针对hart索引0，但0不一定是域中任何hart的有效索引号。对于数组中不对应于域中有效hart索引号的每个IDC结构，IDC结构的寄存器可能(也可能不)都是只读零。</p>
+<p>除了表4.1中的寄存器和上面列出的用于IDC结构的寄存器外，中断域控制区域中的所有其他字节都是保留的，并且被实现为只读零。</p>
+<p>在中断域的控制区内，只支持自然对齐的32位简单读写操作。对只读字节的写入将被忽略。对于其他形式的访问(其他大小、不对齐的访问或AMOs)，实现最好报告访问错误或总线错误，否则必须忽略访问。</p>
+<p>中断域控制区域的前16 KiB寄存器(除了IDC结构外)分别记录在下面。IDC结构稍后会在4.8节“直接由APLIC中断交付”中进行说明。</p>
+<h3 id="4-5-1-域配置-domaincfg"><a href="#4-5-1-域配置-domaincfg" class="headerlink" title="4.5.1 域配置(domaincfg)"></a>4.5.1 域配置(domaincfg)</h3><p>domaincfg（<strong>0x0000</strong>）寄存器的格式如下:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612153519840.png" alt="image-20230612153519840"></p>
+<p>bit <strong>IE</strong>(中断使能)是该中断域中所有有效中断源的全局使能。只有当IE &#x3D; 1时，挂起并启用的中断才会真正发送信号或转发到hart。</p>
+<p>&#x3D;&#x3D;<strong>当domaincfg.IE&#x3D;0时，读取topi仍将显示当前最高优先级的挂起和启用的中断。</strong>&#x3D;&#x3D;</p>
+<p>bit <strong>DM</strong>(交付模式)是WARL，它决定了中断域如何向hart交付中断。DM有两种可能的值:</p>
+<ul>
+<li>0 &#x3D; 直接交付模式</li>
+<li>1 &#x3D; MSI交付模式</li>
+</ul>
+<p>在直接传递模式下，中断由APLIC本身确定优先级并直接向hart发送信号。</p>
+<p>在MSI交付模式中，中断由APLIC作为MSI转发到hart，可能是为了让这些hart上的IMSIC进一步处理。给定的APLIC实现可以为每个中断域支持这两种交付模式中的一种或两种。</p>
+<p><strong>如果中断域的harts有IMSIC，那么除非这些IMSIC的相关中断文件支持寄存器eidelivery为值0x40000000，否则将DM设置为零(直接交付模式)将与将IE设置为零具有相同的效果。</strong>参见第3.8.1和4.8.2节。</p>
+<p><strong>BE(大端)是一个WARL字段，它决定了中断域的内存映射控制区域中大多数寄存器的字节顺序。如果BE &#x3D; 0，字节顺序是小端序，如果BE &#x3D; 1，字节顺序是大端序。对于只支持little-endian的RISC-V系统，BE可能是只读0，对于只支持big-endian的RISC-V系统，BE可能是只读0。对于双端系统，BE是可写的。</strong></p>
+<p>字段BE影响访问domaincfg寄存器本身的字节顺序，就像中断域控制区域中的其他寄存器一样。为了解决这个问题，domaincfg的最高有效字节(bits 31:24)中的只读值有两个目的。首先，对于domaincfg的任何读取，寄存器的正确字节顺序很容易从获得的四字节值中确定:当以正确的字节顺序解释时，第31位是1，而在错误的顺序中，第31位是0。其次，如果BE的值不确定(假设是在软件初始化中断域之前)，可以通过写(x &lt;&lt; 24) | x 将8位值x安全地写入domaincfg，其中&lt;&lt; 24表示向左移动24位，垂直条(|)表示按位逻辑或。在domaincfg写入一次之后，BE的值应该是已知的，因此后续写入不需要重复相同的技巧。</p>
+<p>在系统重置时，domaincfg中的所有可写位都初始化为零，包括IE。如果实现支持额外形式的APLIC重置，则这些重置如何影响domaincfg是由实现定义的(也可能是平台定义的)</p>
+<h3 id="4-5-2-源配置-sourcecfg-1-sourcecfg-1023"><a href="#4-5-2-源配置-sourcecfg-1-sourcecfg-1023" class="headerlink" title="4.5.2 源配置(sourcecfg[1] -sourcecfg [1023])"></a>4.5.2 源配置(sourcecfg[1] -sourcecfg [1023])</h3><p><strong>0x0004-0x0FFC</strong></p>
+<p>对于每个可能的中断源i，sourcecfg[i]控制源i在该中断域中的源模式，以及源到子域的任何委托。</p>
+<p><strong>当源i未被实现或出现在不被实现的域中时，sourcecfg[i]为只读零。</strong></p>
+<p><strong>如果源i没有被委托到这个域，然后(在父域)被更改为被委托到这个域，sourcecfg[i]将保持为零，直到成功写入一个非零值。</strong></p>
+<p><strong>sourcecfg[i]的第10位是一个名为D (委托Delegate)的1bit字段。如果D &#x3D; 1，源i被委托给子域，如果D &#x3D; 0，它不被委托给子域。其余sourcecfg[i]的位解释取决于D。</strong></p>
+<p>当中断源i被委托给子域时，sourcecfg[i]有这样的格式:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614134036636.png" alt="image-20230614134036636"></p>
+<p><strong>子索引</strong>（Child Index）是一个WLRL字段，它<strong>指定该源被委托到的中断域</strong>。</p>
+<p>对于具有C个子域的中断域，该字段必须能够保存0到C−1范围内的整数值。每个中断域都有从这些索引号到子域的固定映射。</p>
+<p><strong>如果一个中断域在域层次结构中没有子域，那么D位不能在该域的任何源寄存器中设置为1。对于这样的叶子域，尝试写一个具有bit10 &#x3D; 1值的sourcecfg寄存器会导致整个寄存器被设置为零。</strong></p>
+<p>当中断源i没有被委托给子域时，sourcecfg[i]有这样的格式:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614134126829.png" alt="image-20230614134126829"></p>
+<p><strong>SM</strong>(源模式)字段是<strong>WARL</strong>，<strong>它控制中断源在这个域中是否处于有效状态</strong>，如果是，<strong>那么入线上的哪些值或转换被解释为中断</strong>。SM允许的值及其含义列于表4.2。字段SM始终支持非有效(零)。实现可以独立地为每个中断源自由选择SM所支持的其他值。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612154645189.png" alt="image-20230612154645189"></p>
+<p>&#x3D;&#x3D;<strong>如果中断源被委托给子域(D &#x3D; 1)或未被委托(D &#x3D; 0)并且SM是Inactive，则中断源在中断域中是无效的。</strong>&#x3D;&#x3D;</p>
+<p>&#x3D;&#x3D;<strong>当中断源i在中断域中处于非有效状态时，该域中相应的interrupt-pending和interrupt-enable位为只读零，target[i]也为只读零。</strong>&#x3D;&#x3D;</p>
+<p>&#x3D;&#x3D;<strong>如果源i从非有效模式变为有效模式，中断源的挂起位和使能位保持为零</strong>，除非由于本节后面或4.7节中指定的原因自动设置，并且target[i]的定义子字段获得未指定的值。&#x3D;&#x3D;</p>
+<p><strong>当一个源配置为分离的（Detached）时，它的线输入将被忽略</strong>；但是，<strong>中断挂起位仍然可以通过写入setip或setipnum寄存器来设置</strong>。(例如，此模式可用于接收MSI。)</p>
+<p>边缘敏感源可以配置为识别上升沿(低到高转换)或下降沿(高到低转换)的传入中断。当配置为下降沿(模式Edge0)时，源被称为反向。</p>
+<p>电平敏感源可以配置为将线路上的高电平(1)或低电平(0)解释为中断的断言。当配置为低电平(模式Level0)时，源被称为反向。</p>
+<p>对于被配置为边缘敏感或电平敏感的中断源，定义</p>
+<center><i>整流(rectified)输入值=(进线值)异或(源倒置)。</i>
+
+<p><strong>对于非有效或分离的源，整流输入值为零。</strong></p>
+<p><strong>如果在新的源模式下整流输入值很高(&#x3D; 1)，那么对sourcecfg寄存器的任何写操作都可能(也可能不会)导致相应的中断挂起位被设置为1。除非源寄存器处于非有效状态，否则对sourcecfg的写操作本身不会导致清除挂起位。(请参见4.7节。)</strong></p>
+<h3 id="4-5-3-机器级MSI地址配置-mmsiaddrcfg和mmsiaddrcfgh"><a href="#4-5-3-机器级MSI地址配置-mmsiaddrcfg和mmsiaddrcfgh" class="headerlink" title="4.5.3 机器级MSI地址配置(mmsiaddrcfg和mmsiaddrcfgh)"></a>4.5.3 机器级MSI地址配置(mmsiaddrcfg和mmsiaddrcfgh)</h3><p><strong>0x1BC0 - 0x1BC4</strong></p>
+<p>对于机器级中断域，寄存器mmsiaddrcfg和mmsiaddrcfgh可以选择性地提供用于确定写传出MSI的地址的参数。</p>
+<p>如果没有中断域，APLIC支持MSI下发模式(所有域的domaincfg. DM是只读零)，这两个寄存器不实现任何域。否则，它们是为根域实现的；可能会，也可能不会为其他机器级域实现。<strong>对于不在机器级别的域，它们永远不会实现</strong>。当一个域没有实现mmsiaddrcfg和mmsiaddrcfgh时，它们位置上的8个字节就像其他保留字节一样只是只读的零。</p>
+<p>寄存器mmsiaddrcfg和mmsiaddrcfgh只对根域可写。对于所有其他机器级域，它们是只读的。</p>
+<p>在实现时，mmsiaddrcfg具有以下格式:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612155646428.png" alt="image-20230612155646428"></p>
+<p>mmsiaddrcfgh有这样的格式:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612155637972.png" alt="image-20230612155637972"></p>
+<p>mmsiaddrcfgh的所有其他位都被保留并作为读取零。</p>
+<p>来自mmsiaddrcfg的字段<strong>High Base PPN</strong>和来自mmsiaddrcfg的字段<strong>Low Base PPN</strong>连接起来形成一个44位的Base PPN(物理页码)。这个值和字段<strong>HHXS</strong> (High Hart Index Shift)、<strong>LHXS</strong> (Low Hart Index Shift)、<strong>HHXW</strong> (High Hart Index Width)和<strong>LHXW</strong> (Low Hart Index Width)用于确定MSI的目标地址的使用将在后面的4.9.1节中描述。</p>
+<p>当mmsiaddrcfg和mmsiaddrcfgh是可写的(仅根域)时，<strong>除L以外的所有字段都是WARL</strong>。实现可以自由选择支持的值。通常，有些位是可写的，而其他位是只读常量。<strong>在极端情况下，所有字段的值可能完全不变，由物理实现固定</strong>。</p>
+<p>如果将mmsiaddrcfgh中的位<strong>L设置为1</strong>，则<strong>锁定mmsiaddrcfg和mmsiaddrcfgh</strong>，并且<strong>忽略对寄存器的写操作</strong>，使寄存器有效地变为只读。当L &#x3D; 1时，<strong>mmsiaddrcfg和mmsiaddrcfgh中的其他字段可以选择性地全部读取为零</strong>。在这种情况下，如果在根域中首次设置L时，<strong>这些其他字段被赋予非零值</strong>，<strong>那么它们的值将由APLIC在内部保留，但是通过读取mmsiaddrcfg和mmsiaddrcfgh将不再可见</strong>。</p>
+<p>设置<strong>mmsiaddrcfgh.L</strong> 为 1还锁定下一小节中描述的寄存器smsiaddrcfg和smsiaddrcfgh，如果也实现了这些寄存器的话。</p>
+<p>对于根域，在系统重置时将L初始化为0或1，视具体的APLIC实现而定。如果reset将L初始化为1，则其他字段要么由APLIC硬连接到常量，要么在此标准之外，APLIC有一种不同的方法来确定传出的MSI写入的地址。在后一种情况下，mmsiaddrcfg和mmsiaddrcfgh中的其他字段可能都读为零，因此mmsiaddrcfg和mmsiaddrcfgh的寄存器分别只有只读值0和0x80000000。任何时候mmsiaddrcfg或mmsiaddrcfgh有不同的值(分别不是0或0x80000000)，指向机器级的输出MSI写地址必须从这些寄存器的可见值派生，如第4.9.1节所述。</p>
+<p><strong>对于不是根域的机器级域，如果实现了这些寄存器，那么位L总是1，其他字段要么是来自根域的mmsiaddrcfg和mmsiaddrcfgh的只读副本，要么全部为零。</strong></p>
+<blockquote>
+<p>&#x3D;&#x3D;赋予软件任意确定发送MSI的地址的能力，即使只允许在机器级别，也允许绕过物理内存保护(PMP)。对于支持MSI交付模式的应用程序，如果可行，建议应用程序在内部硬连接所有目标IMSIC的物理地址，使这些地址在软件无法更改的范围内。然而，并非所有的APLIC实现都能够遵循该建议。&#x3D;&#x3D;</p>
+<p>预计大多数系统将按照hart索引号的简单线性对应来安排目标IMSIC的物理地址。(参见第3.6节。)寄存器mmsiaddrcfg和mmsiaddrcfgh(以及下一小节中的smsiaddrcfg和smsiaddrcfgh)允许足够可信的机器级软件在系统重置后早期配置目标IMSIC的物理地址模式，然后锁定此配置以防止后续篡改。</p>
+<p>实际上在内部硬连接IMSIC地址的应用程序可以将这些寄存器简单地实现为只读，值为0和0x80000000。或者，如果IMSIC地址必须由软件配置，但是公式太复杂，寄存器mmsiaddrcfg和mmsiaddrcfgh无法处理，那么寄存器也可以简单地实现为只读，值为0和0x80000000，并提供一个单独的自定义机制来配置IMSIC地址。</p>
+</blockquote>
+<p>如果APLIC支持除系统重置之外的其他形式的重置，则这些重置如何影响根域中的mmsiaddrcfg和mmsiaddrcfgh(以及smsiaddrcfg和smsiaddrcfgh)是由实现定义的(也可能是平台定义的)。然而，对于没有足够特权的软件来说，<strong>通过将位L更改回零来使用本地化重置来解锁这些寄存器是不可能的。由于这个原因，很可能只有一个完整的系统重置会影响这些寄存器，而任何其他重置都不会。</strong></p>
+<h3 id="4-5-4-管理级MSI地址配置-smsiaddrcfg和smsiaddrcfgh"><a href="#4-5-4-管理级MSI地址配置-smsiaddrcfg和smsiaddrcfgh" class="headerlink" title="4.5.4 管理级MSI地址配置(smsiaddrcfg和smsiaddrcfgh)"></a>4.5.4 管理级MSI地址配置(smsiaddrcfg和smsiaddrcfgh)</h3><p><strong>0x1BC8 - 0x1BCC</strong></p>
+<p>对于机器级中断域，寄存器smsiaddrcfg和smsiaddrcfgh可以选择性地提供管理级域使用的参数，以确定写传出MSI的地址。</p>
+<p>如果域实现了smsiaddrcfg和smsiaddrcfgh，并且APLIC至少有一个主管级中断域，则寄存器smsiaddrcfg和smsiaddrcfgh由域实现。如果没有实现寄存器，那么它们位置上的8个字节就像其他保留字节一样只是只读零。</p>
+<p>与mmsiaddrcfg和mmsiaddrcfgh一样，<strong>smsiaddrcfg和smsiaddrcfgh可能只对根域可写</strong>。<strong>对于实现它们的所有其他机器级域，它们是只读的</strong>。</p>
+<p>当实现时，smsiaddrcfg有这样的格式:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612160237569.png" alt="image-20230612160237569"></p>
+<p>smsiaddrcfgh有这样的格式:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612160251943.png" alt="image-20230612160251943"></p>
+<p>smsiaddrcfgh的所有其他位都被保留并作为零读取。</p>
+<p>smsiaddrcfgh中的<strong>High Base PPN</strong>和smsiaddrcfg中的<strong>Low Base PPN</strong>连接起来形成一个44位的<strong>Base PPN</strong>(物理页码)。这个值和字段**LHXS (Low Hart Index Shift)**用于确定MSI的目标地址的使用将在稍后的4.9.1节中描述。</p>
+<p>当smsiaddrcfg和smsiaddrcfgh可写(仅根域)时，所有字段都是W·ARL。实现可以自由选择支持的值，就像mmsiaddrcfg和mmsiaddrcfgh一样。</p>
+<p>如果域的<strong>mmsiaddrcfgh的位L设置为1，则smsiaddrcfg和smsiaddrcfgh与mmsiaddrcfg和mmsiaddrcfgh一起被锁定为只读</strong>。当mmsiaddrcfgh.L &#x3D; 1，如果mmsiaddrcfg和mmsiaddrcfgh的可读值分别为0和0x80000000(因为它们的其他字段被隐藏)，则smsiaddrcfg和smsiaddrcfgh也被隐藏并读取为零。</p>
+<p>仅对于根域，如果为mmsiaddrcfgh.L &#x3D; 1并且MSI-address-configuration字段是隐藏的(因此mmsiaddrcfgh读取为0x80000000，并且将mmsiaddrcfg, smsiaddrcfg和smsiaddrcfgh都读取为零)，那么当第一次设置mmsiaddrcfgh.L为1时，smsiaddrcfcfg和smsiaddrcfgh的值由APLIC在内部保留，虽然这些值在读寄存器时不再可见。或者，如果系统重置初始化根域中mmsiaddrcfgh.L &#x3D; 1，如果所有MSI地址配置字段都显示为零，那么APLIC的实现需要有一些其他的(可能是非标准的)方法来确定传出MSI的地址，如前面小节4.5.3中所讨论的。</p>
+<p>当mmsiaddrcfg和mmsiaddrcfgh不是只读0和0x80000000时，发送到主管级的MSI写地址必须从寄存器mmsiaddrcfgh、smsiaddrcfg和smsiaddrcfgh的可见值中派生出来，如4.9.1节所述。</p>
+<p><strong>对于不是根域的机器级域，如果实现了smsiaddrcfg和smsiaddrcfgh，并且它们不是只读零，那么它们是根域相同寄存器的只读副本。</strong></p>
+<h3 id="4-5-5-设置中断挂起位-setip-0-setip-31"><a href="#4-5-5-设置中断挂起位-setip-0-setip-31" class="headerlink" title="4.5.5 设置中断挂起位(setip[0] -setip [31])"></a>4.5.5 设置中断挂起位(setip[0] -setip [31])</h3><p><strong>0x1C00 - 0x1C7C</strong></p>
+<p><strong>读或写</strong>寄存器setip[k]<strong>会读取或可能修改</strong>中断源k × 32到k × 32 + 31的挂起位。对于在该范围内实现的中断源i，源i的暂挂位对应于寄存器位(i mod 32)。</p>
+<p><strong>对setip寄存器的读操作返回相应中断源的暂挂位</strong>。结果值 (result value) 中与实现的中断源不对应的位(如setip[0]的第0位)为零</p>
+<p>在写入一个setip寄存器时，对于写入的32位值中的每一个位，如果该位位置对应于一个有效的中断源，则该源的中断挂起位如果可能的话被设置为1。请参见4.7节，了解什么时候可以通过写入setip寄存器来设置挂起位。</p>
+<h3 id="4-5-6-设置中断挂起位by-number-setipnum"><a href="#4-5-6-设置中断挂起位by-number-setipnum" class="headerlink" title="4.5.6 设置中断挂起位by number(setipnum)"></a>4.5.6 设置中断挂起位by number(setipnum)</h3><p><strong>0x1CDC</strong></p>
+<p>如果i是域中的有效中断源号，<strong>将32位值i写入寄存器setipnum，则可能会将源i的挂起位设置为1</strong>。具体何时可以通过写入setipnum来设置挂起位，请参见章节4.7。</p>
+<p>如果写入的值不是域中的有效中断源号，则忽略对setipnum的写入。读setipnum总是返回0。</p>
+<h3 id="4-5-7-整流输入，清除挂起中断位-in-clrip-0-in-clrip-31"><a href="#4-5-7-整流输入，清除挂起中断位-in-clrip-0-in-clrip-31" class="headerlink" title="4.5.7 整流输入，清除挂起中断位(in_clrip[0]-in_clrip[31])"></a>4.5.7 整流输入，清除挂起中断位(in_clrip[0]-in_clrip[31])</h3><p><strong>0x1D00 - 0x1D7C</strong></p>
+<p>in_clrip [k]中读取寄存器返回中断源k × 32到k × 32 + 31的整流输入值(章节4.5.2)，而<strong>在in_clrip [k]中写入可能会修改相同源的暂挂位</strong>。对于在指定范围内实现的中断源i，源i对应于寄存器位(i mod 32)。</p>
+<p><strong>读in_clrip寄存器返回相应中断源的整流输入值</strong>。结果值中与实现的中断源不对应的位位置(例如in_clrip[0]中的位0)为零。</p>
+<p><strong>在写in_clrip寄存器时，对于写入的32位值中的每个位，如果该位位置对应于一个有效的中断源，则如果可能的话，清除该源的中断挂起位</strong>。请参见第4.7节，了解何时可以通过写入暂存寄存器来清除暂存位。</p>
+<h3 id="4-5-8-按位数清除中断挂起-clripnum"><a href="#4-5-8-按位数清除中断挂起-clripnum" class="headerlink" title="4.5.8 按位数清除中断挂起(clripnum)"></a>4.5.8 按位数清除中断挂起(clripnum)</h3><p><strong>0x1DDC</strong></p>
+<p><strong>如果i是域中有效的中断源号，则向寄存器clripnum写入32位值i将尽可能清除源i的挂起位</strong>。关于何时可以通过写入cliripnum来清除挂起位，请参见4.7节。</p>
+<p>如果写入的值不是域中的有效中断源号，则忽略对clripnum的写入。对clripnum的读操作总是返回0。</p>
+<h3 id="4-5-9-设置中断使能位-setie-0-setie-31"><a href="#4-5-9-设置中断使能位-setie-0-setie-31" class="headerlink" title="4.5.9 设置中断使能位(setie[0] -setie [31])"></a>4.5.9 设置中断使能位(setie[0] -setie [31])</h3><p><strong>0x1E00 - 0x1E7C</strong></p>
+<p>读或写寄存器setie [k]读取或可能修改中断源k × 32到k × 32 + 31的使能位。对于在该范围内实现的中断源i，源i的使能位对应于寄存器位(i mod 32)。</p>
+<p>**对设置寄存器的&#x3D;&#x3D;读&#x3D;&#x3D;操作&#x3D;&#x3D;返回相应中断源的使能位&#x3D;&#x3D;**。结果值中与实现的中断源不对应的位(如setie[0]的第0位)为零。</p>
+<p><strong>在写入设置寄存器时，对于写入的32位值中的每一位，如果该位位置对应于一个有效中断源，则该源的中断使能位被设置为1</strong>。</p>
+<h3 id="4-5-10-按位数设置中断使能-setienum"><a href="#4-5-10-按位数设置中断使能-setienum" class="headerlink" title="4.5.10 按位数设置中断使能 (setienum)"></a>4.5.10 按位数设置中断使能 (setienum)</h3><p><strong>0x1EDC</strong> </p>
+<p><strong>如果i是域中有效的中断源号，则将32位值i写入寄存器setienum，会将源i的使能位设置为1</strong>。</p>
+<p>如果写入的值不是域中有效的中断源编号，则忽略写到setienum的操作。对setienum的读操作总是返回零。</p>
+<h3 id="4-5-11-清除中断使能位-clrie-0-clrie-31"><a href="#4-5-11-清除中断使能位-clrie-0-clrie-31" class="headerlink" title="4.5.11 清除中断使能位 (clrie[0] -clrie [31])"></a>4.5.11 清除中断使能位 (clrie[0] -clrie [31])</h3><p><strong>0x1F00 - 0x1F7C</strong> </p>
+<p>写入寄存器clrie[k]可能会修改中断源k × 32到k × 32 + 31的使能位。对于在该范围内实现的中断源i，源i的使能位对应于寄存器位(i mod 32)。</p>
+<p><strong>在对一个clrie寄存器进行写操作时，对于写入的32位值中的每一个位，该源的中断使能位将被清除。</strong></p>
+<p>读寄存器总是返回0。</p>
+<h3 id="4-5-12-按位数清除中断使能-clrienum"><a href="#4-5-12-按位数清除中断使能-clrienum" class="headerlink" title="4.5.12 按位数清除中断使能 (clrienum)"></a>4.5.12 按位数清除中断使能 (clrienum)</h3><p><strong>0x1FDC</strong> </p>
+<p><strong>如果i是域中有效的中断源号，将32位值i写入寄存器clrienum会清除源i的使能位。</strong></p>
+<p>如果写入的值不是域中的有效中断源号，则忽略对clirienum的写入。对clirienum的读取总是返回零。</p>
+<h3 id="4-5-13-设置中断挂起位，按数字小端-setipnum-le"><a href="#4-5-13-设置中断挂起位，按数字小端-setipnum-le" class="headerlink" title="4.5.13 设置中断挂起位，按数字小端 (setipnum_le)"></a>4.5.13 设置中断挂起位，按数字小端 (setipnum_le)</h3><p><strong>0x2000</strong> </p>
+<p>除了字节顺序总是小端序之外，寄存器setipnum_le的行为与setipnum相同，就好像domaincfg的字段BE(大端序)为“0”一样。</p>
+<p>对于只使用大端的系统，domaincfg.BE如果硬连接到“1”，则不需要实现setipnum_le，在这种情况下，此偏移量处的四个字节只是只读零，就像其他保留字节一样。</p>
+<p>&#x3D;&#x3D;<strong>setipnum_le可以用作MSIs的写端口(write port)。</strong>&#x3D;&#x3D;</p>
+<h3 id="4-5-14-设置中断挂起位，按数字大端-setipnum-be"><a href="#4-5-14-设置中断挂起位，按数字大端-setipnum-be" class="headerlink" title="4.5.14 设置中断挂起位，按数字大端(setipnum_be)"></a>4.5.14 设置中断挂起位，按数字大端(setipnum_be)</h3><p><strong>0x2004</strong></p>
+<p>除了字节顺序总是大端序之外，寄存器setipnum_be的行为与setipnum相同，就像注册domaincfg的字段BE(大端序)为“1”一样。</p>
+<p>对于只支持小端的系统，domaincfg.BE如果硬连接到“0”，则不需要实现setipnum_be，在这种情况下，此偏移量处的四个字节只是只读零，就像其他保留字节一样。</p>
+<p>&#x3D;&#x3D;<strong>对于主要为大端字节顺序构建的系统，setipnum_be作为来自某些设备的MSI的写端口可能很有用。</strong>&#x3D;&#x3D;</p>
+<h3 id="4-5-15-生成MSI-genmsi"><a href="#4-5-15-生成MSI-genmsi" class="headerlink" title="4.5.15 生成MSI (genmsi)"></a>4.5.15 生成MSI (genmsi)</h3><p><strong>0x3000</strong> </p>
+<p>当以MSI下发方式配置中断域时(domaincfg. DM &#x3D; 1)时，可以使用genmsi将临时MSI从APLIC发送到hart。这个**&#x3D;&#x3D;功能的主要目的是帮助在hart对APLIC寄存器的写操作和MSI从APLIC到hart的传输之间建立一个临时的已知顺序&#x3D;&#x3D;**，稍后将在4.9.3节中解释。</p>
+<blockquote>
+<p>对于其他目的，将MSI发送到hart通常是通过直接写入hart的IMSIC来完成的，而不是使用APLIC作为中介。应该尽量减少使用genmsi寄存器，以避免它成为瓶颈。</p>
+</blockquote>
+<p>genmsi格式如下：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612162450220.png" alt="image-20230612162450220"></p>
+<p><strong>Busy</strong>位通常为零(false)，但是<strong>写入genmsi会使Busy变为1 (true)<strong>，</strong>表示临时MSI正在挂起</strong>。<strong>Hart Index</strong>字段指定目的Hart, EIID(外部中断标识)<strong>指定MSI的数据值</strong>。字段Hart Index和EIID具有与 <strong>target</strong>  相同的格式和行为，将在下一小节4.5.16中记录。对于机器级中断域，临时MSI被发送到机器级的目的hart，对于主管级中断域，临时MSI被发送到主管级的目的hart。</p>
+<p>暂挂的临时MSI应该由APLIC以最小的延迟发送。一旦它离开了APLIC，并且APLIC能够接受对genmsi的新写入以获得另一个临时MSI, Busy将恢复为false。当临时MSI在hart的IMSIC中可见之前，先前从此APLIC发送到同一hart的所有MSI必须在hart的IMSIC中可见。</p>
+<p>当Busy为true时，对genmsi的写入将被忽略</p>
+<p><strong>临时(extempore)MSIs不受域的domaincfg.IE位的影响。即使domaincfg. IE&#x3D;0也会发送临时(extempore)MSI。</strong></p>
+<p>当以直接下发方式配置中断域时(domaincfg.DM &#x3D; 0)，则寄存器genmsi为只读零。</p>
+<h3 id="4-5-16-中断目标-target-1-target-1023"><a href="#4-5-16-中断目标-target-1-target-1023" class="headerlink" title="4.5.16 中断目标(target[1]-target[1023])"></a>4.5.16 中断目标(target[1]-target[1023])</h3><p><strong>0x3004 - 0x3FFC</strong> </p>
+<p>如果中断源i在该域中处于非有效状态，则 <strong>target</strong>[i]为只读零。如果源i是有效的，则target[i]决定来自源的中断被发送信号或转发到哪个hart。target[i]的具体解释取决于domaincfg.DM字段配置的下发方式。</p>
+<p>如果domaincfg.DM更改后，域内所有有效中断源的<strong>target寄存器</strong>在为新交付模式定义的所有字段中<strong>获得未指定(unspecified)的值</strong>。</p>
+<h4 id="有效源，直接交付模式-Active-source-direct-delivery-mode"><a href="#有效源，直接交付模式-Active-source-direct-delivery-mode" class="headerlink" title="有效源，直接交付模式 Active source, direct delivery mode"></a>有效源，直接交付模式 Active source, direct delivery mode</h4><p>对于有效中断源i，如果域配置为直接交付模式(domaincfg.DM &#x3D; 0)，则target[i]具有如下格式:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612163457619.png" alt="image-20230612163457619"></p>
+<p>Hart Index是一个WLRL字段，它指定来自该源的中断将被发送到哪个Hart。</p>
+<p>字段IPRIO(中断优先级)指定中断源的优先级编号。该字段是一个由IPRIOLEN位组成的WARL无符号整数，其中IPRIOLEN是给定应用程序的一个常量参数，取值范围为1到8。IPRIO取值范围为1 ~ 2^IPRIOLEN^−1，不能为0。对 <strong>target</strong> 的写入设置IPRIO等于写入的32位值的bits (IPRIOLEN−1):0，除非这些位都是零，在这种情况下，优先级号被设置为1。(如果IPRIOLEN &#x3D; 1，这些规则导致IPRIO实际上是只读的，值为1。)</p>
+<p><strong>较小的优先级数字表示较高的优先级。当中断源的优先级号相等时，标识号最低的中断源优先级最高。</strong></p>
+<blockquote>
+<p>中断优先级被编码为整数，较小的数字表示较高的优先级，以匹配IMSIC对优先级的编码</p>
+</blockquote>
+<h4 id="有效源，MSI交付模式-Active-source-MSI-delivery-mode"><a href="#有效源，MSI交付模式-Active-source-MSI-delivery-mode" class="headerlink" title="有效源，MSI交付模式 Active source, MSI delivery mode"></a>有效源，MSI交付模式 Active source, MSI delivery mode</h4><p>对于有效中断源i，如果域配置为MSI交付模式(domaincfg.DM &#x3D; 1)，则寄存器target[i]具有如下格式:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612163846771.png" alt="image-20230612163846771"></p>
+<p>Hart Index字段指定来自该源的中断将被转发到的Hart。</p>
+<p>如果中断域处于主管级，并且该域的硬件实现了RISC-V特权架构的hypervisor扩展，那么Guest Index是一个WLRL字段，必须能够保存从0到GEILEN范围内的所有整数值。(GEILEN参数由特权架构的hypervisor扩展定义。)否则，字段Guest Index为只读零。</p>
+<p><strong>对于supervisor-level中断域</strong>，<strong>非零的Guest Index是目标hart的 <em>guest interrupt file</em> 的编号</strong>，MSI将被发送到该文件。当<strong>Guest Index为零时</strong>，来自supervisor-level域的MSI将被<strong>转发到supervisor level的目标hart</strong>。</p>
+<p><strong>对于机器级域，Guest Index为只读零</strong>，并且始终在&#x3D;&#x3D;机器级&#x3D;&#x3D;将MSI转发到目标hart。</p>
+<p><strong>target</strong>[i]的<strong>Hart Index和Guest Index字段一起决定了为中断源i转发的MSI的地址</strong>。其余字段<strong>EIID</strong>(外部中断标识)指定了这些MSI的数据值，<strong>最终成为目标Hart上外部中断的次要标识</strong>。</p>
+<p>如果<strong>中断域的hart的IMSIC中断文件 实现了N个不同中断标识</strong>(章节3.1)，则EIID是一个k位无符号整数字段，其中[log<del>2</del> N≤k≤11]。因此，EIID能够至少保存0到N的值。写入 <strong>target</strong> 将EIID的k个实现位设置为写入的32位值的最低有效k位。</p>
+<h2 id="4-6-复位"><a href="#4-6-复位" class="headerlink" title="4.6 复位"></a>4.6 复位</h2><p>在APLIC复位后，它的所有状态都变得有效和一致(valid and consistent)，但其他未指定(unspecified)，除了:</p>
+<ul>
+<li>每个中断域的<strong>domaincfg</strong>寄存器(章节4.5.1);</li>
+<li>可能是<strong>机器级中断域</strong>的MSI地址配置寄存器(<strong>mmsiaddrcfg*</strong>)(章节4.5.3和4.5.4);</li>
+<li>每个中断域的<strong>genmsi</strong>寄存器的<strong>Busy</strong>位，如果它存在的话(章节4.5.15)。</li>
+</ul>
+<h2 id="4-7-对中断挂起位的明确影响"><a href="#4-7-对中断挂起位的明确影响" class="headerlink" title="4.7 对中断挂起位的明确影响"></a>4.7 对中断挂起位的明确影响</h2><p>尝试通过写入中断域控制区域的寄存器来<strong>设置</strong>或<strong>清除</strong>中断源的<strong>挂起位</strong>可能成功，也可能不成功，这取决于相应的源模式（source mode）、中断域的传递模式和源的整流输入值的状态(在4.5.2节中定义)。下面列举了为给定源模式设置或清除挂起位时的所有情况。</p>
+<p>&#x3D;&#x3D;<strong>源模式为Detached:</strong>&#x3D;&#x3D;</p>
+<ul>
+<li><p>挂起位<strong>只能通过</strong>对<strong>setip</strong>或<strong>setipnum</strong>寄存器的相关写操作设置为1。</p>
+</li>
+<li><p>当中断在APLIC上被请求(<strong>claimed</strong>)（读IDC里的claimi寄存器）或由MSI转发(forwarded)，或通过写入到一个相关的in_clrip或clripnum寄存器时，挂起位被清除。</p>
+</li>
+</ul>
+<p>&#x3D;&#x3D;<strong>当源模式为Edge1或Edge0时:</strong>&#x3D;&#x3D;</p>
+<ul>
+<li><p>挂起位通过整流输入值的低到高转换设置为1，或通过对setip或setipnum 寄存器的相关写操作设置为1。</p>
+</li>
+<li><p>当中断在APLIC上被请求(<strong>claimed</strong>)或由MSI转发(forwarded)，或通过写入到一个相关的in_clrip或clripnum寄存器时，挂起位被清除。</p>
+</li>
+</ul>
+<p>&#x3D;&#x3D;<strong>如果源模式为Level1或Level0，且中断域配置为直传下发模式(domaincfg.DM &#x3D; 0):</strong>&#x3D;&#x3D;</p>
+<ul>
+<li><p>当整流输入值为高时，挂起位设置为1。挂起位<strong>不能</strong>通过写入setip或setipnum寄存器来设置。</p>
+</li>
+<li><p>当整流输入值为低时，清除挂起位。挂起的位<strong>不能</strong>被APLIC的中断声明（<strong>claim</strong>）清除，也<strong>不能</strong>写in_clrip或clripnum寄存器清除。</p>
+</li>
+</ul>
+<p>&#x3D;&#x3D;<strong>如果源模式为Level1或Level0，且中断域配置为MSI下发模式(domaincfg.DM &#x3D; 1):</strong>&#x3D;&#x3D;</p>
+<ul>
+<li><p>挂起位通过<strong>整流输入值的低到高转换</strong>设置为1。<strong>当整流输入值高时</strong>，也可以<strong>通过写相关setip或setipnum寄存器来设置</strong>挂起位，但当整流输入值低时则不设置。</p>
+</li>
+<li><p>当整流输入值为低时，当中断被MSI转发时，或写相关的in_clrip或clripnum寄存器时，挂起位被清除。</p>
+</li>
+</ul>
+<blockquote>
+<p>当中断域处于直接传递模式时，电平敏感源的挂起位始终只是整流输入值的副本。即使在MSI传输模式下，当整流输入值较低时，电平敏感源的挂起位也永远不会设置(&#x3D; 1)。</p>
+</blockquote>
+<p>除了上面的规则之外，<strong>写入一个sourcecfg寄存器可以导致源的中断挂起位被设置为1</strong>，如第4.5.2节所述。</p>
+<h2 id="4-8-APLIC直接中断交付"><a href="#4-8-APLIC直接中断交付" class="headerlink" title="4.8 APLIC直接中断交付"></a>4.8 APLIC直接中断交付</h2><p>当中断域处于直<strong>接下发模式</strong>时(domaincfg.DM &#x3D; 0)，中断通过一个唯一的信号传递到每个hart，通常是一条专用的wire。在这种情况下，域的<strong>内存映射控制区域</strong>在结束时包含一组中断交付控制(IDC)结构，<strong>每个潜在hart索引一个IDC结构</strong>。第一个IDC结构是该域索引为0的hart;第二个是索引为1的hart;等。</p>
+<h3 id="4-8-1-IDC-Interrupt-delivery-control-结构"><a href="#4-8-1-IDC-Interrupt-delivery-control-结构" class="headerlink" title="4.8.1 IDC (Interrupt delivery control)结构"></a>4.8.1 IDC (Interrupt delivery control)结构</h3><p>每个IDC结构都是32字节(自然地与32字节的地址边界对齐)，并具有以下定义的寄存器:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612171027659.png" alt="image-20230612171027659"></p>
+<p>如果IDC结构的hart索引号对中断域中的任何实际hart都无效，那么这些寄存器可以选择性地全部为只读零。<u>否则，将在下面单独记录寄存器。</u></p>
+<blockquote>
+<p>在不完全了解系统将在每个中断域中使用的hart索引号集的情况下，可能会构建一个特定的APLIC来支持最大数量的hart。在这种情况下，对于未使用的hart索引号，APLIC可能具有在APLIC内起作用的IDC结构(不是只读零)，但只是没有连接到任何物理hart。</p>
+</blockquote>
+<h4 id="4-8-1-1-中断交付使能-Interrupt-delivery-enable-idelivery"><a href="#4-8-1-1-中断交付使能-Interrupt-delivery-enable-idelivery" class="headerlink" title="4.8.1.1 中断交付使能 Interrupt delivery enable (idelivery)"></a>4.8.1.1 中断交付使能 Interrupt delivery enable (idelivery)</h4><p>0x00</p>
+<p>idelivery是一个WARL寄存器，它控制是否将针对相应hart的中断交付给hart，以便它们在hart的mip CSR中显示为挂起中断。目前仅为交付定义了两个值:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612171530251-1686561331234-1.png" alt="image-20230612171530251"></p>
+<p>如果一个IDC结构是针对一个不存在的hart(即，对应的hart索引号对中断域中的任何实际hart无效)，则将idelivery设置为1不会向任何hart发送中断。</p>
+<h4 id="4-8-1-2-中断强制-iforce"><a href="#4-8-1-2-中断强制-iforce" class="headerlink" title="4.8.1.2 中断强制 (iforce)"></a>4.8.1.2 中断强制 (iforce)</h4><p>0x04</p>
+<p>iforce是一个用于测试的WARL寄存器。只允许取值0和1。</p>
+<p>只有当domaincfg.IE字段是1，并且idelivery寄存器启用中断交付到hart，设置iforce &#x3D; 1会强制一个中断被断言到相应的hart。</p>
+<p>当topi为零时，这将为hart创建一个虚假的外部中断。</p>
+<p>当读寄存器**<code>claimi</code>**（0x1C）返回一个中断标识为零(表示一个虚假中断)，iforce自动清除为“0”。</p>
+<h4 id="4-8-1-3-中断使能阈值-ithreshold"><a href="#4-8-1-3-中断使能阈值-ithreshold" class="headerlink" title="4.8.1.3 中断使能阈值(ithreshold)"></a>4.8.1.3 中断使能阈值(ithreshold)</h4><p>0x08</p>
+<p>ithreshold是一个WLRL寄存器，它决定了 向相应hart发出中断的 最小中断优先级 (最大优先级数值)。寄存器ithreshold实现IPRIOLEN位，因此能够保存从0到2^IPRIOLEN^−1的所有优先级数。</p>
+<p>当ithreshold是非零值P时，优先级为P或更高的中断源不会对hart的发出中断，就像这些源没有使能一样，不管它们的中断使能位的设置如何。当ithreshold为零时，所有使能的中断源都可以向hart发送信号中断。</p>
+<h4 id="4-8-1-4-Top中断-topi"><a href="#4-8-1-4-Top中断-topi" class="headerlink" title="4.8.1.4 Top中断(topi)"></a>4.8.1.4 Top中断(topi)</h4><p>0x18</p>
+<p><strong>Topi是一个只读寄存器</strong>，它的值表示当前针对当前hart的最高优先级的挂起和启用中断，该中断也超过ithreshold指定的优先级阈值(如果不是零)。</p>
+<p>如果没有针对该hart的中断处于挂起和启用状态，或者ithreshold不为零，并且针对该hart的挂起和启用的中断的优先级号都小于ithreshold的值，则读取topi返回零。否则，从读取topi返回的值具有以下格式:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612172711313.png" alt="image-20230612172711313"></p>
+<p>在topi中报告的中断标识是目标hart上外部中断的次要标识。</p>
+<p>对topi的写入将被忽略。</p>
+<h4 id="4-8-1-5-Claim-top中断-claimi"><a href="#4-8-1-5-Claim-top中断-claimi" class="headerlink" title="4.8.1.5 Claim top中断(claimi)"></a>4.8.1.5 Claim top中断(<strong><code>claimi</code></strong>)</h4><p>0x1c</p>
+<p>寄存器<strong>claimi</strong>与topi具有相同的值。当该值不为零时，如果可能的话，<strong>读取</strong> <strong><code>claimi</code></strong> 同时具有<strong>清除所报告的中断标识的挂起位</strong>的副作用。请参阅章节4.7，了解挂起位何时被读声明清除。</p>
+<p><strong>从claimi读取返回值为零的同时具有将iforce寄存器设置为零的副作用</strong>。</p>
+<p><strong>对claimi的写入将被忽略</strong>。</p>
+<h3 id="4-8-2-中断交付和处理"><a href="#4-8-2-中断交付和处理" class="headerlink" title="4.8.2 中断交付和处理"></a>4.8.2 中断交付和处理</h3><p>当一个中断域被配置为APLIC直接向hart发送中断时(domaincfg.DM为0)，APLIC在域的特权级别上为该域的所有hart提供外部中断信号，只要下列条件之一为true:</p>
+<ol>
+<li>(a) hart没有IMSIC，或</li>
+<li>(b) 相关IMSIC中断文件的交付寄存器设置为0x40000000(第3.8.1节)。</li>
+</ol>
+<p>对于机器级域，来自APLIC的中断信号在每个hart的mip CSR中显示为MEIP位(机器外部中断挂起)。</p>
+<p>对于管理器级域，中断信号在每个hart的mip和sip csr中显示为位SEIP(管理器外部中断挂起)。</p>
+<p>每个中断信号可以被任意延迟，从APLIC传输到适当的hart。</p>
+<p>在APLIC，每个到hart的中断信号都是从寄存器<strong>domaincfg.IE</strong>字段和hart的IDC结构在内存映射的域控制区域中的当前状态派生出来的。</p>
+<p>当domaincfg.IE &#x3D; 0或中断交付到hart是由 idelivery 寄存器禁用的(idelivery&#x3D; 0)，中断信号保持无效状态。</p>
+<p>当domaincfg.IE &#x3D; 1并且中断传递被使能（idelivery &#x3D; 1）时，只要寄存器iforce或topi不为零，中断信号就会被置位。</p>
+<p>由于APLIC和hart之间的通信可能存在延迟，因此可能会出现外部中断陷阱，但在实际读取hart的**<code>claimi</code>**寄存器时，没有为hart挂起并启用中断。在这种情况下，由声明报告的中断标识将为零，导致来自APLIC的明显虚假中断。可移植软件必须准备好应对APLIC可能出现的虚假中断，这种中断可以被安全地忽略，并且应该是罕见的。出于测试目的，可以通过将IDC结构的iforce寄存器设置为1来触发一个假中断</p>
+<p>通过APLIC编写的专门用于外部中断的陷阱处理程序可以大致如下:</p>
+<ul>
+<li>保存处理器寄存器</li>
+<li>i &#x3D; 从hart在APLIC的IDC结构中读取寄存器**<code>claimi</code>**</li>
+<li>i &#x3D; i&gt;&gt;16</li>
+<li>调用外部中断处理程序i(次要标识)</li>
+<li>恢复处理器寄存器</li>
+<li>从陷阱返回</li>
+</ul>
+<p>为了解释虚假中断，这个伪代码假设存在一个不做任何事情的“外部中断0”的中断处理程序。</p>
+<h2 id="4-9-中断MSI转发"><a href="#4-9-中断MSI转发" class="headerlink" title="4.9 中断MSI转发"></a>4.9 中断MSI转发</h2><p>MSI下发方式(domaincfg. DM &#x3D; 1)，中断域通过MSI将中断转发到目标hart。</p>
+<p>只有当源对应的挂起位和使能位都为1，并且 寄存器domaincfg.IE也为1时，才会为特定的源发送MSI。当MSI被发送时，源的中断挂起位被清除。</p>
+<h3 id="4-9-1-出站MSI的地址和数据"><a href="#4-9-1-出站MSI的地址和数据" class="headerlink" title="4.9.1 出站MSI的地址和数据"></a>4.9.1 出站MSI的地址和数据</h3><p>为了通过MSI转发中断，<strong>APLIC必须知道每个hart的MSI目标地址</strong>。<strong>对于任何给定的系统，这些地址都是固定的</strong>，如果可能的话，应该将它们硬连接到APLIC中。然而，一些APLIC实现可能<strong>需要软件提供MSI目标地址</strong>。在这种情况下，根域的寄存器mmsiaddrcfg, mmsiaddrcfgh, smsiaddrcfg和smsiaddrcfgh(章节4.5.3和4.5.4)可以用来配置所有中断域的MSI地址。另外，MSI地址可以通过本标准之外的一些自定义方式配置。如果<strong>MSI目标地址必须由软件配置，那么应该只在适当的特权执行模式下进行配置，通常只有一次，在系统重置后的早期</strong>。</p>
+<hr>
+<p>对于<strong>机器级</strong>中断域，如果<strong>MSI目标地址由mmsiaddrcfg和mmsiaddrcfgh确定</strong>，则中断源i的传出<strong>MSI地址</strong>从这些寄存器和 <strong>target</strong>[i]的Hart Index字段中计算，如下所示:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612181302350.png" alt="image-20230612181302350"></p>
+<p>这里，&lt;&lt; k和&gt;&gt; k表示向左和向右移动k位，&amp;符号表示按位逻辑与，竖条(|)表示按位逻辑或。</p>
+<p>假设遵循第3.6节的建议，在机器的地址空间中映射IMSIC中断文件， <strong>&#x3D;&#x3D;g 是hart group的编号&#x3D;&#x3D;</strong>(如果HHXW &#x3D; 0，则始终为零)，而**&#x3D;&#x3D;h是该组中的目标hart的编号&#x3D;&#x3D;**。</p>
+<p>在第3.6节中表示，HHXW &#x3D; j, LHXW &#x3D; k, HHXS &#x3D; E−24,LHXS &#x3D; C−12,Base PPN &#x3D; A&gt;&gt;12。</p>
+<hr>
+<p>对于一个管理级域，如果MSI目标地址是由根域的配置寄存器(smsiaddrcfg和其他寄存器)决定的，那么为了为中断源i构造一个传出的MSI地址，必须首先将来自target[i]的Hart索引转换为机器级域用于相同Hart的索引号。(这些数字通常是相同的，但也可能不是。)然后使用这个机器级hart索引，结合smsiaddrcfg和smsiaddrcfgh中的Base PPN和LHXS值，mmsiaddrcfgh中的其他字段(HHXW, LHXW和HHXS)以及target[i]中的Guest index，计算<strong>MSI的地址</strong>，如下所示:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230612181758178.png" alt="image-20230612181758178"></p>
+<p>在第3.6节中表示，HHXW &#x3D; j, LHXW &#x3D; k, HHXS &#x3D; E−24,LHXS &#x3D; D−12,Base PPN &#x3D; B&gt;&gt;12。</p>
+<p>&#x3D;&#x3D;传出MSI写入的<strong>数据从target[i]的EIID字段(中断标识)中取出</strong>，高位补0扩展到32位。无论域的domaincfg寄存器的BE字段如何，MSI的<strong>32位数据总是以小端字节顺序写入</strong>。&#x3D;&#x3D;</p>
+<h3 id="4-9-2-对电平敏感中断源的特殊考虑"><a href="#4-9-2-对电平敏感中断源的特殊考虑" class="headerlink" title="4.9.2 对电平敏感中断源的特殊考虑"></a>4.9.2 对电平敏感中断源的特殊考虑</h3><p>一旦电平敏感中断被MSI转发，APLIC就会清除中断源的挂起位，然后忽略该源，直到它的传入信号被解除断言。在发送MSI时清除挂起位显然是必要的，以避免同一中断从APLIC到目标hart的重复MSI的恒定流。然而，在中断服务程序解决了中断的原因之后，尽管中断在APLIC上的挂起位已被清除，并且在没有软件干预的情况下仍将如此，但由于另一个原因，进入的中断线可能会在APLIC上保持断言。如果中断服务程序在没有进一步操作的情况下退出，那么来自该源的持续中断可能永远不会受到注意。</p>
+<p>为了避免以这种方式丢弃中断，电平敏感中断的中断服务程序在退出之前可以执行以下操作之一:</p>
+<p>第一个选项是通过在APLIC上读取适当的in_clrip寄存器来测试进入APLIC的中断线是否仍然被断言。如果传入中断仍然是断言的，中断服务例程的主体可以在  再次测试源线之前 重复查找和处理额外的中断原因。一旦观察到入线没有断言，中断服务例程就可以安全退出，因为任何新的中断断言都会导致挂起位被设置，并将新的MSI发送到hart。</p>
+<p>第二个选项是中断服务例程在退出之前将中断的APLIC源标识号写入域的setipnum寄存器。如果源仍在断言中断，这将导致中断的挂起位再次被设置为1，但如果源没有断言中断，则不会。</p>
+<h3 id="4-9-3-同步hart与APLIC的交互"><a href="#4-9-3-同步hart与APLIC的交互" class="headerlink" title="4.9.3 同步hart与APLIC的交互"></a>4.9.3 同步hart与APLIC的交互</h3><p>当APLIC向hart发送MSI时，在hart的IMSIC上观察到MSI之前 存在不确定的传输延迟。因此，在更改了APLIC的配置之后，“通过写入APLIC寄存器“，hart可能会在不确定的时间里 继续看到从APLIC到达的MSI。</p>
+<p>有时需要知道什么时候这些迟来的MSI无法到达。例如，如果一个hart将被关闭(“powered down”)，指向它的所有中断必须被重定向到其他hart，这可能涉及到重新配置一个或多个APLICs。即使在重新配置了APLICs之后，在确定没有更多的MSI用于hart之前，hart仍然不能被安全地关闭。</p>
+<p>genmsi寄存器(第4.5.15节)的存在是为了允许软件确定所有早期的MSI何时到达一个hart。要将genmsi用于此目的，软件可以在每个hart的IMSIC中断文件中专门为APLIC同步指定一个外部中断标识。假设有多个hart, APLIC的genmsi寄存器也应该受到标准互斥锁的保护。然后可以使用以下序列在APLIC和特定hart之间进行同步:</p>
+<ol>
+<li><p>在hart的IMSIC中，清除APLIC专用同步次要的中断标识挂起位。</p>
+</li>
+<li><p>为APLIC的genmsi寄存器获取共享锁。</p>
+</li>
+<li><p>写入genmsi以生成一个具有中断标识i的MSI到hart。</p>
+</li>
+<li><p>反复读genmsi直到bit Busy为false。</p>
+</li>
+<li><p>为genmsi释放锁。</p>
+</li>
+<li><p>在hart的IMSIC中重复读取次要中断标识i的挂起位，直到发现它已设置。</p>
+</li>
+</ol>
+<p>步骤4和6的循环通常会很快成功，通常是在第一次或第二次尝试时。当这个序列完成时，来自APLIC的所有早期MSI也必须到达hart的IMSIC。</p>
+<h1 id="第五章：M级和S级中断"><a href="#第五章：M级和S级中断" class="headerlink" title="第五章：M级和S级中断"></a>第五章：M级和S级中断</h1><p>RISC-V特权架构在0-15范围内定义了中断的几个中断标识(major identities)，包括机器级和主管级外部中断(数字11和9)，机器级和主管级定时器中断(数字7和5)，以及机器级和主管级软件中断(3和1)。除了这些中断标识，每个特权级别的外部中断由外部中断控制器(如APLIC或IMSIC)赋予次要标识(minor identities)。区分来自不同设备或原因的中断。外部中断的这些次要标识将在第3章和第4章中介绍，其中指定了IMSIC和APLIC组件。</p>
+<p>高级中断体系结构保留了另外24个主要中断标识，用于在hart内或hart附近出现的额外本地中断，通常用于报告错误。还定义了一种机制，<strong>允许软件有选择地将本地中断和自定义中断委托给下一个较低的特权级别，或者在某些情况下将完全虚拟的中断注入到较低的特权级别。</strong></p>
+<p>最后，一个<strong>可选的功能允许软件为主要中断</strong>(如定时器和软件中断，以及任何本地中断)<strong>分配优先级</strong>，这样它们就可以与由PLIC、APLIC或IMSIC为外部中断设置的优先级混合在一起。</p>
+<h2 id="5-1-定义的主要中断和默认优先级"><a href="#5-1-定义的主要中断和默认优先级" class="headerlink" title="5.1  定义的主要中断和默认优先级"></a>5.1  定义的主要中断和默认优先级</h2><p>表5.1列出了当前为RISC-V hart定义的所有主要中断，这些中断符合高级中断架构(AIA)。除了RISC-V特权架构指定的主要中断外，AIA还为低优先级和高优先级RAS事件添加了中断号<strong>35</strong>和<strong>43</strong>作为本地中断。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230613153335071.png" alt="image-20230613153335071"></p>
+<p>在特权体系结构(编号0-15)控制的主要中断中，AIA将<strong>计数器溢出中断(代码13)归类为本地中断</strong>。进一步假设，任何保留中断号<strong>14和15的未来定义也将是本地中断</strong>。除了两个RAS中断之外，AIA还为其他RISC-V扩展可能定义的标准本地中断保留了16-23和32-47范围内的主要中断号。分配给特权体系结构的其余主要中断(编号0-12)被归类为非本地中断。综上所述，表5.2总结了AIA对所有主要中断标识的分类。</p>
+<p>RAS是可靠性、可用性和可服务性的缩写。通常，RAS事件对应于检测损坏的数据(例如，由于软错误或硬错误)和&#x2F;或使用此类数据。例如，高优先级RAS事件本地中断可能发出紧急未纠正错误的信号，需要RAS错误处理程序的操作来包含该错误，并在可能的情况下从中恢复。例如，低优先级RAS事件本地中断可能由非紧急延迟或纠正错误触发。</p>
+<p>AIA本身并不要求检测到的RAS事件触发为此目的定义的两个本地中断之一。系统可以自由地以其他方式报告任何或所有RAS事件，例如通过APLIC或IMSIC路由的外部中断，或通过自定义中断。很可能，报告特定RAS事件的方法将取决于在系统中检测到事件的位置。AIA为RAS事件定义了本地中断号，因此当系统在本地检测到此类事件时，系统有一种标准的方法来报告此类事件，而不依赖于外部或自定义中断。</p>
+<blockquote>
+<p>与往常一样，平台标准可能会进一步限制系统报告事件的方式，无论是RAS事件还是其他事件。</p>
+</blockquote>
+<blockquote>
+<p>对于RISC-V特权架构(编号16-23和32-47)未定义的标准本地中断，当前的计划是按照下表所示的顺序分配默认优先级:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230613153532447.png" alt="image-20230613153532447"></p>
+<p>在中断16-23中，更高的中断号表示更高的默认优先级，对于中断32-47也是如此。这两组以完整的顺序交错在一起，特权体系结构的标准中断0-15被插入到序列的中间。这个建议的默认优先级顺序是这样安排的，因此中断0-31可能是32位RISC-V系统的一个适当的子集。</p>
+<p>实际上，未来的RISC-V扩展可能会也可能不会为它们定义的中断的默认优先级顺序坚持这个计划。</p>
+</blockquote>
+<blockquote>
+<p>除了表5.1现有的主要中断外，暂定提出以下几种本地中断，按默认优先级递减的顺序排列:</p>
+<blockquote>
+<p>23 总线或系统错误</p>
+<p>45 Pre-core 高功率或过热事件</p>
+<p>17 Debug&#x2F;trace interrupt</p>
+</blockquote>
+<p>这些本地中断预计将由其他RISC-V扩展指定。请注意，此列表不是最终的，可能会随着相关扩展的开发和批准而变化。</p>
+</blockquote>
+<blockquote>
+<p>如果RISC-V特权架构的未来版本定义了中断0，高级中断架构需要它具有低于某些外部中断的默认优先级。参见第5.2.2和5.4.2节关于csr的mtopi和stopi。</p>
+</blockquote>
+<p>中断号24-31和48及更高的都被指定为自定义使用。如果hart实现了任何自定义中断，则必须为hart记录它们在默认优先级顺序中的位置。</p>
+<blockquote>
+<p>虽然许多标准寄存器(如mip和mie)只有0-63范围内的主中断空间，但通过添加自定义支持，可以想象64及以上数字的自定义中断。CSRs mtopi(第5.2.2节)和stopi(第5.4.2节)允许主中断数可能高达4095。</p>
+</blockquote>
+<p>当hart支持软件对中断优先级的任意配置时(在后面的章节中描述)，当两个中断源被分配相同的优先级编号时，默认优先级顺序仍然与断开连接（breaking ties）相关。</p>
+<h2 id="5-2-机器级别的中断"><a href="#5-2-机器级别的中断" class="headerlink" title="5.2  机器级别的中断"></a>5.2  机器级别的中断</h2><p>对于实现任何标准本地中断，CSR mip 和 mie 中的相应位必须是<strong>可写的(writable)<strong>，并且 mideleg 中的相应位（如果这些 CSR 存在是因为实现了supervisor模式）</strong>都必须是可写的或硬接线为零</strong>。**&#x3D;&#x3D;本地中断事件(local interrupt event)&#x3D;&#x3D;<strong>的发生</strong>导致 mip 中的中断挂起位设置为 1<strong>。然后该位保持设置状态，</strong>直到被软件清除**。</p>
+<p>根据RISC-V特权架构的规定，只要满足以下所有条件，中断就会进入M模式:</p>
+<ul>
+<li>(a)<strong>要么当前特权模式为 M 模式并且通过 mstatus 的 MIE 位启用机器级中断，要么当前特权模式的特权低于 M 模式；</strong></li>
+<li>(b)<strong>mip和mie中的匹配位都为1;</strong></li>
+<li>(c)<strong>如果mideleg存在，则mideleg中对应的位为0。</strong></li>
+</ul>
+<p>当多个中断原因准备同时触发时，首先发生的中断由优先级顺序决定，<strong>可以是上一节中指定的默认顺序，也可以是软件配置的修改顺序</strong>。</p>
+<h3 id="5-2-1-在机器级别配置主要中断的优先级"><a href="#5-2-1-在机器级别配置主要中断的优先级" class="headerlink" title="5.2.1 在机器级别配置主要中断的优先级"></a>5.2.1 在机器级别配置主要中断的优先级</h3><p><strong>主要中断 0-63 的机器级优先级可以由一组寄存器配置</strong>，这些寄存器通过第 2 章介绍的 <code>miselect</code> 和 <code>mireg</code> CSR 访问。当 MXLEN &#x3D; 32 时，定义了其中的 16 个寄存器，下面列出了它们的 miselect 地址：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230221153958624.png" alt="image-20230221153958624"></p>
+<p>每个寄存器控制<strong>四</strong>个中断的优先级，每个中断一个 8 位字节。<strong>对于 0-15 范围内的数字 <em>k</em></strong>，寄存器 iprio<em>k</em> 控制中断 <em>k × 4</em> 到 <em>k × 4 + 3</em> 的优先级，格式如下：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230221154153222.png" alt="image-20230221154153222"></p>
+<p>当 MXLEN &#x3D; 64 时，只有偶数编号的寄存器存在：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230221154213347.png" alt="image-20230221154213347"></p>
+<p>每个寄存器控制<strong>八</strong>个中断的优先级。<strong>对于 0-14 范围内的偶数 <em>k</em></strong>，寄存器 iprio<em>k</em> 控制中断 <em>k × 4</em> 到 <em>k × 4 + 7</em> 的优先级，格式如下：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230221154259732.png" alt="image-20230221154259732"></p>
+<p><strong>当 XLEN &#x3D; 64 且 miselect 是 0x31-ox3F 范围内的奇值时，尝试访问 mireg 会引发非法指令异常。</strong></p>
+<p>有效寄存器 iprio0–iprio15 统称为机器级别的 iprio array。</p>
+<p>外部中断的优先级数宽度为IPRIOLEN。该参数受hart的主外部中断控制器(PLIC、APLIC或IMSIC)的影响。</p>
+<p>&#x3D;&#x3D;<strong>对于APLIC, IPRIOLEN的取值范围为1-8</strong>&#x3D;&#x3D;，参见APLIC的第4章。</p>
+<p>&#x3D;&#x3D;<strong>对于IMSIC, IPRIOLEN为6、7或8。</strong>&#x3D;&#x3D;</p>
+<p><strong>只有当IMSIC实现的外部中断标识数为63时，IPRIOLEN才可能为6。只有当IMSIC实现的外部中断标识数不超过127时，IPRIOLEN才可能为7。对于任何IMSIC, IPRIOLEN可以是8，而不管实现的外部中断标识的数量。</strong></p>
+<p>&#x3D;&#x3D;一个有效的ipriok寄存器的每个字节要么是一个只读零，要么是一个完全实现IPRIOLEN位的WARL无符号整数字段。&#x3D;&#x3D;</p>
+<ul>
+<li><strong>对于给定的中断号，如果mie中对应的位是只读零，那么iprio数组中中断的优先级号也必须是只读零</strong>。</li>
+<li><strong>机器级外部中断的优先级数(寄存器iprio2的31:24位)也必须为只读零。</strong></li>
+</ul>
+<p>除了这两个限制之外，可以自由选择实现哪些优先级号字段是可设置的，哪些是只读零。<strong>如果iprio数组中的所有字节都是只读零，则只能为外部中断配置优先级，不能为任何其他中断配置优先级。</strong></p>
+<blockquote>
+<p><strong>平台标准可能要求为某些中断原因配置优先级。</strong></p>
+</blockquote>
+<p>通过miselect和mireg访问的iprio数组只有在中断进入M模式时才会影响它们的优先级。当中断在数组中的优先级为零(只读零或设置为零)时，其优先级为5.1节中的默认顺序。将中断的优先级编号设置为非零值p，使该中断在名义上与优先级编号为p的机器级外部中断具有相同的优先级。对于默认优先级高于机器外部中断的主中断，将其优先级编号设置为非零值会降低其优先级。对于默认优先级低于机器外部中断的主中断，将其优先级号设置为非零值将提高其优先级。当两个中断原因被分配了相同的名义优先级时，由默认优先级顺序打破关系。表5.3总结了优先级数对中断优先级的影响。</p>
+<blockquote>
+<p><strong>当一个hart具有支持超过255个外部中断次要标识的IMSIC时</strong>，可以为其他中断配置的唯一非默认优先级是与外部中断标识1-255对应的优先级，而不是标识256或更高的优先级。</p>
+</blockquote>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230613184454501.png" alt="image-20230613184454501"></p>
+<p>表5.3:机器级iprio数组对 M模式中断优先级的影响，对于具有相同优先级号的中断，采用5.1节的默认顺序。</p>
+<blockquote>
+<p>要实现本节的优先级可配置性，需要RISC-V hart的外部中断控制器与hart通信，不仅要知道是否存在一个挂起并启用的外部中断，还要知道中断的优先级号。通常，这意味着用于向hart发送外部中断信号的连接的宽度不仅仅是像往常一样的单线，而是现在的IPRIOLEN + 1线。</p>
+<p>&#x3D;&#x3D;预计许多系统将放弃主要中断的优先级可配置性，并简单地使iprio数组全部为只读零。&#x3D;&#x3D;需要这种优先级可配置性的系统可以尝试安排每个hart的外部中断控制器相对靠近hart，例如，通过将系统限制为最多连接到APLIC的几个小内核，或者通过为每个hart提供自己的IMSIC。</p>
+</blockquote>
+<p>如果支持，将主管级外部中断的优先级编号(iprio2的15:8位)设置为非零值p，可以使整个主管级外部中断类别在名义上与优先级编号为p的机器外部中断具有相同的优先级。但请注意，这只适用于上级外部中断进入 M模式的情况。</p>
+<p>(因为在实现hypervisor扩展时，需要将hypervisor guest external interrupts和VS级外部中断委托给hypervisor级别，所以这些中断的机器级优先级编号总是被忽略，并且应该是只读零。)</p>
+<p>如果系统具有用于向后兼容旧软件的原始PLIC，则reset应将机器级iprio数组初始化为全零。</p>
+<h3 id="5-2-2-机器top中断CSR-mtopi"><a href="#5-2-2-机器top中断CSR-mtopi" class="headerlink" title="5.2.2 机器top中断CSR (mtopi)"></a>5.2.2 机器top中断CSR (mtopi)</h3><p>机器级CSR <strong>mtopi是只读</strong>的，宽度为MXLEN。<strong>读取mtopi返回有关机器级别的最高优先级挂起并启用的中断的信息</strong>，格式如下:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614085133331.png" alt="image-20230614085133331"></p>
+<p>mtopi的值为零，除非<strong>在mip中存在挂起的中断</strong>，<strong>并且在mie中启用了该中断</strong>，该中断<strong>没有被委托给较低的权限级别</strong>。当机器级存在一个挂起并启用的主中断时，<strong>字段IID(中断标识)是最高优先级中断的<font color="red">主标识号</font><strong>，</strong>字段IPRIO表示其优先级</strong>。</p>
+<p><strong>如果机器级iprio数组的所有字节都是只读零，则允许简化iprio字段的实现，&#x3D;&#x3D;在mtopi不为零时，其值始终为1&#x3D;&#x3D;。</strong></p>
+<p>否则，当mtopi不为零时，如果报告的中断的优先级号在1到255的范围内，IPRIO就是这个数字。如果中断的优先级为0或大于255，则IPRIO设置为0或255，如下所示:</p>
+<ul>
+<li><p>如果中断的优先级大于255，则IPRIO为255(最低优先级)。</p>
+</li>
+<li><p>如果中断的优先级为0，并且中断号IID的默认优先级高于机器外部中断，则IPRIO为0(最高优先级)。</p>
+</li>
+<li><p>如果中断的优先级为0，并且中断号IID的默认优先级低于机器外部中断，则IPRIO为255(最低优先级)。</p>
+</li>
+</ul>
+<blockquote>
+<p>为了确保在中断挂起并在机器级别启用时 mtopi 永远不会为零，如果主要中断0可以捕获到M模式，则它必须具有低于机器外部中断的默认优先级。</p>
+</blockquote>
+<p>&#x3D;&#x3D;<strong>mtopi的值不受CSR mstatus 中全局中断使能MIE的影响</strong>。&#x3D;&#x3D;</p>
+<p>RISC-V 特权架构确保，当 mtopi 的值不为零时，如果当前特权模式为 M 且 mstatus.MIE 为 1，或者当前特权模式的特权小于 M-模式，则会对字段 IID 所指示的中断采取陷阱 M-模式。陷阱本身不会导致 mtopi 的值发生变化。</p>
+<p>下面的伪代码显示了机器级陷阱处理程序如何读取mtopi，以避免在处理另一个陷阱(同步异常或更早的中断)期间出现中断时冗余地恢复和保存处理器寄存器:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614085305292.png" alt="image-20230614085305292"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">保存处理器寄存器 </span><br><span class="line">i = 读 CSR mcause </span><br><span class="line"><span class="keyword">if</span> (i &gt;= <span class="number">0</span>) &#123; </span><br><span class="line">	处理同步异常 i </span><br><span class="line">	必要时恢复 mstatus </span><br><span class="line">&#125; </span><br><span class="line"><span class="keyword">if</span> (mstatus.MPIE == <span class="number">1</span>) &#123; </span><br><span class="line">	循环 &#123; </span><br><span class="line">		i = 读 CSR mtopi </span><br><span class="line">		<span class="keyword">if</span> (i == <span class="number">0</span>) 退出循环 </span><br><span class="line">		i = i&gt;&gt;<span class="number">16</span> </span><br><span class="line">		调用主要中断 i 的中断处理程序 </span><br><span class="line">	&#125; </span><br><span class="line">&#125; </span><br><span class="line">恢复处理器寄存器 </span><br><span class="line">从陷阱返回</span><br></pre></td></tr></table></figure>
+
+<p>该示例可以进一步优化，但复杂性会增加。</p>
+<h2 id="5-3-主管级别的中断过滤和虚拟中断"><a href="#5-3-主管级别的中断过滤和虚拟中断" class="headerlink" title="5.3  主管级别的中断过滤和虚拟中断"></a>5.3  主管级别的中断过滤和虚拟中断</h2><p>当实现supervisor模式时，高级中断体系结构增加了<strong>中断和虚拟中断的&#x3D;&#x3D;软件过滤&#x3D;&#x3D;功能</strong>，利用新的csr <code>mvien</code>(机器虚拟中断启用)和<code>mvip</code>(机器虚拟中断挂起位)。</p>
+<p>&#x3D;&#x3D;<strong>即使在mideleg中相应的位仍然为零时，中断过滤允许主管级中断(SEI或SSI)或本地或自定义中断进入M模式，然后由软件有选择地委托到supervisor级</strong>。&#x3D;&#x3D;</p>
+<p>在适当的情况下，<strong>相同的硬件还可以允许机器级向管理器级断言与任何实际中断事件没有连接的虚拟中断</strong>。</p>
+<p>就像CSRs <code>mip</code>、<code>mie</code>和<code>mideleg</code>一样，寄存器<code>mvien</code>和<code>mvip</code>的每一位都对应一个0-63范围内的中断号。</p>
+<ul>
+<li><p>当<code>mideleg</code>中的一个位为零，而<code>mvien</code>中的匹配位为1时，则<code>sip</code>中相同的位位置是<code>mvip</code>中对应位的别名。</p>
+</li>
+<li><p>当<code>mideleg</code>和<code>mvien</code>中对应的位都为零时，<code>sip</code>中的位为只读零。</p>
+</li>
+</ul>
+<p><code>mideleg</code>和<code>mvien</code>对<code>sip</code>和<code>sie</code>的综合影响见表5.4。</p>
+<p> <img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614090555518.png" alt="image-20230614090555518"></p>
+<p>表 5.4：mideleg 和 mvien 对 sip 和 sie 的影响（hypervisor扩展的 VS 级中断除外，它出现在 hip 和 hie 而不是 sip 和 sie 中）。</p>
+<p>&#x3D;&#x3D;仅对于<strong>主要中断 1</strong>（Supervisor software interrupt）、<strong>9</strong> （Supervisor external interrupt）和 <strong>13-63</strong>，<strong>mvien 中的位可以设置为 1</strong>。<strong>对于中断 0-12，sip 中的别名可能是只读的，如 RISC-V 特权架构所指定的</strong>。&#x3D;&#x3D;</p>
+<blockquote>
+<p>CSR mvien的名称不是“mvie”，因为这个寄存器的功能更类似于mcounteren而不是mie。<strong>mvien的bit控制mvip中的虚拟中断挂起位是否处于有效状态，并且在supervisor level上是否可见。</strong>这与通常的中断启用位(例如在mie中)如何屏蔽挂起的中断不同。</p>
+</blockquote>
+<p><strong>当且仅当对应的bit使能在mideleg或mvien中时，sie中的位是可写的。</strong>当一个中断被mideleg委托时，sie中的可写位是mie中对应位的别名；否则它就是一个独立的可写位。通常，在sie中不可写的位必须是只读零。</p>
+<p>如果mideleg中有一位为零，并且mvien中对应的位由0变为1，则sie中匹配位的值变为未指定。同样地，如果mvien中的一位为1，而mideleg中的对应位从1变为0，则sie中的匹配位的值再次变为未指定。</p>
+<p>对于中断号 13-63，实现可以自由选择 mvien 的哪些位是可写的以及哪些位是只读的 0 或 1。如果 <strong>mvien中的该位是只读零</strong>（防止启用虚拟中断），则 <strong>mvip中的同一位也应该是只读零</strong>。<strong>中断 13-63 的所有其他位必须可在 mvip 中写入</strong>。</p>
+<blockquote>
+<p>平台标准或其他扩展可能要求用于某些中断原因的mvien位是可写的，或者是只读的0或1。</p>
+</blockquote>
+<p><strong>SSI(代码1)和SEI(代码9)的mvien位都是可写或只读的0；它们不能是只读的1。中断0-12的mvien的其他位是保留的，必须是只读0。</strong></p>
+<p><strong>强烈建议mvien的第9位是可写的</strong>。此外，<strong>如果mip的第1位(SSIP)可以由中断控制器自动设置，而不仅仅是通过显式写入mip或sip，那么强烈建议mvien的第1位也是可写的</strong>。</p>
+<p>当mvien的位1为零时，mvip的位1是mip的相同位(SSIP)的别名。但当 mvien 的位 1 为 1 时，mvip 的位 1 是独立于 mip.SSIP 的单独可写位。当mvien的第1位的值从0变为1时，mvip的第1位的值变为未指定。</p>
+<p><strong>mvip 的位 5 是 mip 中同一位 (STIP) 的别名（当该位在 mip 中可写时）</strong>。当 STIP 在 mip 中不可写时（例如 menvcfg.STCE &#x3D; 1 时），mvip 的位 5 为只读零。</p>
+<p><strong>当mvien的第9位为零时，mvip的第9位是mip(SEIP)的软件可写第9位的别名。但当 mvien 的第 9 位为 1 时，mvip 的第 9 位是独立于 mip.SEIP 的可写位。&#x3D;&#x3D;与位 1 不同，更改 mvien 的位 9 的值不会影响 mvip 的位 9 的值&#x3D;&#x3D;。</strong></p>
+<blockquote>
+<p>当mvien的第9位为零时，mvip的第9位使mip的软件可写SEIP位可以直接由其本身访问。</p>
+</blockquote>
+<p><strong>mvip中除1、5、9位外，12:0范围内的其他位为保留位，必须为只读零。</strong></p>
+<p>mvien的第9位的值对于hypervisor外部中断有一些额外的后果:</p>
+<ul>
+<li>当mvien 的第9 位为0时，软件可写SEIP 位（mvip 的第9 位）以RISC-V 特权架构指定的方式与mip 的读写交互。特别是，对于大多数用途，mvip 的第 9 位的值会被逻辑或运算为 mip.SEIP 的可读值。但当mvien的第9位为1时，mip中的位SEIP是只读的，不包括mvip的第9位的值。相反，mip.SEIP 的值只是来自 hart 外部中断控制器（APLIC 或 IMSIC）的监控器外部中断信号。</li>
+<li>如果hart具有IMSIC，那么当mvien的第9位为1时，尝试从s模式显式访问supervisor-level interrupt file 将引发非法指令异常。当siselect的值在0x70-0xFF范围内时，尝试访问CSR stopei或访问sireg时会引发异常。访问guest interrupt files(通过vstopei或vsiselect + vsireg)不受影响。</li>
+</ul>
+<p>当实现hypervisor扩展时，如果在mideleg和mvien中相同位置的位为零，则该位在hideleg中为只读零(除了在sip、sie、hip和hie中为只读零之外)。但是，如果中断13-63之一的位在mideleg或mvien中为1，则hideleg中的同一位可能是可写的，也可能是只读的零，这取决于实现。hideleg中的任何位都不是只读的。RISC-V特权架构进一步限制了比特12:0的hideleg。</p>
+<p>当实现supervisor模式时，mvien和mvip的最小要求实现是所有位都是只读零，除了mvip位1和位9，有时还有位5，每个位都是mip中现有可写位的别名。(尽管如上所述，强烈建议mvien的第9位也是可写的。)未实现supervisor模式时，mvien和mvip不存在。</p>
+<h2 id="5-4-主管级别的中断"><a href="#5-4-主管级别的中断" class="headerlink" title="5.4  主管级别的中断"></a>5.4  主管级别的中断</h2><p>如果标准本地中断在sip中变为pending(&#x3D; 1)，则sip中的位是可写的，并且将<strong>保持设置直到被软件清除</strong>。</p>
+<p>就像机器级别一样，在supervisor level采取中断陷阱基本上与RISC-V特权体系结构指定的相同。当满足以下条件时，中断将进入S模式(或HS模式):</p>
+<ul>
+<li>(a) 当前特权模式为S模式，并且sstatus的SIE位启用了supervisor 中断，或者当前特权模式的特权小于S模式;</li>
+<li>(b) sip和sie中的匹配位都是一，或者，如果实现了hypervisor扩展，则hip和hie中的匹配位都是一;</li>
+<li>(c) 如果实现了hypervisor扩展，则hideleg中的相应位为零。</li>
+</ul>
+<h3 id="5-4-1-在主管级别配置主要中断的优先级"><a href="#5-4-1-在主管级别配置主要中断的优先级" class="headerlink" title="5.4.1 在主管级别配置主要中断的优先级"></a>5.4.1 在主管级别配置主要中断的优先级</h3><p>主要中断0-63的管理器级优先级可以在通过siselect和sireg访问的管理器级ipriok寄存器数组中<strong>可选地配置</strong>。当SXLEN &#x3D; 32或64时，该数组与MXLEN &#x3D; 32或64时的机器级iprio数组具有相同的结构。总而言之，当SXLEN &#x3D; 32时，有16个32位寄存器具有这些siselect地址:</p>
+<p>每个寄存器控制四个中断的优先级，每个中断一个8位字节。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614092540183.png" alt="image-20230614092540183"></p>
+<p>当SXLEN &#x3D; 64时，只存在偶数寄存器:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614092547769.png" alt="image-20230614092547769"></p>
+<p>每个寄存器控制8个中断的优先级。如果SXLEN &#x3D; 64并且siselect是0x31-0x3F范围内的奇数值，则试图访问sireg会引发非法指令异常。</p>
+<p>有效的寄存器iprio - iprio15被统称为主管级的iprio数组。一个有效的ipriok寄存器的每个字节要么是一个只读零，要么是一个完全实现IPRIOLEN位的WARL无符号整数字段。</p>
+<p>对于给定的中断号，如果sie中相应的位为只读零，则该中断在主管级iprio数组中的优先级号也必须为只读零。主管级外部中断的优先级数(iprio2的15:8位)也必须为只读零。除了这两个限制之外，实现可以自由选择哪些优先级号字段是可设置的，哪些是只读零。</p>
+<blockquote>
+<p>与往常一样，平台标准可能要求针对某些中断原因可配置优先级。</p>
+</blockquote>
+<blockquote>
+<p>预计许多高端系统将不支持在本节中描述的主管级别配置主要中断优先级的能力。特别是Linux，如果提供了这些功能，它的设计并不是为了利用这些功能。iprio数组必须是可访问的，但也可以全是只读零。</p>
+</blockquote>
+<p>通过siselect和sireg访问的supervisor iprio数组只有在中断陷入s模式时才会影响它们的优先级。当中断在数组中的优先级为零(只读零或设置为零)时，其优先级为5.1节中的默认顺序。将中断的优先级编号设置为非零值p，使该中断在名义上与优先级编号为p的上级外部中断具有相同的优先级。对于默认优先级高于上级外部中断的中断，将其优先级编号设置为非零值会降低其优先级。对于默认优先级低于上级外部中断的中断，将其优先级号设置为非零值将提高其优先级。当两个中断原因被分配了相同的名义优先级时，由默认优先级顺序打破关系。表5.5总结了优先级号对中断优先级的影响。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614092656193.png" alt="image-20230614092656193"></p>
+<p>表5.5:supervisor iprio数组对s模式中断优先级的影响 对于具有相同优先级号的中断，采用5.1节的默认顺序。</p>
+<p>如果支持，设置VS级外部中断的优先级(iprio2的23:16位)为非零值p，当VS外部中断trap到s模式时，会使整个VS外部中断类别在名义上与优先级为p的上级外部中断具有相同的优先级。</p>
+<p>如果系统具有用于向后兼容旧软件的原始PLIC，则reset应将主管级iprio数组初始化为全零。</p>
+<h3 id="5-4-2-主管top中断CSR-stopi"><a href="#5-4-2-主管top中断CSR-stopi" class="headerlink" title="5.4.2 主管top中断CSR (stopi)"></a>5.4.2 主管top中断CSR (stopi)</h3><p>主管级CSR stopi为只读，宽度为SXLEN。读取stopi返回有关主管级最高优先级挂起并启用的中断的信息，格式如下:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614093009936.png" alt="image-20230614093009936"></p>
+<p>stopi 的值为零，除非：</p>
+<ol>
+<li>有一个中断在 sip 中挂起并在 sie 中启用，或者，如果实施了hypervisor扩展，有一个中断在 hip 中挂起并在 hie 中启用；</li>
+<li>该中断未委托给较低权限级别（如果实施了hypervisor扩展，则通过 hideleg）。</li>
+</ol>
+<p>当存在挂起并启用的 supervisor 主要中断时，字段 IID 是优先级最高的中断的主要标识号，字段 IPRIO 表示其优先级。</p>
+<p>如果主管级 iprio 数组的所有字节都是只读零，则允许简化 iprio 字段的实现，当 stopi 不为零时，其值始终为1。</p>
+<p>否则，当stopi不为零时，如果报告的中断的优先级号在1到255的范围内，IPRIO就是这个数字。如果中断的优先级为0或大于255，则IPRIO设置为0或255，如下所示:</p>
+<ul>
+<li><p>如果中断的优先级大于255，则IPRIO为255(最低优先级)。</p>
+</li>
+<li><p>如果中断的优先级为0，并且中断号IID的默认优先级高于上级外部中断，则IPRIO为0(最高优先级)。</p>
+</li>
+<li><p>如果中断的优先级为0，并且中断号IID的默认优先级低于上级外部中断，则IPRIO为255(最低优先级)。</p>
+</li>
+</ul>
+<blockquote>
+<p>为了确保当中断处于挂起状态时stopi永远不会为零，并且为supervisor level启用，如果主要中断0可以捕获到S模式，则它必须具有低于 supervisor 外部中断的默认优先级。</p>
+</blockquote>
+<p><strong>stopi 的值不受 CSR sstatus 中全局中断使能 SIE 的影响。</strong></p>
+<p>RISC-V特权架构确保，当stopi的值不为零时，如果当前特权模式为S和sstatus.SIE为1，则对字段IID指示的中断采取trap到S模式，或者当前特权模式的特权小于s模式。陷阱本身不会导致stopi的值改变。</p>
+<p>下面的伪代码展示了一个supervisor 的陷阱处理程序如何读取stopi，以避免在处理另一个陷阱(同步异常或更早的中断)期间出现中断时，对处理器寄存器进行冗余恢复和保存:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614093129025.png" alt="image-20230614093129025"></p>
+<h2 id="5-5-WFI（等待中断）指令"><a href="#5-5-WFI（等待中断）指令" class="headerlink" title="5.5  WFI（等待中断）指令"></a>5.5  WFI（等待中断）指令</h2><p>在RISC-V特权架构中，指令WFI（等待中断）可以暂停一个Hart的执行，直到该Hart有挂起的中断。AIA重新定义了在WFI后执行必须恢复的时间。</p>
+<p>根据RISC-V特权架构，无论何时，任何中断在csr的<strong>mip和mie中处于挂起状态和启用状态，指令执行必须从WFI恢复</strong>。忽略由midleg指示的任何委托。对于AIA，由于AIA为虚拟中断添加的机制，这个简洁的规则不再适用。相反，<strong>任何特权级别存在挂起中断(无论中断特权级别是高于还是低于hart的当前特权模式)，就必须从WFI恢复执行</strong>。</p>
+<blockquote>
+<p>当mvien &#x3D; 0时，AIA的WFI规则给出了与特权架构规则相同的行为，如果实现了hypervisor扩展，也会给出hvien &#x3D; 0和hvitl.VTI &#x3D; 0，因此禁用所有在mip中不可见的虚拟中断。(AIA的hypervisor寄存器将在下一章“虚拟机的中断(VS级别)”中介绍。)</p>
+</blockquote>
+<h1 id="第六章：虚拟机的中断（VS级）"><a href="#第六章：虚拟机的中断（VS级）" class="headerlink" title="第六章：虚拟机的中断（VS级）"></a>第六章：虚拟机的中断（VS级）</h1><p>在实现hypervisor extension后，hart的一组可能的特权模式包括用于托管虚拟hart的虚拟管理员(VS)和虚拟用户(VU)模式。高级中断体系结构向hypervisor扩展添加了新的中断工具，这些工具与前面描述的用于管理器级中断的工具一致。</p>
+<p>添加了几个hypervisor和 VS 的CSR：hvien、hvictl、hviprio1、hviprio2、vsiselect、vsireg、vstopei 和 vstopi。</p>
+<p>与往常一样，在 VS 模式或 VU 模式下执行时，VS CSR会替代相应的supervisor CSR。</p>
+<p>为了让运行在虚拟机中的软件看起来像在实际机器上执行一样，需要由虚拟机监控程序和本章中描述的硬件设施共同承担责任。一些行为可以由硬件直接处理，而其他行为则需要虚拟机监控程序进行重要的仿真，有时需要硬件的辅助。换句话说，虚拟机监控程序和硬件都需要实现AIA协议中的相关机制，以使虚拟机的中断处理等行为与实际硬件运行时的行为一致。</p>
+<h2 id="6-1-带有guest-interrupt-files的-VS-级外部中断"><a href="#6-1-带有guest-interrupt-files的-VS-级外部中断" class="headerlink" title="6.1.带有guest interrupt files的 VS 级外部中断"></a>6.1.带有<em>guest interrupt files</em>的 VS 级外部中断</h2><p>当 hart 实现 hypervisor 扩展时，建议 hart 也有一个带有<em>guest interrupt files</em>的 IMSIC。假设<em>guest interrupt files</em>可用，每个都可以分配给物理 hart 上的虚拟 hart，以充当该虚拟 hart 的supervisor-level interrupt files。如果有 N 个 <em>guest interrupt files</em>，则该物理 hart 上的 N 个虚拟 hart 可能每个都有一个 <em>physical guest interrupt file</em> 作为其（虚拟）supervisor-level interrupt files。<strong>当前虚拟 hart 的<em>guest interrupt files</em>始终由 CSR <code>hstatus.VGEIN</code> 字段指示。</strong></p>
+<p><strong>除了每个 hart 的 IMSIC 之外，虚拟机可能还需要查看 PLIC 或 APLIC</strong>。然而，与 IMSIC 为虚拟 harts 提供 <em>physical guest interrupt file</em> 的能力不同，&#x3D;&#x3D;**hypervisor 必须为虚拟机模拟PLIC或APLIC **&#x3D;&#x3D;。</p>
+<blockquote>
+<p><strong>高级中断体系结构目前不包括虚拟化APLIC的硬件辅助</strong>。对于少量的hart，这样的硬件将比为IMSIC实现 <em>guest interrupt files</em> 所需的硬件大得多。假设大多数高性能I&#x2F;O可以通过设备直接向guest interrupt files发送MSIs来完成(例如通过PCI Express互连的设备)。对于中断必须经过(虚拟)APLIC的设备类型，模拟APLIC的开销预计不会太大。</p>
+</blockquote>
+<p>当虚拟 hart 看似具有 IMSIC 时，是因为分配了一个<em>guest interrupt files</em>，所有的外部中断，无论是真实的还是模拟的，都必须经过这个被感知到的 IMSIC。<strong>通过在 vsiselect 和 vsireg 间接访问的中断挂起数组中设置一个位，hypervisor可以轻松地将模拟的外部中断注入到由 hstatus.VGEIN 选择的<em>guest interrupt files</em>中</strong>。当虚拟 hart 具有<em>guest interrupt files</em>时，<strong>通常不期望hypervisor在 CSR hvip 中设置位 VSEIP</strong>。</p>
+<p>在一种特殊情况下，虚拟机的模拟APLIC具有一个有线中断源，该中断源相当于实际APLIC的实际中断源，如果在此虚拟机中运行的软件配置其虚拟APLIC将来自该源的中断作为MSI转发到特定虚拟hart，则hypervisor可以配置实际APLIC将实际中断直接作为MSI转发到虚拟hart的 <em>guest interrupt files</em>。</p>
+<p>通过这种方式，尽管hypervisor必须捕获（trao）并模拟（emulate）虚拟机的内存访问，这些内存访问在虚拟APLIC上配置了中断的转发，但是中断本身可以自动转换为 <em>guest interrupt files</em> 的真实 <em>MSIs</em>，而无需为每个到达的中断调用hypervisor。</p>
+<h3 id="6-1-1-guest-OS直接控制设备"><a href="#6-1-1-guest-OS直接控制设备" class="headerlink" title="6.1.1 guest OS直接控制设备"></a>6.1.1 guest OS直接控制设备</h3><p>为了确保正确支持中断，必须满足两个条件，然后hypervisor才能允许在虚拟机中运行的guest OS直接控制发送 MSI 的物理设备：</p>
+<ol>
+<li><font color="#FF000"><strong>首先，每个虚拟 hart 必须有一个分配给它的 <em>guest interrupt files</em> ，为VM分配自己的 IMSIC。</strong></font></li>
+<li><font color="#FF000"><strong>其次，来自设备的中断必须通过能够将这些有线方式发出中断转换为 MSI 的 APLIC，或者系统必须具有I&#x2F;O MMU，可以翻译设备自身进行的 MSI 内存写入地址。</strong></font></li>
+</ol>
+<p>如果guest OS直接控制能够发送 MSI 的设备，它自然会使用操作系统看到的 <em>guest physical addresses</em> 在设备上配置 MSI，为其虚拟 hart 的 IMSIC，而不知道这些地址只是虚拟的。当设备为 MSI 执行内存写入时，此写入的目标地址必须由 I&#x2F;O MMU 从guest OS分配的guest物理地址转换为目标guest interrupt files的真实物理地址，使用由hypervisor提供的转换表。</p>
+<p>按照设计，IOMMU必须为设备MSI进行的转换基本上与IOMMU必须为来自同一设备的其他内存访问执行的地址转换没有什么不同，即将 guest physical addresses 转换为 host physical addresses 。因为每个虚拟hart都被分配了一个专用的 <em>physical guest interrupt file</em>，该文件与一个 <em>true supervisor-level interrupt file</em> 无法区分，所以不需要对MSI写入的数据进行翻译，它在target interrupt file中指定了中断的标识号（interrupt’s identity number）。</p>
+<h3 id="6-1-2-将虚拟hart迁移到不同的-guest-interrupt-files"><a href="#6-1-2-将虚拟hart迁移到不同的-guest-interrupt-files" class="headerlink" title="6.1.2 将虚拟hart迁移到不同的 guest interrupt files"></a>6.1.2 将虚拟hart迁移到不同的 <em>guest interrupt files</em></h3><p>当需要将虚拟hart从一个物理hart移动到另一个物理hart时，如果虚拟hart使用 <em>guest interrupt files</em> ，则分配给它的特定 <em>guest interrupt files</em> 必须从旧物理hart上使用的中断文件更改为新物理hart上使用的中断文件。因为每个guest interrupt files在物理上绑定到单个物理hart，所以虚拟hart在移动时不能携带其guest interrupt files。</p>
+<p>将虚拟hart从一个 <em>guest interrupt files</em> 迁移到另一个 <em>guest interrupt files</em> 的过程比移动虚拟hart持有的大多数其他状态要复杂得多。在新的物理服务器上选择目标guest interrupt files后，建议执行以下步骤:</p>
+<ol>
+<li>在旧的中断文件中，将寄存器 eidelivery 和 eithreshold 的值保存到内存，并设置 eidelivery &#x3D; 0。</li>
+<li>在新的中断文件中，设置 eidelivery &#x3D; 0，并将所有已实现的中断挂起位（eip 数组）清零。</li>
+<li>修改所有 IOMMU 上的相关转换表，以便该虚拟中断文件的 MSI 现在发送到新的物理中断文件。同样，如果 APLIC 上的任何中断由 MSI 转发到旧中断文件，请重新配置 APLIC 以将它们发送到新中断文件。根据需要，与所有 IOMMU 和 APLIC 同步，以确保在此步骤之后没有落后的 MSI 到达旧中断文件。与 APLIC 同步可以使用第 4.9.3 节的算法来完成。</li>
+<li>在旧的中断文件中，将所有已实现的中断挂起和可中断位（eip 和 eie 数组）转储到内存。这一步完成后，旧的中断文件就不再使用了。</li>
+<li>在新的中断文件中，使用CSRS指令将步骤4中保存的中断挂起位<strong>逻辑或</strong>到新的中断文件中，写入eip数组。另外，将步骤 4 中保存的中断使能位加载到 eie 数组中。</li>
+<li>在新的中断文件中，使用步骤 1 中保存的值加载到寄存器 eithreshold 和 eidelivery。</li>
+</ol>
+<p>在整个中断文件完全迁移之前，不建议在新的物理hart上恢复虚拟hart的执行。</p>
+<blockquote>
+<p>在中断文件完全迁移之前恢复虚拟hart的执行可以允许在虚拟机中运行的软件看到多个MSI以不应该发生的顺序从单个设备到达。虽然这在实践中很少有关系，但它有可能导致设备驱动程序依赖于(可能无意中)事件的有效顺序。</p>
+</blockquote>
+<h2 id="6-2-没有-guest-interrupt-file的-VS-级外部中断"><a href="#6-2-没有-guest-interrupt-file的-VS-级外部中断" class="headerlink" title="6.2 没有 guest interrupt file的 VS 级外部中断"></a>6.2 没有 <em>guest interrupt file</em>的 VS 级外部中断</h2><p>尽管建议实现hypervisor extension的harts 也具有带guest interrupt files 的IMSICs，但这不是必需的。即使存在 <em>guest interrupt files</em>，physical hart上的virtual harts也可能比guest interrupt file数量多，导致一些virtual harts<strong>没有</strong>分配<strong>guest interrupt files</strong>。在任何一种情况下，<strong>hypervisor 都必须为virtual hart 模拟外部中断控制器，而不能利用已经分配给虚拟hart的guest interrupt files。</strong></p>
+<p>当为虚拟hart模拟外部中断控制器时，如果除了外部中断之外，虚拟hart不支持可配置的中断优先级，那么外部中断可以通过在hvip中设置位VSEIP来断言到VS级别，这是由RISC-V特权架构定义的。然而，为了模拟外部中断控制器和非外部中断的优先级可配置性，hypervisor必须使用CSR hvictl(hypervisor虚拟中断控制)，下一节稍后将对此进行描述。</p>
+<h2 id="6-3-VS级的中断"><a href="#6-3-VS级的中断" class="headerlink" title="6.3. VS级的中断"></a>6.3. VS级的中断</h2><h3 id="6-3-1-在VS级别配置主要中断的优先级"><a href="#6-3-1-在VS级别配置主要中断的优先级" class="headerlink" title="6.3.1 在VS级别配置主要中断的优先级"></a>6.3.1 在VS级别配置主要中断的优先级</h3><p>与Supervisor一样，高级中断架构&#x3D;&#x3D;<strong>可选地</strong>&#x3D;&#x3D;允许软件配置 <strong>主要的(major)VS 级中断</strong> 与 <strong>VS 级外部(external)中断</strong>的优先级混合。</p>
+<p>如5.4节所述，supervisor级别的中断优先级由通过 CSR siselect 和sireg 间接访问的 iprio 数组配置。 iprio 阵列寄存器的 siselect 地址为 0x30–0x3F。</p>
+<p>VS级有自己的vsiselect和vsireg，但与supervisor级不同的是，vsiselect地址0x30-0x3F没有寄存器。当 vsiselect 的值在 0x30–0x3F 范围内时，从 VS 模式访问sireg（实际上是 vsireg）的尝试会导致<strong>虚拟指令异常</strong>(virtual instruction exception)。为了给虚拟 hart 一个通过 siselect 和sireg 访问的iprio 寄存器数组的错觉，当从VS 模式访问sireg 导致虚拟指令陷阱(virtual instruction traps)时，<strong>hypervisor必须模拟VS 级别的iprio 数组</strong>。</p>
+<p>代替物理 VS 级别的 iprio array，提供了一个<strong>单独的硬件机制</strong>来配置 VS 级别的中断子集的优先级，使用hypervisor CSR <code>hviprio1</code> 和 <code>hviprio2</code>。可以<strong>在硬件中配置优先级的主要(major)中断号</strong>的子集如下：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227102457899.png" alt="image-20230227102457899"></p>
+<p>对于直接到VS级别的中断，32-48范围内的standard local interrupts在硬件中不支持软件可配置的优先级</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230605110700101-1685934440859-1-1685934453486-3.png" alt="image-20230605110700101"></p>
+<blockquote>
+<p>对于自定义中断，自定义csr可以在硬件中支持优先级可配置性，扩展hviprio1和hviprio2用于标准中断。</p>
+</blockquote>
+<p>对于 RV32，寄存器 hviprio1、hviprio1h、hviprio2 和 hviprio2h 具有以下格式：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227102715077.png" alt="image-20230227102715077"></p>
+<p>对于 RV64，寄存器 hviprio1 和 hviprio2 是相同 R V32 寄存器与其各自高半部分伙伴的 64 位串联：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227102743188.png" alt="image-20230227102743188"></p>
+<p>hviprio1和hviprio2中的每个优先级号都是一个WARL无符号整数字段，<strong>要么是只读零</strong>，要么实现IPRIOLEN位或6位的最小值，以较大的值为准，最好全部为8位。实现可以自由选择哪些优先级数字段是只读零，但所有其他字段必须实现相同数量的整数位。这些csr的最小实现使它们都是只读零。</p>
+<p>当为虚拟hart模拟通过siselect和sireg(实际上是vsiselect和vsireg)间接访问的(虚拟)hypervisor级iprio数组时，hypervisor可以选择使用寄存器hviprio1和hviprio2。对于不在hviprio1和hviprio2支持的子集中的中断，模拟iprio数组中的优先级数字节可以为只读零。</p>
+<blockquote>
+<p>在VS级别上，仅为主要中断的子集提供可配置优先级的硬件支持是一种妥协。当所有 M模式和 HS 模式的陷阱(包括中断和同步异常)都具有绝对优先级时，当每个虚拟hart也可能与其他超出其控制范围的虚拟hart竞争资源时，能够在VS级别控制中断优先级的效用可以说是虚幻的。然而，对于最可能的中断子集，优先级可配置性已经成为可能，同时最小化必须在虚拟hart交换机上交换的添加csr的数量。</p>
+<p>优先级可配置子集之外的主要(major)中断仍然可以定向到VS级别，但它们的优先级将只是5.1节中定义的默认顺序。</p>
+</blockquote>
+<p>如果hypervisor确实必须模拟 hviprio1 和 hviprio2 支持的子集之外的中断的优先级可配置性，它可以通过设置 <strong>CSR hvictl 的位 VTI 来实现这一点</strong>，如下一小节所述。</p>
+<h3 id="6-3-2-VS级的虚拟中断"><a href="#6-3-2-VS级的虚拟中断" class="headerlink" title="6.3.2 VS级的虚拟中断"></a>6.3.2 VS级的虚拟中断</h3><p>假设虚拟hart不需要为hviprio1和hviprio2在硬件中支持的子集之外的主要中断配置优先级，那么hypervisor可以使用CSRs <code>hvien</code> (hypervisor virtual - interrupt - enable)和<code>hvip</code> (hypervisor virtual - interrupt - pending bits) 断言中断(assert interrupts)到虚拟hart。<br>这些csr对VS级别中断的影响与<code>mvien</code>和<code>mvip</code>对supervisor级别中断的影响非常相似，如5.3节所述。</p>
+<p>寄存器 <strong>hvien</strong> 和 <strong>hvip</strong> 的每一位对应一个 0-63 范围内的中断号。 </p>
+<p>&#x3D;&#x3D;<strong>hvien 的位 12:0 是保留的并且必须是只读零</strong>&#x3D;&#x3D;</p>
+<hr>
+<p>&#x3D;&#x3D;<strong>而 hvip 的位 12:0 由 RISC-V 特权架构定义</strong>&#x3D;&#x3D;。具体来说，<strong>hvip 的第 10、6 和 2 位是可写</strong>位，分别对应于 VS 级外部中断（VSEIP）、VS 级定时器中断（VSTIP）和 VS 级软件中断（VSSIP）。</p>
+<hr>
+<p><strong>以下情况仅适用于中断号13-63的CSR位：</strong></p>
+<ul>
+<li><p>当hideleg中的位为1时，则vsip中的相同位是sip中对应位的别名。</p>
+</li>
+<li><p>否则，当hideleg中的某个位为0,hvien中的匹配位为1时，vsip中的相同位是hvip中对应位的别名。</p>
+</li>
+<li><p>当hideleg和hvien中对应的位都为零时，vsip中的位为只读零。</p>
+</li>
+<li><p>hideleg和hvien对vsip和vsie的综合影响如表6.1所示。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230605160717667-1686534967277-21.png" alt="image-20230605160717667"></p>
+</li>
+</ul>
+<p>对于<strong>中断号13-63</strong>，当且仅当对应的位在hideleg或hvien中设置时，vsie中的位是可写的。当一个中断被hideleg委托时，vsie中的可写位是sie中对应位的别名;否则它就是一个独立的可写位。特权体系结构指定了vsie的12:0位何时是hie中位的别名。通常，在vsie中不可写的位必须是只读零。</p>
+<p>如果hideleg的一个位为零，并且hvien中对应的位从0变为1，则vsie中匹配位的值变为未指定(unspecified)。同样，如果hvien的一个位为1，而hideleg中的对应位从1变为0，则vsie中的匹配位的值再次变为未指定(unspecified)。</p>
+<p>对于中断号13-63，实现可以自由选择hvien的哪些位是可写的，哪些位是只读的(0或1)。如果hvien中的该位是只读零(防止启用虚拟中断)，则hvip中的该位应该是只读零。中断13-63的所有其他位必须在hvip中可写。</p>
+<p>CSR &#x3D;&#x3D;<strong>hvictl</strong>&#x3D;&#x3D; (Hypervisor Virtual Interrupt Control) 提供了进一步的灵活性，可以在目前所描述的功能不完全支持的情况下将中断注入到VS级别（injecting interrupts into VS level），但只有在hypervisor更积极地参与的情况下。hypervisor必须在以下情况下使用<code>hvictl</code>:</p>
+<ul>
+<li><strong>为 VS 级别断言 hvien 和 hvip 不支持的主要中断</strong>；（0-12号）</li>
+<li><strong>为超出 hviprio1 和 hviprio2 支持的主要中断实现 VS 级别的<code>优先级</code>可配置性</strong>；</li>
+<li>**或者在不使用 IMSIC 的 <em>guest interrupt files</em> 的情况下为虚拟 hart 模拟外部中断控制器，同时还支持外部中断和虚拟 hart 主要中断的<code>可配置优先级</code>**。</li>
+</ul>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227104643115.png" alt="image-20230227104643115"></p>
+<p><code>hvictl</code> 的所有其他位都保留并读为零。</p>
+<p><strong>当bit VTI(Virtual Trap Interrupt control)&#x3D; 1时，从VS-mode显式访问csr <code>sip</code>, <code>sie</code>会导致虚拟指令异常。</strong></p>
+<p>此外，对于任何给定的CSR，如果在某些情况下，对寄存器的写入可能会导致vsip位从1变为0，<strong>不包括用于外部中断(SEIP)的第9位</strong>，那么当<strong>VTI &#x3D; 1</strong>时，对于<strong>guest写入该寄存器的任何尝试</strong>也会引发<strong>虚拟指令异常</strong>。</p>
+<p>在确定是否引发异常时，将忽略写入CSR的值和vsip(之前或之后)的值。(因此，写操作实际上不需要将vsip从1更改为0来引发异常。)</p>
+<p>特别是，如果寄存器vstimecmp(从扩展名Sstc)实现，那么尝试从VS-mode写入stimecmp 会在<strong>VTI &#x3D; 1</strong>时导致<strong>虚拟指令异常</strong>。</p>
+<blockquote>
+<p>对于标准本地中断(主要标识13-23和32-47)和软件中断(SSI)， vsip中相应的中断挂起位被定义为<strong>“粘性”</strong>，这意味着guest只能通过直接写入sip(实际上是vsip)来清除它们。在标准定义的中断中，只剩下定时器中断(STI)，可以通过向vstimemp写入一个新值在vsip中清除它。</p>
+</blockquote>
+<p><strong>所有<code>hvictl</code>字段共同影响CSR vstopi (Virtual Supervisor Top Interrupt)的值</strong>，从而影响当一个中断traps to VS-mode时，vscause记录中断标识(interrupt identity)。</p>
+<p><strong>IID是一个WARL无符号整数字段</strong>，至少实现6 bit，而<strong>IPRIO</strong>总是完整的8bit。</p>
+<p>如果IID实现k bit，则支持0到2<sup>k</sup>−1的所有值，并且写入<code>hvictl</code>将<strong>IID</strong>设置为写入值的bits (15 + k):16</p>
+<p>对于由<strong>hvictl</strong>指定为VS级别的虚拟中断，如果<strong>VTI &#x3D; 1</strong>且<strong>IID $\neq$ 9</strong>，则字段<code>DPR</code>(默认优先级等级 Default Priority Rank) 决定了中断相对于(虚拟)管理级外部中断(SEI) major identity 9 的假定默认优先级顺序，如下所示 :</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230605165204453-1686534967277-22.png" alt="image-20230605165204453"></p>
+<ul>
+<li>0 &#x3D; 中断的默认优先级高于 SEI </li>
+<li>1 &#x3D; 中断的默认优先级低于 SEI</li>
+</ul>
+<p><strong>当 <code>hvictl.IID</code> &#x3D; 9 时，DPR 被忽略</strong>。</p>
+<h3 id="6-3-3-虚拟管理级top中断-CSR-vstopi"><a href="#6-3-3-虚拟管理级top中断-CSR-vstopi" class="headerlink" title="6.3.3 虚拟管理级top中断 CSR(vstopi)"></a>6.3.3 虚拟管理级top中断 CSR(vstopi)</h3><p>只读 CSR vstopi 是VSXLEN位宽，格式与stopi相同：</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230227110632591.png" alt="image-20230227110632591"></p>
+<p>vstopi 返回有关 <strong>VS 级别最高优先级中断的信息</strong>，这些中断是从这些候选者中找到的（以 + 号为前缀）：</p>
+<ul>
+<li>如果 hstatus.VGEIN 是 guest interrupt file 的有效编号，vsip 和 vsie 中的第 9 位都为 1，且 <strong>vstopei</strong> 不为零：</li>
+</ul>
+<p>​			+ a supervisor外部中断 (code 9)  优先级由  <strong>vstopei</strong> 指示；</p>
+<blockquote>
+<p>分配了有效的vs interrupt file，<strong>外部中断</strong> 优先级由 <code>vstopei</code> 指示</p>
+</blockquote>
+<ul>
+<li>如果 hstatus.VGEIN &#x3D; 0，vsip 和 vsie 中第 9 位 都为 1，并且 <code>hvictl.IID</code> &#x3D; 9 且 <code>hvictl.IPRIO</code> $\neq$ 0：</li>
+</ul>
+<p>​			+ a supervisor外部中断 (code 9)  优先级由 <code> hvictl.IPRIO</code>决定；</p>
+<blockquote>
+<p>没有分配vs interrupt file ，但是 hvictl 指定了 <strong>外部中断</strong> 的 优先级 由 <code> hvictl.IPRIO</code>决定</p>
+<p><em>此时没有分配 vs interrupt file 那么vsip bit9 只能通过写 hvip bit10来拉高</em></p>
+</blockquote>
+<ul>
+<li>如果bit 9在vsip和vsie中都是1，并且前两种情况都不适用：</li>
+</ul>
+<p>​			+ a supervisor外部中断 (code 9)  优先级编号为256；</p>
+<blockquote>
+<p>没有分配vs interrupt file ，且hvictl没有指定了IID&#x3D;9 的 优先级，则 <strong>外部中断</strong> 优先级 为 <strong>256</strong></p>
+<p><em>此时没有分配 vs interrupt file 那么vsip bit9 只能通过写 hvip bit10来拉高</em></p>
+</blockquote>
+<ul>
+<li>如果<code>hvictl.VTI</code>&#x3D;0：</li>
+</ul>
+<p>​			+ 由vsip和vsie指示的<strong>除 a supervisor 外部中断(代码9) 之外</strong>的<strong>最高优先级</strong>(highest-priority)的<strong>挂起并启用</strong>( pending-and-enabled )的<strong>主中断</strong>( major interrupt)，使用由hviprio1和hviprio2分配的优先级号；</p>
+<blockquote>
+<p>vs的1号、5号、13号（计数器溢出中断）的中断优先级在<code>hvictl.VTI</code>&#x3D;0时 使用hviprio1和hviprio2分配的优先级号</p>
+</blockquote>
+<ul>
+<li>如果<code>hvictl.VTI</code> &#x3D; 1, <code>hvictl.IID</code> $\neq$9:</li>
+</ul>
+<p>​			+ 由<code>hvictl</code> 的<code>IID</code>, <code>DPR</code>, 和<code>IPRIO</code>指定的主要中断 。</p>
+<blockquote>
+<p>在这种情况下，hvictl指定某一个主要中断（1、5、13）的优先级</p>
+</blockquote>
+<p>在上面的列表中，所有的“supervisor”外部中断都是virtual， directed to VS level，在VS level有major code 9。</p>
+<blockquote>
+<p>候选中断列表可以相对容易地减少到两个最终列表，通过观察前三个列表项彼此互斥，其余两个列表项也彼此互斥。</p>
+</blockquote>
+<blockquote>
+<p>当<code>hvictl.VTI</code> &#x3D; 1，只能通过设置<code>hvictl.IID</code> &#x3D; 9来表示VS level没有中断。软件通常可能希望使用 IID &#x3D; 9, IPRIO &#x3D; 0 表示在hvictl中没有中断。</p>
+</blockquote>
+<p><strong>当没有候选中断满足上述列表的条件时，vstopi为0。否则，vstopi字段IID和IPRIO由候选中断中优先级最高的中断确定。</strong></p>
+<p>正如表5.5所指定的，通常适用于supervisor-level的优先级顺序，除了优先级号是从上面的候选列表中获取，而不是从supervisor level iprio数组中获取。</p>
+<p>名义优先级的关系通常被5.1节中的默认优先级顺序打破，除非<code>hvictl.VTI</code> &#x3D; 1并且<code>hvictl.IID</code>$\neq$​9 (上面候选列表中的最后一项)，在这种情况下，默认优先级顺序仅由 <code>hvictl.DPR</code> 决定。</p>
+<ul>
+<li>如果 <code>hvictl.IPRIOM</code> 位(IPRIO Mode)为0，则vstopi中的IPRIO为1；</li>
+<li>否则，如果最高优先级候选的优先级数字在 1 到 255 的范围内，则 IPRIO 为该值；</li>
+<li>否则，IPRIO 将设置为 0 或 255，如第 5.4.2 节中 stopi 所述。</li>
+</ul>
+<hr>
+<p>hvictl控制向VS中断的优先级，</p>
+<hr>
+<h3 id="6-3-4-VS-模式的中断陷阱"><a href="#6-3-4-VS-模式的中断陷阱" class="headerlink" title="6.3.4 VS 模式的中断陷阱"></a>6.3.4 VS 模式的中断陷阱</h3><p>高级中断体系结构修改了标准的RISC-V特权体系结构，<strong>当且仅当vstopi不为零时，一个中断在VS级挂起</strong>。CSRs vsip和vsie本身不确定vs级中断是否挂起，尽管它们可以通过对vstopi的影响间接确定。</p>
+<p><strong>当vstopi不为零时，如果当前特权模式为VS-mode且CSR vsstatus中的SIE位为1，或者当前特权模式为VU-mode，则对vstopi字段IID所指示的中断向VS-mode发送trap。</strong></p>
+<p>vcause的异常码(Exception Code)字段必须至少实现所需的位数，以表示vstopi字段IID对于给定hart可以拥有的最大值。</p>
+<h1 id="第七章：-处理器间中断-IPI"><a href="#第七章：-处理器间中断-IPI" class="headerlink" title="第七章： 处理器间中断 (IPI)"></a>第七章： 处理器间中断 (IPI)</h1><p>默认情况下，除非平台具有不同的处理器间中断(ipi)机制，否则RISC-V特权体系结构指定具有多个hart的机器必须为每个hart提供一个实现定义的内存地址，该地址可以写入用于在该hart发出机器级软件中断(主代码3)的信号。因此，机器级的ipi可以作为机器级软件中断发送到任何hart。</p>
+<blockquote>
+<p>RISC-V软件中断仅作为最小的“门铃”信号。接收端的软件负责将传入的软件中断识别为IPI，并进一步解码其目的，通常利用发送方在普通存储器中存储的附加数据。</p>
+</blockquote>
+<p>同样的机制(但是使用一组不同的内存地址)也可能存在，也可能不存在，用于在远程服务器上发送管理器级软件中断(主代码1)的信号。如果没有以这种方式直接支持，则通常通过从主管模式到机器模式的环境调用将主管级软件中断发送到另一个hart。因此，在S模式下运行的操作系统调用特定的SBI函数，将软件中断传递到另一个hart，使原始hart的机器级软件向目标hart发送机器级IPI，然后软件在CSR mip中设置管理级软件中断挂起位(SSIP)。</p>
+<p><strong>当hart具有IMSIC时，可以通过写入目标hart的IMSIC将IPI发送到hart，而不是使用特权体系结构的机制在远程hart上发送软件中断的信号，这与常规消息信号中断(MSI)相同。</strong>在这种情况下，传入的IPI在目标端口显示为通过IMSIC路由的外部中断，而不是像以前那样显示为软件中断。然而，只要同一个软件( 例如操作系统或机器监视器（machine monitor）)在IPI的两个端点(源和目标)都处于控制状态，那么目标hart就没有理由误解表示IPI的传入外部中断的目的。</p>
+<p>如果hart没有IMSIC，那么假定RISC-V特权体系结构指定的方法用于ipi，向目标hart发出软件中断的信号。另一方面，当hart拥有IMSIC时，在远程hart触发软件中断的机制与IMSIC的功能是冗余的，因此它从<strong>需求</strong>降级为<strong>选项</strong>，可能仅用于在一系列RISC-V系统中提供软件兼容性，无论是否具有IMSIC。&#x3D;&#x3D;<strong>如果一台机器实现了IMSIC而不是早期的软件中断机制，那么用于机器级软件中断(MSIP和MSIE)的csr mip和mie位将硬连线为零。</strong>&#x3D;&#x3D;</p>
+<blockquote>
+<p>如果一台机器实现了IMSIC，但没有实现软件中断机制，那么对于S模式或VS模式，后者仍然可以在主管级完全模拟，方法是捕获对特殊内存地址的写入，这些地址应该在远程服务器发出主管级软件中断的信号。在这样的陷阱中，软件可以通过IMSIC向目标hart发送高级IPI。然后高级软件可以为期望的特权级别S或VS级，将sip中的SSIP位设为1。</p>
+<p>同样，SBI 环境对发送 IPI 的调用可以轻松地继续得到支持，而guest端根本不知道用于在 hart 之间传送 IPI 的底层硬件发生了变化。</p>
+</blockquote>
+<blockquote>
+<p>当软件通过将 MSI 写入其他 hart 的 IMSIC 来发送 IPI 时，程序员还应该考虑在写入此类 MSI 的每个存储指令之前执行 FENCE 指令。在没有 FENCE 的情况下，许多系统保证仅在单个设备之间保留 Hart 的加载和存储顺序，而不是在多个设备之间，并且根本不访问主内存。对于这样的系统，必须记住，每个IMSIC 都可能被视为众多设备中的一个单独设备。例如，如果hart A想要通知hart B它已经完成了涉及访问某个I&#x2F;O设备的任务，那么hart A可能需要在向B的IMSIC发送MSI之前执行FENCE，以确保A的所有访问都被执行。在 MSI 到达 B 之前，设备实际上已完成。类似地，如果 hart A 将任何应该在 hart B 上可见的内容存储到内存中，则在后续存储将 MSI 发送到 B 的 IMSIC 之前可能需要 FENCE。</p>
+</blockquote>
+<h1 id="第八章：-IOMMU-支持-MSI-到虚拟机"><a href="#第八章：-IOMMU-支持-MSI-到虚拟机" class="headerlink" title="第八章： IOMMU 支持 MSI 到虚拟机"></a>第八章： IOMMU 支持 MSI 到虚拟机</h1><p>系统中<strong>IOMMU的存在使得在虚拟机中运行的guest OS可以直接控制I&#x2F;O设备，而只需要最少的hypervisor干预</strong>。直接控制设备的guest OS将使用guest物理地址对设备进行编程，因为这是操作系统所知道的全部内容。当设备使用这些地址执行内存访问时，IOMMU负责将这些 <em>guest physical address</em> 转换为 <em>machine physical addresses</em>，并引用由hypervisor提供的地址转换数据结构。</p>
+<p>要处理来自guest OS控制的设备的 MSI，IOMMU 必须能够将这些 MSI 重定向到 IMSIC中的 <em>guest interrupt file</em> 。不具有带有guest interrupt file的IMSIC 的系统不需要实现本章中描述的功能。</p>
+<p>因为来自设备的MSI仅仅是内存写入，所以它们自然会受到IOMMU应用于其他内存写入的相同地址转换的影响。然而，高级中断体系结构要求IOMMU特别对待指向虚拟机的MSI，<strong>一方面是为了简化软件，另一方面是为了允许对驻留在内存中的中断文件的可选支持</strong>。</p>
+<p>本章使用一般意义上的术语 IOMMU，<strong>它涵盖虚拟化设备访问所需的所有转换和事务处理服务</strong>，并且仅<strong>关注 IOMMU 如何识别和处理定向到虚拟机的 MSI</strong>。 IOMMU 的大多数其他功能和细节超出了本标准的范围，必须在其他地方指定。</p>
+<blockquote>
+<p>RISC-V IOMMU 架构规范提供了 IOMMU 架构的详细描述，将翻译和事务处理功能划分为 IOMMU、IO 桥等块，并描述了如何将这些块集成到系统中。</p>
+</blockquote>
+<p>如果单个物理I&#x2F;O设备可以由多个独立的设备驱动程序细分控制，则此处将每个子设备称为一个设备。</p>
+<h2 id="8-1-IOMMU设备背景信息"><a href="#8-1-IOMMU设备背景信息" class="headerlink" title="8.1 IOMMU设备背景信息"></a>8.1 IOMMU设备背景信息</h2><p>对系统中的IOMMU作如下假设:</p>
+<ul>
+<li>对于通过IOMMU连接到系统的每个I&#x2F;O设备，软件可以在IOMMU上配置一个设备上下文，该设备上下文与设备关联一个特定的虚拟地址空间和IOMMU可能支持的任何其他设备参数。通过在IOMMU中为每个设备提供自己单独的设备上下文，每个设备可以单独配置一个单独的操作系统，该操作系统可以是guest OS或主(主机)操作系统。在设备发起的每次内存访问中，硬件通过某种形式的唯一设备标识符向IOMMU指示原始设备，IOMMU使用该标识符在软件提供的数据结构中定位适当的设备上下文。例如，对于PCI，原始设备可以通过PCI总线号、设备号和功能号的唯一三位数来标识。</li>
+<li>IOMMU使用地址转换数据结构(通常是页表)选择性地转换设备内存访问的地址，地址转换数据结构由软件通过相应的设备上下文指定。所有IOMMU实现的地址转换的最小粒度不大于4 kB页，与标准RISC-V地址转换页表相匹配。(IOMMU实际上可以使用与RISC-V特权架构定义的基于页面的地址转换相同格式的页表，但这不是必需的。)</li>
+</ul>
+<p><strong>高级中断架构根据需要将这些字段添加到设备上下文中:</strong></p>
+<ul>
+<li><strong>一个MSI地址掩码(address mask)和地址模式(address pattern)，一起用于识别guest物理地址空间中作为MSI目的地的页面;</strong></li>
+<li><strong>MSI页表的真实物理地址，用于控制来自设备的MSI的翻译和&#x2F;或转换。</strong></li>
+</ul>
+<p>MSI地址掩码和地址模式都是无符号整数，与guest物理页码宽度相同，即比guest物理地址的最大支持宽度窄12位。它们的用法在8.4节“VM中断文件页地址的识别”中有解释。</p>
+<p><strong>设备上下文的MSI页表与通常用于转换来自同一设备的其他内存访问的地址转换数据结构是分开的</strong>。MSI页表的形式和功能是本章其余大部分内容的主题。</p>
+<blockquote>
+<p><strong>设备上下文为MSI提供一个独立的页表有两个原因</strong>:首先，在Linux或类似操作系统下运行的hypervisor可以从对MSI转换的单独控制中获益，从而帮助简化虚拟hart从一个物理hart迁移到另一个物理hart的情况。如第6.1.2节所述，当虚拟hart的中断文件映射到真实机器中的 <em>guest interrupt file</em> 时，虚拟hart的迁移会导致这些虚拟中断文件底层的物理 <em>guest interrupt file</em> 发生变化。但是，由于在其他系统(不是RISC-V)上，虚拟hart的迁移不会影响 <em>guest physical address</em> 到实际物理地址的映射，因此执行此迁移的Linux内部函数不会设置为修改IOMMU的地址转换表来调整RISC-V虚拟中断文件的物理位置的变化。在IOMMU中提供一个单独的MSI转换表的hypervisor可以绕过这个限制。MSI页表可以由hypervisor和&#x2F;或管理中断的子系统随意修改，而无需与许多其他与常规地址转换有关的操作系统组件进行协调。</p>
+<p>其次，指定一个单独的MSI页表有助于使用内存驻留中断文件(MRIF)，这将在8.3节中介绍。专用的MSI页表可以很容易地支持专用的MRIF表入口格式(章节8.5.2)，这种格式是完全不同的，很难改造成任何其他地址转换数据结构。</p>
+</blockquote>
+<h2 id="8-2-设备的MSI地址转换"><a href="#8-2-设备的MSI地址转换" class="headerlink" title="8.2 设备的MSI地址转换"></a>8.2 设备的MSI地址转换</h2><p>为了支持MSI从I&#x2F;O设备直接传递到RISC-V虚拟机，而无需hypervisor干预，IOMMU必须能够将MSI的 <em>guest physical address</em> 转换为机器中IMSIC的 <em>guest interrupt file</em> 的实际物理地址，如图8.1所示。此<strong>地址转换由在IOMMU的配对的设备上下文中配置的MSI页表控制</strong>。因为每个中断文件，无论是真实的还是虚拟的，都占用一个自然对齐的4-KiB页的地址空间，所以所需的地址转换是从虚拟(guest)页地址到物理页地址，这与常规RISC-V基于页的地址转换所支持的相同。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614100546666.png" alt="image-20230614100546666"></p>
+<p>图8.1:guest OS转到操作系统虚拟机中的(虚拟)IMSIC中断文件的 设备源MSI转换。IOMMU引用由控制hypervisor提供的MSI页表，将MSI重定向到真实机器的guest interrupt files。</p>
+<p>来自设备的内存写操作 通过写入的目的地址被识别为MSI。如果IOMMU确定一个32位的写操作是针对相关虚拟机中的一个(虚拟)中断文件的位置，那么这个写操作就被认为是虚拟机中的一个MSI，否则就不是。识别MSI的确切公式见章节8.4。</p>
+<blockquote>
+<p>尽管MSI的转换是由它自己单独的页表控制的，但MSI转换与常规的RISC-V地址转换具有相同的页面粒度，这意味着IOMMU中的地址转换缓存需要很少的修改来缓存MSI转换。只有在翻译缓存丢失时，IOMMU才需要将MSI与来自同一设备的其他内存访问明显区别对待，以选择正确的翻译表并正确访问和解释表。</p>
+</blockquote>
+<h3 id="8-3-驻留内存的中断文件"><a href="#8-3-驻留内存的中断文件" class="headerlink" title="8.3 驻留内存的中断文件"></a>8.3 驻留内存的中断文件</h3><p><strong>IOMMU可以选择支持内存驻留的中断文件(MRIF)。</strong>如果实现，使用驻留内存的中断文件可以大大增加虚拟hart的数量，这些虚拟hart可以直接控制系统中的一个或多个物理设备，假设系统的其余部分仍然可以处理增加的负载。</p>
+<p><strong>如果没有驻留内存的中断文件，可以直接从设备接收MSI的虚拟RISC-V hart的数量将受到系统中所有IMSIC实现的 <em>guest interrupt file</em> 总数的限制，因为所有到RISC-V hart的MSI都必须经过IMSIC</strong>。对于单个RISC-V hart，<strong>guest interrupt files的数量是特权架构定义的GEILEN参数</strong>，RV32最多为31个，<strong>RV64最多为63个</strong>。</p>
+<p>另一方面，使用驻留内存的中断文件，能够接收设备MSI的虚拟RISC-V hart的总数几乎是无限的，仅受实际物理内存大小和处理它们所需的额外处理时间的限制。顾名思义，<strong>驻留内存的中断文件位于内存中，而不是位于IMSIC中</strong>。图8.2描述了IOMMU如何在MRIF中记录传入的MSI。当由hypervisor正确配置时，IOMMU识别特定的传入MSI，并通过在普通内存中的MRIF数据结构中<strong>设置存储的中断挂起位</strong>来记录每个这样的MSI。在每个MSI被记录到一个MRIF中之后，<strong>IOMMU还向hypervisor发送一个通知MSI，通知它MRIF的内容可能已经发生了变化</strong>。</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614100720056.png" alt="image-20230614100720056"></p>
+<p>图8.2:将传入的MSI记录到驻留内存的中断文件(MRIF)中，而不是像图8.1那样将其发送到 <em>guest interrupt file</em> 。</p>
+<p>虽然驻留内存的中断文件提供了一个记录MSI的位置，但它不能像IMSIC的 <em>guest interrupt file</em> 那样直接中断hart。hypervisor接收到的通知MSI仅表示虚拟hart可能需要中断;hypervisor负责每次检查MRIF内容，以确定是否实际中断虚拟hart。此外，尽管IMSIC的 <em>guest interrupt file</em> 可以直接充当虚拟hart的supervisor-level interrupt file ，但在虚拟hart执行时将虚拟hart的中断文件保存在MRIF中需要hypervisor模拟虚拟hart的supervisor-level interrupt file ，从而隐藏底层MRIF。根据虚拟hart接触其中断文件的频率和实现对MRIF的支持级别，这种模拟的成本可能非常高。</p>
+<p>因此，期望MRIF最常用于虚拟hart，这些虚拟hart由于空闲或几乎空闲而或多或少地从物理hart“交换”出来。当系统hypervisor确定在MRIF中着陆的MSI应该唤醒空闲的特定虚拟hart时，可以在IMSIC中为该虚拟hart分配一个 <em>guest interrupt file</em> ，并在虚拟hart恢复之前将其中断文件从MRIF移到该 <em>guest interrupt file</em> 中。为新唤醒的虚拟hart分配 <em>guest interrupt file</em> 的过程当然可能会迫使另一个虚拟hart的中断文件被驱逐到它自己的MRIF中。</p>
+<blockquote>
+<p>&#x3D;&#x3D;<strong>并非所有系统都需要容纳大量空闲虚拟hart。例如，许多批处理服务器努力使所有虚拟工作线程从头到尾都尽可能忙碌，只受I&#x2F;O延迟和处理资源限制的限制。在这样的环境中，只要参数GELEN不是太小，对MRIF的支持可能就没有用。</strong>&#x3D;&#x3D;</p>
+</blockquote>
+<p>IOMMU可以对驻留内存的中断文件提供以下三种级别的支持:</p>
+<ul>
+<li>没有驻留内存的中断文件;</li>
+<li>没有原子更新的内存驻留中断文件;或</li>
+<li>具有原子更新的驻留内存中断文件。</li>
+</ul>
+<p>当内存系统支持与RISC-V指令AMOAND和AMOOR相对应的逻辑原子内存操作(AMOs)时，对于从harts和IOMMU进行的内存访问，驻留内存的中断文件是最有效的。对驻留内存的中断文件进行原子更新需要AMOAND和AMOOR操作。在没有AMOs的情况下，仅依靠基本的内存读写，可能会降低支持级别。</p>
+<h3 id="8-3-1-驻留内存中断文件的格式"><a href="#8-3-1-驻留内存中断文件的格式" class="headerlink" title="8.3.1 驻留内存中断文件的格式"></a>8.3.1 驻留内存中断文件的格式</h3><p>驻留内存的中断文件占用512字节的内存，自然地与512字节的地址边界对齐。512字节被组织成一个包含32对64位双字的数组，总共64个双字。每个双字都是小端字节顺序(即使对于所有hart都只有大端字节顺序的系统也是如此)。</p>
+<blockquote>
+<p>使用MRIFs的大端配置的硬件有望实现由标准RISC-V扩展Zbb定义的REV8通用指令，或者使用指令序列支付端序转换的成本。</p>
+</blockquote>
+<p>双字对包含外部中断标识1-2047的interrupt-pending和interrupt-enable位，如下所示:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614100941336.png" alt="image-20230614100941336"></p>
+<p>通常，整数k的地址偏移量k × 16和k × 16 + 8处的双字对包含k × 64到k × 64 + 63范围内的外部中断次要标识的中断挂起和中断使能位。对于这个范围内的标识i，第一个(偶数)双字的位(i mod 64)是中断挂起位，第二个(奇数)双字的相同位是中断启用位。</p>
+<blockquote>
+<p>中断挂起位和中断使能位在 MRIF 内以双字交错存储，以便于 IOMMU 检查相关使能位以确定是否在更新挂起位后发送通知 MSI，而不是始终使用默认行为更新后发送通知 MSI，而不考虑中断使能位。仅当支持 MRIF 而无需原子更新时，内存排列才重要。</p>
+</blockquote>
+<p>MRIF的第一个双字位0为不存在的中断0存储了一个假的中断挂起位。如果来自I&#x2F;O设备的写入似乎是应该存储在MRIF中的MSI，但是要写的数据(中断标识)是零，IOMMU就像零是一个有效的中断标识一样，设置目标MRIF的第一个双字的0位并像往常一样发送通知MSI。</p>
+<p>所有MRIF的大小都能容纳2047个有效的中断标识，这是IMSIC中断文件所允许的最大值。如果一个系统的实际IMSIC的中断文件只实现N个中断标识，N &lt; 2047，那么大于N的标识的MRIF内容可能会被软件忽略。然而，IOMMUs将每个MRIF视为0 - 2047范围内的所有中断标识都是有效的，即使软件忽略无效标识0和所有大于N的标识。</p>
+<blockquote>
+<p>对于小于 2047 个有效中断标识的 MRIF，无需向 IOMMU 指定所需大小 N。 IOMMU 使用此信息的唯一用途是丢弃任何指示大于 N 的中断标识的MSI。如果设备由软件正确配置，则不应发生此类错误的 MSI；但即使它们这样做，软件在将虚假中断标识记录在 MRIF 中之后忽略它们与 IOMMU 在将它们记录在 MRIF 中之前丢弃它们一样有效。</p>
+<p>IOMMU 同样没有必要检查和丢弃指示无效中断标识零的 MSI。</p>
+</blockquote>
+<h3 id="8-3-2-将传入的MSI记录到驻留内存的中断文件中"><a href="#8-3-2-将传入的MSI记录到驻留内存的中断文件中" class="headerlink" title="8.3.2 将传入的MSI记录到驻留内存的中断文件中"></a>8.3.2 将传入的MSI记录到驻留内存的中断文件中</h3><p><strong>MSI写入的数据指定要在目标中断文件中引发的中断标识。</strong>(回想3.2节)该数据可以是小端字节序或大端字节序。如果IOMMU支持驻留内存的中断文件，它可以将机器的IMSIC接受的相同端序的MSI存储到MRIF中。</p>
+<p>MSI以小端字节顺序写入内存映射寄存器seteipnum(章节3.5)。如果寄存器seteipnum与seteipnum一起实现，则IMSIC中断文件也可以接受大端字节顺序的MSI。</p>
+<p>如果 MSI 数据（以正确字节顺序解释时）指示的中断标识在 0-2047 范围内，则 IOMMU 通过将 MRIF 中该标识的中断挂起位设置为 1，将 MSI 存储到 MRIF。如果 MRIF 支持原子更新，则使用 AMOOR 操作设置挂起位，否则使用非原子读-修改-写序列设置挂起位。在MRIF中设置了interrupt-pending位后，IOMMU会发送通知MSI，表示该MRIF已被软件配置。</p>
+<p>将MSI存储到MRIF的确切过程在8.5.2节中有更精确的说明，其中包括在MRIF模式下配置的MSI页表项。</p>
+<blockquote>
+<p>IOMMU是否可以选择检查目标MRIF中匹配的可中断位，以决定是否在设置中断挂起位后发送通知MSI，这是一个悬而未决的问题。目前，<strong>IOMMU总是需要在将MSI存储到MRIF后发送通知MSI，即使中断标识的相应使能位为零。</strong></p>
+</blockquote>
+<h3 id="8-3-3-使用原子更新的驻留内存中断文件"><a href="#8-3-3-使用原子更新的驻留内存中断文件" class="headerlink" title="8.3.3 使用原子更新的驻留内存中断文件"></a>8.3.3 使用原子更新的驻留内存中断文件</h3><p>为了使用支持原子更新的驻留内存中断文件，除了8.3.1节中的MRIF结构本身之外，<strong>软件还必须有内存位置来保存IMSIC中断文件的发送和阈值寄存器。</strong></p>
+<p>将虚拟hart的中断文件从IMSIC移动到MRIF包括以下步骤:</p>
+<ol>
+<li><p>通过将其所有中断挂起位（偶数双字）清零并将 IMSIC 中断文件的 eie 数组复制到 MRIF 的中断启用来准备 MRIF位（奇数双字）。</p>
+</li>
+<li><p>将IMSIC中断文件寄存器eidelivery和eithreshold的现有值保存到内存，并设置eidelivery &#x3D; 0。</p>
+</li>
+<li><p>修改 IOMMU 上的所有相关转换表，以便该虚拟中断文件的 MSI 现在存储在 MRIF 中。如有必要，与所有 IOMMU 同步，以确保在此步骤之后没有落后的 MSI 到达 IMSIC 中断文件。</p>
+</li>
+<li><p>使用 AMOOR 运算，将IMSIC 中断文件的 eip 数组的内容逻辑或到 MRIF 的中断挂起位中。</p>
+</li>
+</ol>
+<p>此序列完成后，IMSIC 中断文件将不再使用。</p>
+<p>每次MSI通知到达，表明MSI已存储在MRIF中时，控制hypervisor应该扫描MRIF的中断挂起和中断启用位，以确定是否有任何已启用的中断现在既挂起又启用，从而应该中断虚拟hart。</p>
+<p>通过 MRIF 的原子更新，只要管理程序为虚拟 Hart 模拟适当的 IMSIC 中断文件以隐藏底层 MRIF，虚拟 Hart 就可以继续使用 MRIF 中包含的中断文件执行。即使 IOMMU 可能将传入的 MSI 存储到同一 MRIF 中，管理程序软件也可以使用 AMOOR 和 AMOAND 操作安全地设置和清除 MRIF 的中断待处理位和中断启用位。</p>
+<blockquote>
+<p>如果 IOMMU 配置为检查 MRIF 的中断使能位来决定是否发送通知 MSI，则修改这些启用位通常需要与 IOMMU 协调。但只要 IOMMU 忽略当前假设的中断使能位，这些位就可以通过软件更改而没有风险。</p>
+</blockquote>
+<p>将相同的中断文件从MRIF移回IMSIC:</p>
+<ol>
+<li>在新的IMSIC 中断文件中，设置eidelivery &#x3D; 0，并将eip 数组清零。</li>
+<li>修改 IOMMU 上的所有相关翻译表，以便该虚拟中断文件的 MSI 现在发送到 IMSIC中断文件。如有必要，与所有 IOMMU 同步，以确保在此步骤之后不会将任何落后的 MSI 存储在 MRIF 中。</li>
+<li>使用 CSRS 指令将 MRIF 中的中断挂起位逻辑或写入 IMSIC 中断文件中，以写入 eip 数组。另外，将中断使能位从 MRIF 复制到 IMSIC 中断文件的 eie 数组。</li>
+<li>使用之前保存的值加载IMSIC 中断文件的寄存器eithreshold 和eidelivery。</li>
+</ol>
+<h3 id="8-3-4-使用驻留内存的中断文件而不进行原子更新"><a href="#8-3-4-使用驻留内存的中断文件而不进行原子更新" class="headerlink" title="8.3.4 使用驻留内存的中断文件而不进行原子更新"></a>8.3.4 使用驻留内存的中断文件而不进行原子更新</h3><p>在不支持原子更新的情况下，内存驻留中断文件的使用类似于前一小节的原子更新情况，但增加了一些复杂性。</p>
+<p>首先，如果虚拟hart控制的I&#x2F;O设备位于多个IOMMU之后，则需要多个MRIF结构，每个IOMMU一个，而不仅仅是单个MRIF结构。此外，除了用于存储eidedelivery和eeithreshold的位置外，软件还需要一个位置来存放中断文件实现的eip数组的完整副本，而不是MRIF。当虚拟中断文件在内存中时，它的中断挂起位将在所有MRIF和保存的eip数组中被分割。中断使能位只能存在于MRIF中。</p>
+<p>将虚拟hart的中断文件从IMSIC移动到内存中，每个IOMMU有一个MRIF:</p>
+<ol>
+<li><p>通过将中断挂起位(偶数双字)调零并将IMSIC中断文件的eip eie数组复制到MRIF的中断启用位(奇数双字)来准备所有MRIF。</p>
+</li>
+<li><p>将IMSIC中断文件的寄存器eidedelivery和eithreshold的现有值保存到内存中，并设置eidedelivery &#x3D; 0。</p>
+</li>
+<li><p>在每个IOMMU中，修改所有相关的转换表，以便该虚拟中断文件的MSI现在存储在与IOMMU匹配的单个MRIF中。如果有必要，与所有的IOMMU同步，以确保在此步骤之后没有分散的MSI到达IMSIC中断文件。</p>
+</li>
+<li><p>将IMSIC中断文件的eip数组转储到其在MRIF之外的单独位置。</p>
+</li>
+</ol>
+<p>一旦这个序列完成，就不再使用IMSIC中断文件。</p>
+<p>当虚拟hart的中断文件保留在内存中时，中断标识的真正挂起位是其在所有MRIF中的位和在保存的eip数组中的位的逻辑或。MRIF中所有挂起的位都以零开始，但是中断可能在那里成为挂起，因为该虚拟hart的MSI到达IOMMU并存储在相应的MRIF中。</p>
+<p>如果没有MRIF的原子更新，中断挂起位就不容易在MRIF中清除。</p>
+<p>(清除一个MRIF中的单个挂起位需要分配和初始化一个新的MRIF，并重新配置相应的IOMMU以将MSI存储到新的MRIF中。)由于这个原因，在内存中保留一个中断文件的同时执行一个虚拟hart可能是实用的，也可能是不实用的。当MRIF记录一个应该唤醒虚拟hart的中断时，最简单的策略是在恢复虚拟hart的执行之前始终将中断文件移回IMSIC的 <em>guest interrupt file</em> 。</p>
+<p>将中断文件从内存传输回IMSIC:</p>
+<ol>
+<li><p>在新的IMSIC中断文件中，设置eidedelivery &#x3D; 0，并将eip数组归零。</p>
+</li>
+<li><p>修改 IOMMU 上的所有相关转换表，以便该虚拟中断文件的 MSI 现在发送到 IMSIC中断文件。如有必要，请与所有 IOMMU 同步，以确保在此步骤之后不会将落后（straggler）的 MSI 存储在 MRIF 中。</p>
+</li>
+<li><p>将所有 MRIF 的中断挂起位与保存的 eip 数组按位逻辑或合并，并将这些合并的位逻辑或放入 IMSIC 中断文件中，使用指令 CSRS 写入 eip 数组。此外，将中断启用位从 MRIF 之一复制到 IMSIC 中断文件的 eie 数组。</p>
+</li>
+<li><p>用先前保存的值加载IMSIC中断文件的寄存器eithreshold和eidelivery。</p>
+</li>
+</ol>
+<h3 id="8-3-5-为接收通知MSI分配-guest-interrupt-file"><a href="#8-3-5-为接收通知MSI分配-guest-interrupt-file" class="headerlink" title="8.3.5 为接收通知MSI分配 guest interrupt file"></a>8.3.5 为接收通知MSI分配 <em>guest interrupt file</em></h3><p>可以通过为每个MRIF分配一个单独的中断标识来最小化hypervisor响应通知MSI所做的处理，因此，在通知MSI中编码的标识总是指示哪个MRIF可能已经更改。但是，如果有非常多的MRIF(可能有数千个)，则hypervisor可能会在IMSIC中可用的hypervisor级中断文件中缺少中断标识。在这种情况下，hypervisor可以通过为自己分配一个或多个IMSIC的 <em>guest interrupt file</em> 来增加中断标识的供应，以便接收通知MSI。</p>
+<p>通过为每个 MRIF 分配单独的中断标识，可以最大限度地减少管理程序响应通知 MSI 所做的处理，因此通知 MSI 中编码的标识始终指示哪一个 MRIF 可能已更改。然而，如果有非常多的 MRIF（可能有数千个），hypervisor可能会缺少 IMSIC 中可用的管理级中断文件 中的中断标识。在这种情况下，<strong>虚拟机管理程序可以通过将一个或多个 IMSIC 的guest interrupt file分配给自身来增加其中断标识的供应，以便接收通知 MSI。</strong></p>
+<blockquote>
+<p><strong>尽管guest interrupt files的存在主要是作为虚拟hart的supervisor-level中断文件，但是IMSIC硬件并不监督软件如何使用它们</strong>。</p>
+</blockquote>
+<h2 id="8-4-虚拟机中断文件页面地址识别"><a href="#8-4-虚拟机中断文件页面地址识别" class="headerlink" title="8.4 虚拟机中断文件页面地址识别"></a>8.4 虚拟机中断文件页面地址识别</h2><p>当一个I&#x2F;O设备由guest OS直接配置时，来自该设备的MSI将被定位到guest OS虚拟机中的虚拟IMSIC，使用的guest physical address对于真实的机器来说是不合适和不安全的。IOMMU必须识别来自MSI等设备的某些写入，并根据实际机器的需要将其转换。(回顾图8.1)</p>
+<p>来自需要转换的单个设备的MSI预计已经在设备上由运行在一个RISC-V虚拟机中的单个guest OS配置。假设虚拟机本身符合高级中断体系结构，则通过写入虚拟IMSIC的中断文件的内存映射寄存器，将MSI发送到虚拟机中的虚拟hart。这些虚拟中断文件中的每一个都在VM的 <em>guest physical address</em> 空间中占用一个单独的4-KiB页，这与真正的中断文件在真实机器的物理地址空间中所做的一样。因此，如果对虚拟机内虚拟IMSIC的中断文件所占用的页面进行写操作，则可以将对 <em>guest physical address</em> 的写操作识别为对虚拟hart的MSI。</p>
+<p>在设备上下文中指定的MSI地址掩码和地址模式(章节8.1)用于识别相关VM的 <em>guest physical address</em> 空间中的虚拟中断文件的4-KiB页。如果目标guest端物理页在提供的地址掩码中所有为零的位位置与提供的地址模式相匹配，则由设备进行的传入32位写操作被识别为对虚拟中断文件的MSI写操作。详细地说，对 <em>guest physical address</em> a的内存访问是对虚拟中断文件的内存映射页的访问</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614101801890.png" alt="image-20230614101801890"></p>
+<p>其中&gt;&gt; 12表示右移12位，与符号(&amp;)表示按位逻辑与，“~地址掩码”是地址掩码的按位逻辑补码</p>
+<p>当发现对虚拟中断文件的内存访问时，从原始 <em>guest physical address</em> 中提取中断文件编号为</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614101825741.png" alt="image-20230614101825741"></p>
+<p>这里，extract(x, y)是一个“位提取”，它丢弃x中与掩码y中相同位置的匹配位为零的所有位，并在结果的最低有效位端连续打包x中剩余的位，保持与x相同的位顺序，并用零填充结果的最高有效位端的任何其他位。例如，如果x和y的位是</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614101844856.png" alt="image-20230614101844856"></p>
+<h2 id="8-5-MSI页表"><a href="#8-5-MSI页表" class="headerlink" title="8.5 MSI页表"></a>8.5 MSI页表</h2><p>当IOMMU确定内存访问是上一节中指定的虚拟中断文件时，通过咨询为设备配置的MSI页表来翻译或转换访问，而不是使用适用于来自同一设备的所有其他内存访问的常规转换数据结构。</p>
+<p>MSI页表是MSI页表项(MSI pte)的平面数组，每个16字节。MSI页表不像常规的RISC-V页表那样具有多级层次结构。相反，每个MSI PTE都是一个叶子条目，指定对虚拟中断文件在相关虚拟机中占用(或可能占用)的特定4-KiB guest physical page 的访问的转换或转换。</p>
+<p>为了从一个MSI页表中选择一个单独的MSI PTE, PTE数组由中断文件编号索引，该中断文件编号是根据上一节的公式从传入内存访问的目标guest物理地址中提取的。每个MSI PTE可以指定一个替代目标虚拟中断文件的真实guest interrupt files的地址(如图8.1所示)，也可以指定一个驻留内存的中断文件，其中存储虚拟中断文件的传入MSI(如图8.2所示)。</p>
+<p>MSI页表中的条目数是2k，其中k是用于从目标guest物理地址提取中断文件号的MSI地址掩码中的位位数。如果一个MSI页表有256个或更少的表项，表的开始将与实际物理内存中的4-KiB页地址对齐。如果MSI页表有2k &gt; 256个表项，则该表必须自然地对齐到2k × 16字节的地址边界。如果一个MSI页表没有按要求对齐，表中的所有条目对IOMMU来说都是未指定的，并且IOMMU可以计算和用于从表中读取单个MSI PTE的任何地址也未指定。</p>
+<p>每个16字节的MSI PTE被解释为两个64位双字。如果IOMMU还引用由RISC-V特权架构定义的标准RISC-V页表进行常规地址转换，那么内存中两个双字(小端或大端)的字节顺序应该与为相同设备上下文配置的常规RISC-V页表的字节顺序相同。否则，MSI PTE的双字的端序由实现定义。</p>
+<p>MSI PTE的第一个双字的0位是字段V (Valid)。当V &#x3D; 0时，PTE无效，并且两个双字的所有其他位都被IOMMU忽略，使它们可供软件免费使用。</p>
+<p>如果V &#x3D; 1，第一个双字的第63位是字段C (Custom)，指定用于自定义使用。如果MSI PTE具有V &#x3D; 1和C &#x3D; 1，则对PTE其余部分的解释是实现定义的。</p>
+<p>如果V &#x3D; 1且自定义使用位C &#x3D; 0，则第一个双字的位2:1包含字段M (Mode)。如果M &#x3D; 3，则MSI PTE指定访问页面的基本翻译模式，如果M &#x3D; 1，则指定MRIF模式。M保留取值为0和2。在接下来的两个小节中，将进一步详细介绍对这两种已定义模式的MSI PTE的解释。</p>
+<h3 id="8-5-1-MSI-PTE，基本翻译模式"><a href="#8-5-1-MSI-PTE，基本翻译模式" class="headerlink" title="8.5.1 MSI PTE，基本翻译模式"></a>8.5.1 MSI PTE，基本翻译模式</h3><p>当MSI PTE具有V &#x3D; 1, C &#x3D; 0和M &#x3D; 3(基本翻译模式)字段时，PTE的完整格式为:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614102442012.png" alt="image-20230614102442012"></p>
+<p>第一个双字的所有其他位都被保留，并且必须由软件设置为零。第二个双字被IOMMU忽略，因此可供软件免费使用。</p>
+<p>MSI PTE覆盖的页面内的内存访问通过将访问的原始地址位12及以上(the guest physical page number)替换为PTE中的字段PPN(Physical Page Number)来进行翻译，同时保留原始地址位11:0(页面偏移量)。这个翻译后的地址可以根据需要在上端进行零扩展或裁剪，以使其成为机器的实际物理地址的宽度。然后，设备的原始存储器访问被传递到具有新地址的存储器系统。</p>
+<p>基本转换模式下的MSI PTE允许hypervisor将用于虚拟中断文件的MSI写入路由到机器中真实IMSIC的 <em>guest interrupt file</em> 。</p>
+<blockquote>
+<p>IOMMU也采用标准RISC-V页表进行常规地址转换，可以最大限度地提高MSI pte和常规RISC-V叶pte处理之间的重叠，如下所示:</p>
+<p>对于RV64，基本翻译模式下的MSI PTE的第一个双字与基于页面的Sv39、Sv48、Sv57、Sv39x4、Sv48x4或Sv57x4的常规RISC-V叶PTE具有相同的编码，PTE字段D、a、G、U和X均为零，W &#x3D; R &#x3D; 1。因此，MSI PTE的第一个双字看起来与授予读写权限(R &#x3D; W &#x3D; 1)但不授予执行权限(X &#x3D; 0)的常规PTE相同。这个相同编码的常规PTE将转换与实际MSI PTE相同的MSI写，除了PTE的访问(a)，脏(D)和用户(U)位都是零。IOMMU只需要对MSI PTE和常规RV64叶子PTE区别对待这三个比特。</p>
+<p>用于从常规RISC-V页表中选择PTE的地址计算必须修改为从MSI页表中选择MSI PTE的第一个双字。然而，从guest physical address提取中断文件号以获得访问MSI页表的索引已经在PTE寻址中产生了不可避免的差异。</p>
+<p>对于RV32, MSI PTE的第一个双字的下32位字具有与Sv32或Sv32x4基于页面的地址转换的叶PTE相同的格式，除了PTE位a, D和U，它们必须以不同的方式处理。</p>
+</blockquote>
+<h3 id="8-5-2-MSI-PTE-MRIF模式"><a href="#8-5-2-MSI-PTE-MRIF模式" class="headerlink" title="8.5.2 MSI PTE, MRIF模式"></a>8.5.2 MSI PTE, MRIF模式</h3><p>如果支持驻留内存中断文件，并且MSI PTE具有V &#x3D; 1, C &#x3D; 0和M &#x3D; 1 (MRIF模式)字段，则PTE的完整格式为:</p>
+<p><img src="/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614103054402.png" alt="image-20230614103054402"></p>
+<p>PTE的MRIF地址字段提供了驻留在内存中的中断文件的物理地址的55:9位，用于存储传入的MSI，称为目标MRIF。由于每个驻留内存的中断文件都自然地与512字节的地址边界对齐，因此目标MRIF地址的8:0位必须为零，并且在PTE中没有指定。</p>
+<p>字段NPPN(通知物理页码)和两个NID(通知标识符)字段一起指定了通知MSI的目的地和值，该通知MSI是在每次目的地MRIF更新后发送的，因为它咨询了该PTE以存储传入的MSI。</p>
+<blockquote>
+<p>通常，NPPN将是真实机器中IMSIC中断文件的页地址，而NID将是在该中断文件中挂起的中断标识，以指示目标MRIF可能已经更改。然而，NPPN并不需要是一个有效的中断文件地址，IOMMU也不能试图将其限制为只有这样的地址。NPPN必须接受任何页面地址。</p>
+</blockquote>
+<p>I&#x2F;O设备对由MRIF模式PTE覆盖的页内地址的内存访问由IOMMU处理，而不是传递给内存系统。如果内存访问(读或写)不是针对32位数据，或者访问地址没有对齐到4字节边界(包括跨页边界的访问)，则该访问应被视为不受支持而中止。对于一个自然对齐的32位读操作，IOMMU最好返回0作为读值，但也可能中止访问。一个自然对齐的32位写操作要么被解释为MSI，导致目标MRIF的更新，要么被丢弃。</p>
+<p>当系统中的IMSIC中断文件实现内存映射寄存器seteipnum用于接收大端字节顺序的MSI时(章节3.5)，那么IOMMU必须能够以小端和大端字节顺序将MSI存储到目标MRIF。如果系统中的IMSIC中断文件没有实现寄存器seteipnum, IOMMU通常应该只将小端MSI存储到目标MRIF。如果目的地址的第2位为0，则假定传入MSI的数据是小端字节序，如果目的地址的第2位为1，则假定传入MSI的数据是大端字节序。</p>
+<p>如果一个自然对齐的32位写操作是在一个由MRIFmode PTE覆盖的页面中对guest物理地址a进行的，并且如果写数据在按照a的第2位指示的字节顺序进行解释时为D，那么写操作将按照以下方式处理:如果a[11:3]或D[31:11]不为零，或者如果a的第2位为1且不支持大端MSIs，则接受但丢弃传入的写操作。</p>
+<p>否则，原始的写入将被识别为MSI，并被以下序列替换:</p>
+<ol>
+<li><p>在目标MRIF中，使用用于原子更新的AMOOR操作或非原子读-修改-写序列，将中断标识D的中断挂起位设置为1。</p>
+</li>
+<li><p>将11位NID值扩展为32位，并以小端字节顺序将该值进行32位写入地址NPPN &lt;&lt; 12(即物理页码NPPN，页偏移量为零)。</p>
+</li>
+</ol>
+<p>在步骤2的写入对任何代理可见之前，步骤1的写入必须对系统中的所有代理可见。</p>
+<blockquote>
+<p>虽然IOMMU通常会缓存在基本转换模式下配置的MSI pte (M &#x3D; 3)，但它们可能不会缓存在MRIF模式下配置的pte (M &#x3D; 1)。不缓存MSI pte的原因有两个:首先，将MSI存储到MRIF所需的信息和操作与正常的地址转换大不相同;其次，就其性质而言，MSI到MRIF的发生频率应该更低。因此，IOMMU可能仅仅作为缓存缺失页表遍历的扩展来执行MRIF模式处理，使其地址转换缓存对MRIF模式MSI pte无关。</p>
+</blockquote>
+</center>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/RISC-V/" rel="tag"># RISC-V</a>
+              <a href="/tags/%E4%B8%AD%E6%96%AD/" rel="tag"># 中断</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/25/SGDMA%E4%B8%8E%E6%99%AE%E9%80%9ADMA/" rel="prev" title="SGDMA与普通DMA">
+                  <i class="fa fa-angle-left"></i> SGDMA与普通DMA
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/11/04/ATS%E7%AE%80%E4%BB%8B/" rel="next" title="ATS简介">
+                  ATS简介 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu JInlin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+
+</body>
+</html>
