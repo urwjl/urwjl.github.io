@@ -96,7 +96,7 @@
 <meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614102442012.png">
 <meta property="og:image" content="http://example.com/2024/11/01/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/RISC-V_AIA_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/image-20230614103054402.png">
 <meta property="article:published_time" content="2024-11-01T05:52:39.000Z">
-<meta property="article:modified_time" content="2024-11-15T03:24:28.122Z">
+<meta property="article:modified_time" content="2024-11-20T01:17:04.111Z">
 <meta property="article:author" content="Wu JInlin">
 <meta property="article:tag" content="RISC-V">
 <meta property="article:tag" content="中断">
@@ -199,18 +199,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">32</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">44</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -273,7 +273,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-11-15 11:24:28" itemprop="dateModified" datetime="2024-11-15T11:24:28+08:00">2024-11-15</time>
+      <time title="修改时间：2024-11-20 09:17:04" itemprop="dateModified" datetime="2024-11-20T09:17:04+08:00">2024-11-20</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -739,7 +739,7 @@
 <p>边缘敏感源可以配置为识别上升沿(低到高转换)或下降沿(高到低转换)的传入中断。当配置为下降沿(模式Edge0)时，源被称为反向。</p>
 <p>电平敏感源可以配置为将线路上的高电平(1)或低电平(0)解释为中断的断言。当配置为低电平(模式Level0)时，源被称为反向。</p>
 <p>对于被配置为边缘敏感或电平敏感的中断源，定义</p>
-<center><i>整流(rectified)输入值=(进线值)异或(源倒置)。</i>
+<center><i>整流(rectified)输入值=(进线值)异或(源倒置)。</i></center>
 
 <p><strong>对于非有效或分离的源，整流输入值为零。</strong></p>
 <p><strong>如果在新的源模式下整流输入值很高(&#x3D; 1)，那么对sourcecfg寄存器的任何写操作都可能(也可能不会)导致相应的中断挂起位被设置为1。除非源寄存器处于非有效状态，否则对sourcecfg的写操作本身不会导致清除挂起位。(请参见4.7节。)</strong></p>
@@ -1523,7 +1523,7 @@
 <blockquote>
 <p>虽然IOMMU通常会缓存在基本转换模式下配置的MSI pte (M &#x3D; 3)，但它们可能不会缓存在MRIF模式下配置的pte (M &#x3D; 1)。不缓存MSI pte的原因有两个:首先，将MSI存储到MRIF所需的信息和操作与正常的地址转换大不相同;其次，就其性质而言，MSI到MRIF的发生频率应该更低。因此，IOMMU可能仅仅作为缓存缺失页表遍历的扩展来执行MRIF模式处理，使其地址转换缓存对MRIF模式MSI pte无关。</p>
 </blockquote>
-</center>
+
     </div>
 
     
@@ -1540,8 +1540,8 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2024/10/25/SGDMA%E4%B8%8E%E6%99%AE%E9%80%9ADMA/" rel="prev" title="SGDMA与普通DMA">
-                  <i class="fa fa-angle-left"></i> SGDMA与普通DMA
+                <a href="/2024/10/25/gitea%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/" rel="prev" title="gitea安装和使用">
+                  <i class="fa fa-angle-left"></i> gitea安装和使用
                 </a>
             </div>
             <div class="post-nav-item">
@@ -1567,7 +1567,7 @@
 
   <div class="copyright">
     &copy; 
-    <span itemprop="copyrightYear">2024</span>
+    <span itemprop="copyrightYear">2025</span>
     <span class="with-love">
       <i class="fa fa-heart"></i>
     </span>

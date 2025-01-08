@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/312127.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/312127.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="iStoreOS 版本介绍12345678root@iStoreOS:~# cat &#x2F;etc&#x2F;openwrt_releaseDISTRIB_ID&#x3D;&#x27;iStoreOS&#x27;DISTRIB_RELEASE&#x3D;&#x27;22.03.7&#x27;DISTRIB_REVISION&#x3D;&#x27;2024102509&#x27;DISTRIB_TARGET&#x3D;&#x27;x86&#x2F;64&#x27;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iStoreOS安装WireGuard">
+<meta property="og:url" content="http://example.com/2024/11/14/iStoreOS%E5%AE%89%E8%A3%85WireGuard/index.html">
+<meta property="og:site_name" content="WJL">
+<meta property="og:description" content="iStoreOS 版本介绍12345678root@iStoreOS:~# cat &#x2F;etc&#x2F;openwrt_releaseDISTRIB_ID&#x3D;&#x27;iStoreOS&#x27;DISTRIB_RELEASE&#x3D;&#x27;22.03.7&#x27;DISTRIB_REVISION&#x3D;&#x27;2024102509&#x27;DISTRIB_TARGET&#x3D;&#x27;x86&#x2F;64&#x27;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/11/14/iStoreOS%E5%AE%89%E8%A3%85WireGuard/iStoreOS%E5%AE%89%E8%A3%85WireGuard/QQ_1731546892337.png">
+<meta property="article:published_time" content="2024-11-14T00:38:58.000Z">
+<meta property="article:modified_time" content="2024-11-25T06:38:27.842Z">
+<meta property="article:author" content="Wu JInlin">
+<meta property="article:tag" content="iStoreOS">
+<meta property="article:tag" content="WireGuard">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2024/11/14/iStoreOS%E5%AE%89%E8%A3%85WireGuard/iStoreOS%E5%AE%89%E8%A3%85WireGuard/QQ_1731546892337.png">
+
+
+<link rel="canonical" href="http://example.com/2024/11/14/iStoreOS%E5%AE%89%E8%A3%85WireGuard/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/11/14/iStoreOS%E5%AE%89%E8%A3%85WireGuard/","path":"2024/11/14/iStoreOS安装WireGuard/","title":"iStoreOS安装WireGuard"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>iStoreOS安装WireGuard | WJL</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">WJL</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fighting forgetfulness</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#iStoreOS-%E7%89%88%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="nav-text">iStoreOS 版本介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85WireGuard"><span class="nav-text">安装WireGuard</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E8%A1%8C%E5%8D%87%E7%BA%A7"><span class="nav-text">例行升级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-text">安装</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-text">配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE"><span class="nav-text">端口配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E5%AF%B9%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-text">端口对端配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%B2%E7%81%AB%E5%A2%99%E9%85%8D%E7%BD%AE"><span class="nav-text">防火墙配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%A2%E6%9C%8D%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-text">客服端配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="nav-text">参考文档</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu JInlin"
+      src="/images/20241114140630.jpg">
+  <p class="site-author-name" itemprop="name">Wu JInlin</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/14/iStoreOS%E5%AE%89%E8%A3%85WireGuard/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/20241114140630.jpg">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="iStoreOS安装WireGuard | WJL">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iStoreOS安装WireGuard
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-11-14 08:38:58" itemprop="dateCreated datePublished" datetime="2024-11-14T08:38:58+08:00">2024-11-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-11-25 14:38:27" itemprop="dateModified" datetime="2024-11-25T14:38:27+08:00">2024-11-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/iStoreOS/" itemprop="url" rel="index"><span itemprop="name">iStoreOS</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/iStoreOS/WireGuard/" itemprop="url" rel="index"><span itemprop="name">WireGuard</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="iStoreOS-版本介绍"><a href="#iStoreOS-版本介绍" class="headerlink" title="iStoreOS 版本介绍"></a>iStoreOS 版本介绍</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root@iStoreOS:~# <span class="built_in">cat</span> /etc/openwrt_release</span><br><span class="line">DISTRIB_ID=<span class="string">&#x27;iStoreOS&#x27;</span></span><br><span class="line">DISTRIB_RELEASE=<span class="string">&#x27;22.03.7&#x27;</span></span><br><span class="line">DISTRIB_REVISION=<span class="string">&#x27;2024102509&#x27;</span></span><br><span class="line">DISTRIB_TARGET=<span class="string">&#x27;x86/64&#x27;</span></span><br><span class="line">DISTRIB_ARCH=<span class="string">&#x27;x86_64&#x27;</span></span><br><span class="line">DISTRIB_DESCRIPTION=<span class="string">&#x27;iStoreOS 22.03.7 2024102509&#x27;</span></span><br><span class="line">DISTRIB_TAINTS=<span class="string">&#x27;busybox&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>iStoreOS 作为主路由，并且有公网IP，而且配置了DDNS</p>
+<span id="more"></span>
+
+<h1 id="安装WireGuard"><a href="#安装WireGuard" class="headerlink" title="安装WireGuard"></a>安装WireGuard</h1><h2 id="例行升级"><a href="#例行升级" class="headerlink" title="例行升级"></a>例行升级</h2><p>通过<code>opkg</code>升级</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">opkg update</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>安装WireGuard和相关依赖</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">opkg install  kmod-wireguard \</span><br><span class="line">luci-app-wireguard \</span><br><span class="line">luci-i18n-wireguard-zh-cn \</span><br><span class="line">luci-proto-wireguard \</span><br><span class="line">wg-installer-server \</span><br><span class="line">wg-installer-server-hotplug-babeld \</span><br><span class="line">wg-installer-server-hotplug-olsrd \</span><br><span class="line">wireguard-tools -y</span><br></pre></td></tr></table></figure>
+
+<p>然后进行重启，否则接口那边不能选择WireGuard协议</p>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><h2 id="端口配置"><a href="#端口配置" class="headerlink" title="端口配置"></a>端口配置</h2><p>登陆 iStoreOS – 网络 – 接口 – 添加新接口</p>
+<p>接口名随意填写例如 <code>WG0</code></p>
+<p>协议选择 <code>WireGuard VPN</code></p>
+<p>点击<code>提交</code></p>
+<p>开机自动运行 <code>打钩</code></p>
+<p>直接<code>生成新的密钥对</code></p>
+<p>监听接口改一下，然后记住例如（<code>45688</code>）</p>
+<p>地址改为 <code>10.10.10.1/8</code> （改为私有地址，不与主网络相同）</p>
+<h2 id="端口对端配置"><a href="#端口对端配置" class="headerlink" title="端口对端配置"></a>端口对端配置</h2><p>网络 – 接口 – WG0 - 编辑 - 对端 - 添加对端</p>
+<p>填写相关密钥和ip</p>
+<p>然后可以导出成文本或二维码</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[Interface]</span></span><br><span class="line"><span class="attr">PrivateKey</span> = xxx</span><br><span class="line"><span class="attr">Address</span> = <span class="number">10.10</span>.<span class="number">10.2</span>, <span class="number">192.168</span>.<span class="number">2.1</span>/<span class="number">24</span></span><br><span class="line"><span class="comment"># ListenPort not defined</span></span><br><span class="line"><span class="attr">DNS</span> = <span class="number">192.168</span>.<span class="number">2.1</span></span><br><span class="line"></span><br><span class="line"><span class="section">[Peer]</span></span><br><span class="line"><span class="attr">PublicKey</span> = xxx</span><br><span class="line"><span class="attr">PresharedKey</span> = xxx</span><br><span class="line"><span class="attr">AllowedIPs</span> = <span class="number">0.0</span>.<span class="number">0.0</span>/<span class="number">0</span>, ::/<span class="number">0</span></span><br><span class="line"><span class="attr">Endpoint</span> = <span class="number">175.0</span>.<span class="number">35.223</span>:<span class="number">45688</span></span><br><span class="line"><span class="attr">PersistentKeepAlive</span> = <span class="number">25</span></span><br></pre></td></tr></table></figure>
+
+<p>这个对端的配置需要导到外网的客户端，例如下文提到的外网的电脑</p>
+<h2 id="防火墙配置"><a href="#防火墙配置" class="headerlink" title="防火墙配置"></a>防火墙配置</h2><p>新建WG区域，将接口WG0 纳入 WG区域</p>
+<p>然后接收所有WG-&gt; LAN 区域所有的包</p>
+<p>开启MSS钳制</p>
+<p><img src="/2024/11/14/iStoreOS%E5%AE%89%E8%A3%85WireGuard/iStoreOS%E5%AE%89%E8%A3%85WireGuard/QQ_1731546892337.png" alt="QQ_1731546892337"></p>
+<p>iStoreOS配置完成</p>
+<h1 id="客服端配置"><a href="#客服端配置" class="headerlink" title="客服端配置"></a>客服端配置</h1><p>客户端是外网没有公网IP的设备，例如放在公司的 <strong>laptop</strong></p>
+<p>通过网关下载win的版本</p>
+<p><a target="_blank" rel="noopener" href="https://download.wireguard.com/windows-client/wireguard-installer.exe">https://download.wireguard.com/windows-client/wireguard-installer.exe</a></p>
+<p>然后进行安装</p>
+<p>之后新建隧道配置文件，将配置内容粘贴进去</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[Interface]</span></span><br><span class="line"><span class="attr">PrivateKey</span> = xxx</span><br><span class="line"><span class="attr">Address</span> = <span class="number">10.10</span>.<span class="number">10.2</span>, <span class="number">192.168</span>.<span class="number">2.1</span>/<span class="number">24</span></span><br><span class="line"><span class="comment"># ListenPort not defined</span></span><br><span class="line"><span class="attr">DNS</span> = <span class="number">192.168</span>.<span class="number">2.1</span></span><br><span class="line"></span><br><span class="line"><span class="section">[Peer]</span></span><br><span class="line"><span class="attr">PublicKey</span> = xxx</span><br><span class="line"><span class="attr">PresharedKey</span> = xxx</span><br><span class="line"><span class="attr">AllowedIPs</span> = <span class="number">0.0</span>.<span class="number">0.0</span>/<span class="number">0</span>, ::/<span class="number">0</span></span><br><span class="line"><span class="attr">Endpoint</span> = www.<span class="number">073123</span>.xyz:<span class="number">45688</span></span><br><span class="line"><span class="attr">PersistentKeepAlive</span> = <span class="number">25</span></span><br></pre></td></tr></table></figure>
+
+<p><code>PrivateKey</code> 是客户端的私钥</p>
+<p><code>Address</code> 是本地的地址</p>
+<p><code>DNS</code> 可以填远程路由器的LAN地址</p>
+<p><code>PublicKey</code> 是服务端的公钥，也就是iStoreOS的公钥</p>
+<p><code>PresharedKey</code> 是共享密钥，与iStoreOS保持一致即可</p>
+<p><code>AllowedIPs</code> 是接管流量的IP，例如<code>0.0.0.0/0</code>代表所有的流量走WG，<code>192.168.2.1/24</code>代表目的地址为 192.168.2.* 的 走WG，多个域用逗号加空格隔开<code>, </code></p>
+<p><code>Endpoint</code> 填iStoreOS的域名和端口</p>
+<p><code>PersistentKeepAlive</code> 为保活时间，NAT建议填25</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a target="_blank" rel="noopener" href="https://gitee.com/spoto/wireguard">司波图</a></p>
+<p><a href="ttps://icloudnative.io/posts/wireguard-docs-practice">米开朗基杨1</a></p>
+<p><a target="_blank" rel="noopener" href="https://icloudnative.io/posts/wireguard-docs-theory/">米开朗基杨2</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/pirate/wireguard-docs">非官方的 WireGuard 文档</a> </p>
+<p><a target="_blank" rel="noopener" href="https://kenvix.com/post/wireguard-ddns-windows/">在Windows下实现WireGuard动态DNS解析(DDNS)的正确方法</a></p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/dcssn_weiangongsi/windows-wireguard-watchdog">windows-wireguard-watchdog</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iStoreOS/" rel="tag"># iStoreOS</a>
+              <a href="/tags/WireGuard/" rel="tag"># WireGuard</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/12/RISC-V_%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%88%86%E9%A1%B5/" rel="prev" title="RISC-V 虚拟内存分页">
+                  <i class="fa fa-angle-left"></i> RISC-V 虚拟内存分页
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/11/22/git%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="next" title="git常用命令">
+                  git常用命令 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu JInlin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"http://example.com/2024/11/14/iStoreOS%E5%AE%89%E8%A3%85WireGuard/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+
+</body>
+</html>

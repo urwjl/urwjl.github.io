@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/312127.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/312127.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Debian12安装注意事项 安装时联网会更新软件，导致安装进度慢，建议安装时不插网线 只有在确定格式化硬盘时选yes，其他时刻都能选no  目录树   目录 内容    bin 基本命令执行文件   boot boot loader 的静态链接文件   dev 设备文件   etc 主机特定的系统配置   home 用户目录   lib 基本共享库以及内核模块   media 用于移动介质的挂载">
+<meta property="og:type" content="article">
+<meta property="og:title" content="debian12">
+<meta property="og:url" content="http://example.com/2024/07/12/Debian12/index.html">
+<meta property="og:site_name" content="WJL">
+<meta property="og:description" content="Debian12安装注意事项 安装时联网会更新软件，导致安装进度慢，建议安装时不插网线 只有在确定格式化硬盘时选yes，其他时刻都能选no  目录树   目录 内容    bin 基本命令执行文件   boot boot loader 的静态链接文件   dev 设备文件   etc 主机特定的系统配置   home 用户目录   lib 基本共享库以及内核模块   media 用于移动介质的挂载">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-07-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-08T01:21:19.318Z">
+<meta property="article:author" content="Wu JInlin">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="debian12">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/07/12/Debian12/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/07/12/Debian12/","path":"2024/07/12/Debian12/","title":"debian12"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>debian12 | WJL</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">WJL</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fighting forgetfulness</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian12"><span class="nav-text">Debian12</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-text">安装注意事项</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E6%A0%91"><span class="nav-text">目录树</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE"><span class="nav-text">网卡配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ifconfig"><span class="nav-text">ifconfig</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BD%BF%E7%94%A8-ip-%E5%91%BD%E4%BB%A4%E4%BB%A3%E6%9B%BF"><span class="nav-text">1. 使用 ip 命令代替</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%AE%89%E8%A3%85-ifconfig"><span class="nav-text">2. 安装 ifconfig</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lshw-%E6%9F%A5%E7%9C%8B%E7%A1%AC%E4%BB%B6%E4%BF%A1%E6%81%AF"><span class="nav-text">lshw 查看硬件信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E6%BA%90"><span class="nav-text">修改源</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E6%97%B6%E5%8C%BA"><span class="nav-text">修改时区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-1%EF%BC%9A%E4%BD%BF%E7%94%A8-timedatectl-%E4%BF%AE%E6%94%B9%E6%97%B6%E5%8C%BA"><span class="nav-text">方法 1：使用 timedatectl 修改时区</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%97%B6%E9%97%B4%E6%A0%BC%E5%BC%8F"><span class="nav-text">配置时间格式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEsudo%E6%9D%83%E9%99%90"><span class="nav-text">配置sudo权限</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AEssh"><span class="nav-text">安装和配置ssh</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%AE%89%E8%A3%85"><span class="nav-text">1. 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E9%85%8D%E7%BD%AE-SSH-%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95"><span class="nav-text">2. 配置 SSH 免密登录</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-%E7%94%9F%E6%88%90-SSH-%E5%AF%86%E9%92%A5"><span class="nav-text">1.1 生成 SSH 密钥</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-%E5%B0%86%E5%85%AC%E9%92%A5%E5%A4%8D%E5%88%B6%E5%88%B0%E7%9B%AE%E6%A0%87%E6%9C%BA%E5%99%A8-B"><span class="nav-text">1.2 将公钥复制到目标机器 B</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-%E9%AA%8C%E8%AF%81%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95"><span class="nav-text">1.3 验证免密登录</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%85%8D%E7%BD%AE-rsync-%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93"><span class="nav-text">3. 配置 rsync 文件传输</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E4%BD%BF%E7%94%A8-rsync-%E5%92%8C%E6%8C%87%E5%AE%9A%E5%AF%86%E9%92%A5"><span class="nav-text">3.1 使用 rsync 和指定密钥</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%AE%80%E5%8C%96%E6%93%8D%E4%BD%9C"><span class="nav-text">3.2 定义配置文件简化操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-%E4%BD%BF%E7%94%A8%E5%9B%BA%E5%AE%9A%E6%96%87%E4%BB%B6%E6%89%80%E6%9C%89%E8%80%85"><span class="nav-text">3.3 使用固定文件所有者</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E9%A2%9D%E5%A4%96%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE"><span class="nav-text">4. 额外安全配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E9%AA%8C%E8%AF%81%E5%92%8C%E6%B5%8B%E8%AF%95"><span class="nav-text">5. 验证和测试</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%9C%AC%E5%9C%B0%E4%BB%A3%E7%90%86"><span class="nav-text">使用本地代理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85python3-pandas"><span class="nav-text">安装python3-pandas</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-wol"><span class="nav-text">安装 wol</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Docker-%E4%BB%A5%E5%8F%8A-Docker-Compose"><span class="nav-text">安装 Docker 以及 Docker Compose</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AE%98%E6%96%B9%E6%BA%90%E5%AE%89%E8%A3%85-Docker"><span class="nav-text">使用官方源安装 Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Docker-Compose"><span class="nav-text">安装 Docker Compose</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9-Docker-%E9%85%8D%E7%BD%AE"><span class="nav-text">修改 Docker 配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7%E5%88%B0-docker-%E7%BB%84"><span class="nav-text">添加用户到 docker 组</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Docker-%E5%AE%89%E8%A3%85-homeassistans"><span class="nav-text">Docker 安装 homeassistans</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Docker-%E5%AE%89%E8%A3%85-immich"><span class="nav-text">Docker 安装 immich</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%87%E4%BB%BD"><span class="nav-text">备份</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%A9-%E8%84%9A%E6%9C%AC%E6%94%B9%E8%BF%9B%EF%BC%88%E5%90%AB%E6%97%A5%E5%BF%97%E8%BE%93%E5%87%BA%EF%BC%89%EF%BC%9A"><span class="nav-text">🧩 脚本改进（含日志输出）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%93%8B-%E6%94%B9%E8%BF%9B%E5%90%8E%E7%9A%84%E8%84%9A%E6%9C%AC%EF%BC%88backup-sh%EF%BC%89%EF%BC%9A"><span class="nav-text">📋 改进后的脚本（backup.sh）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8rclone%E5%90%8E%E7%9A%84%E8%84%9A%E6%9C%AC"><span class="nav-text">使用rclone后的脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%95%92-%E8%AE%BE%E7%BD%AE%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%EF%BC%9A"><span class="nav-text">🕒 设置定时任务：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A41%EF%BC%9A%E7%BC%96%E8%BE%91-cron-%E4%BB%BB%E5%8A%A1"><span class="nav-text">步骤1：编辑 cron 任务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A42%EF%BC%9A%E6%B7%BB%E5%8A%A0%E4%BB%A5%E4%B8%8B-cron-%E4%BB%BB%E5%8A%A1"><span class="nav-text">步骤2：添加以下 cron 任务</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%B9-%E6%97%A5%E5%BF%97%E6%B8%85%E7%90%86%E5%BB%BA%E8%AE%AE%EF%BC%9A"><span class="nav-text">🧹 日志清理建议：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-logrotate-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%EF%BC%9A"><span class="nav-text">创建 logrotate 配置文件：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%93%8A-%E6%89%A7%E8%A1%8C%E6%95%88%E6%9E%9C%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-text">📊 执行效果示例：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%9C%85-%E6%AD%A3%E5%B8%B8%E5%A4%87%E4%BB%BD%E6%97%A5%E5%BF%97%EF%BC%9A"><span class="nav-text">✅ 正常备份日志：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%9A%A0%EF%B8%8F-%E9%94%99%E8%AF%AF%E6%97%A5%E5%BF%97%EF%BC%9A"><span class="nav-text">⚠️ 错误日志：</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85zerotier-one"><span class="nav-text">安装zerotier-one</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5-%E5%9C%A8%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E5%AE%89%E8%A3%85-zerotier-one"><span class="nav-text">第一步 在云服务器上安装 zerotier-one</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5-%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8A%A0%E5%85%A5%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C"><span class="nav-text">第二步 云服务器加入虚拟网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5-%E9%85%8D%E7%BD%AE-Moon"><span class="nav-text">第三步 配置 Moon</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-Moon"><span class="nav-text">使用 Moon</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-%E7%B3%BB%E7%BB%9F%E4%B8%8B%E4%BD%BF%E7%94%A8-Moon"><span class="nav-text">Linux 系统下使用 Moon</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Windows-%E7%B3%BB%E7%BB%9F%E4%B8%8B%E4%BD%BF%E7%94%A8-Moon"><span class="nav-text">Windows 系统下使用 Moon</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%B8%80%EF%BC%9A%E7%94%B5%E8%84%91%E6%B7%BB%E5%8A%A0%E4%BA%86%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%8C%E4%BD%86Zerotier%E7%AE%A1%E7%90%86%E5%88%97%E8%A1%A8%E4%B8%AD%E5%A7%8B%E7%BB%88%E6%B2%A1%E6%9C%89%E6%98%BE%E7%A4%BA%E8%BF%99%E5%8F%B0%E8%AE%BE%E5%A4%87"><span class="nav-text">常见问题一：电脑添加了虚拟网络，但Zerotier管理列表中始终没有显示这台设备</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEfrp"><span class="nav-text">配置frp</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#chown-%E5%91%BD%E4%BB%A4%E5%8F%98%E6%9B%B4%E6%96%87%E4%BB%B6%E5%85%B3%E8%81%94%E7%BB%84"><span class="nav-text">chown 命令变更文件关联组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95"><span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B"><span class="nav-text">实例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#crontab"><span class="nav-text">crontab</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E6%97%A5%E5%BF%97"><span class="nav-text">打开日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%90%AF-cron-%E6%9C%8D%E5%8A%A1"><span class="nav-text">重启 cron 服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Debian12-root%E7%94%A8%E6%88%B7%E7%9A%84cron%E6%96%87%E4%BB%B6%E8%B7%AF%E5%BE%84"><span class="nav-text">Debian12 root用户的cron文件路径</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8C%82%E8%BD%BDNTFS"><span class="nav-text">挂载NTFS</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wu JInlin"
+      src="/images/20241114140630.jpg">
+  <p class="site-author-name" itemprop="name">Wu JInlin</p>
+  <div class="site-description" itemprop="description">个人博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/12/Debian12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/20241114140630.jpg">
+      <meta itemprop="name" content="Wu JInlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WJL">
+      <meta itemprop="description" content="个人博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="debian12 | WJL">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          debian12
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-07-12 00:00:00" itemprop="dateCreated datePublished" datetime="2024-07-12T00:00:00+08:00">2024-07-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-01-08 09:21:19" itemprop="dateModified" datetime="2025-01-08T09:21:19+08:00">2025-01-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/debian12/" itemprop="url" rel="index"><span itemprop="name">debian12</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/debian12/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Debian12"><a href="#Debian12" class="headerlink" title="Debian12"></a>Debian12</h1><h1 id="安装注意事项"><a href="#安装注意事项" class="headerlink" title="安装注意事项"></a>安装注意事项</h1><ol>
+<li>安装时联网会更新软件，导致安装进度慢，建议安装时不插网线</li>
+<li>只有在确定格式化硬盘时选<code>yes</code>，其他时刻都能选<code>no</code></li>
+</ol>
+<h2 id="目录树"><a href="#目录树" class="headerlink" title="目录树"></a>目录树</h2><table>
+<thead>
+<tr>
+<th>目录</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>bin</code></td>
+<td>基本命令执行文件</td>
+</tr>
+<tr>
+<td><code>boot</code></td>
+<td>boot loader 的静态链接文件</td>
+</tr>
+<tr>
+<td><code>dev</code></td>
+<td>设备文件</td>
+</tr>
+<tr>
+<td><code>etc</code></td>
+<td>主机特定的系统配置</td>
+</tr>
+<tr>
+<td><code>home</code></td>
+<td>用户目录</td>
+</tr>
+<tr>
+<td><code>lib</code></td>
+<td>基本共享库以及内核模块</td>
+</tr>
+<tr>
+<td><code>media</code></td>
+<td>用于移动介质的挂载点</td>
+</tr>
+<tr>
+<td><code>mnt</code></td>
+<td>用于临时挂载文件系统</td>
+</tr>
+<tr>
+<td><code>proc</code></td>
+<td>系统信息的虚拟目录</td>
+</tr>
+<tr>
+<td><code>root</code></td>
+<td>root 用户的目录</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td>Run-time variable data</td>
+</tr>
+<tr>
+<td><code>sbin</code></td>
+<td>基本系统命令执行文件</td>
+</tr>
+<tr>
+<td><code>sys</code></td>
+<td>系统信息的虚拟目录</td>
+</tr>
+<tr>
+<td><code>tmp</code></td>
+<td>临时文件</td>
+</tr>
+<tr>
+<td><code>usr</code></td>
+<td>第二级目录</td>
+</tr>
+<tr>
+<td><code>var</code></td>
+<td>不断变化的数据</td>
+</tr>
+<tr>
+<td><code>srv</code></td>
+<td>系统提供的用于 service 的数据</td>
+</tr>
+<tr>
+<td><code>opt</code></td>
+<td>附加的应用程序软件包</td>
+</tr>
+</tbody></table>
+<p>下面列出关于目录和分区的重要考虑。要注意磁盘的使用随系统配置和特定用途有很大变化。这里所推荐的是通用指引，提供如何分区的起点。</p>
+<ul>
+<li>根分区 <code>/</code> 必须总是物理地包含 <code>/etc</code>、<code>/bin</code>、<code>/sbin</code>、<code>/lib</code> 和 <code>/dev</code>，否则您将不能启动系统。典型的根分区需要 250–350MB 大小空间。</li>
+<li><code>/usr</code>：包含所有的用户程序(<code>/usr/bin</code>)，库文件(<code>/usr/lib</code>)，文档(<code>/usr/share/doc</code>)，等等。这是文件系统中耗费空间最多的部分。您需要提供至少 500MB 磁盘空间。总容量会依据您要安装的软件包数量和类型增长。宽松的工作站或服务器安装应该需要 4–6GB。</li>
+<li>It is now recommended to have <code>/usr</code> on the root partition <code>/</code>, otherwise it could cause some trouble at boot time. This means that you should provide at least 600–750MB of disk space for the root partition including <code>/usr</code>, or 5–6GB for a workstation or a server installation.</li>
+<li><code>/var</code>：所有的可变数据，如新闻组文章、电子邮件、网站、数据库、软件包系统的缓存等等，将被放入这个目录。这个目录的大小取决于您计算机的用途，但是对大多数人来说，将主要用于软件包系统的管理工具。如果您准备一次性地做一个全面的安装，包含 Debian 提供的所有程序，<code>/var</code> 下面 2 或 3GB 的空间应该够用。如果您准备逐个安装(也就是说，安装服务程序和工具，然后是文本处理工具，然后是 X，…)，您准备 300–500 MB 就行。要是硬盘空间很紧张，并且不准备做主版本的系统升级，可以为其准备 30 或 40MB 大小。</li>
+<li><code>/tmp</code>: 程序创建的临时数据大都存到这个目录。通常 40–100 MB 应该足够。一些应用程序 — 包括归档处理程序、CD&#x2F;DVD 制作工具和多媒体软件 — 可能会使用 <code>/tmp</code> 临时保存映像文件。如果要使用这些程序，应该相应地调整 <code>/tmp</code> 目录的大小。</li>
+<li><code>/home</code>：每个用户将放置他的私有数据到这个目录的子目录下。其大小取决于将有多少用户使用系统，以及有什么样文件放在他们的目录下。根据规划的用途，应该为每个用户准备 100MB 空间，不过应该按您的需求调整。假如您在 home 目录下计划保存大量的多媒体文件(图片、MP3、电影)，该预备更多的空间。</li>
+</ul>
+<p>参考 <a target="_blank" rel="noopener" href="https://www.debian.org/releases/bullseye/mips/apcs02.zh-cn.html"><strong>附录 C. 为 Debian 准备分区</strong></a></p>
+<h1 id="网卡配置"><a href="#网卡配置" class="headerlink" title="网卡配置"></a>网卡配置</h1><p>编辑 &#x2F;etc&#x2F;network&#x2F;interfaces 文件并设置静态IP地址，如下所示</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/network/interfaces</span><br></pre></td></tr></table></figure>
+
+<p>用下面显示的方式替换『allow-htplug enp0s3』行，并将dhcp参数更改为static。以下是我的示例文件，根据您的环境更改介面名称和IP详细信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">auto enp0s3</span><br><span class="line">iface enp0s3 inet static</span><br><span class="line">        address 192.168.1.240/24</span><br><span class="line">        network 192.168.1.0</span><br><span class="line">        broadcast 192.168.1.255</span><br><span class="line">        gateway 192.168.1.1</span><br><span class="line">        dns-nameservers 8.8.8.8</span><br></pre></td></tr></table></figure>
+
+<p>为了使上述更改生效，重新启动网路服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart networking.service</span><br></pre></td></tr></table></figure>
+
+<p>现在，运行ip命令以验证IP地址</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip add show</span><br></pre></td></tr></table></figure>
+
+<h2 id="ifconfig"><a href="#ifconfig" class="headerlink" title="ifconfig"></a>ifconfig</h2><p>在较新的 Linux 发行版中，<code>ifconfig</code> 命令已经被标记为过时，推荐使用 <code>ip</code> 命令代替。如果你确实需要使用 <code>ifconfig</code>，可以安装 <code>net-tools</code> 包，以下是相关步骤：</p>
+<h3 id="1-使用-ip-命令代替"><a href="#1-使用-ip-命令代替" class="headerlink" title="1. 使用 ip 命令代替"></a>1. 使用 <code>ip</code> 命令代替</h3><p><code>ip</code> 命令是现代 Linux 网络管理的标准工具，功能更强大：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip addr</span><br></pre></td></tr></table></figure>
+
+<p>显示所有网络接口和 IP 地址。</p>
+<p>其他常用的 <code>ip</code> 命令示例：</p>
+<ul>
+<li><p>查看网络接口信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip <span class="built_in">link</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>显示路由信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip route</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="2-安装-ifconfig"><a href="#2-安装-ifconfig" class="headerlink" title="2. 安装 ifconfig"></a>2. 安装 <code>ifconfig</code></h3><p>如果你仍希望使用 <code>ifconfig</code>，需要安装 <code>net-tools</code>：</p>
+<ol>
+<li><p>更新软件包列表：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装 <code>net-tools</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install net-tools</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>再次运行 <code>ifconfig</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ifconfig</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="lshw-查看硬件信息"><a href="#lshw-查看硬件信息" class="headerlink" title="lshw 查看硬件信息"></a><code>lshw</code> 查看硬件信息</h2><p><code>lshw</code> 工具可以显示详细的硬件信息，包括网卡名称和对应的物理位置。</p>
+<ol>
+<li><p>安装 <code>lshw</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install lshw -y</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看网卡信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lshw -class network</span><br></pre></td></tr></table></figure>
+
+<p>输出示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">plaintext复制代码*-network</span><br><span class="line">     description: Ethernet interface</span><br><span class="line">     product: I210 Gigabit Network Connection</span><br><span class="line">     vendor: Intel Corporation</span><br><span class="line">     physical id: 0</span><br><span class="line">     bus info: pci@0000:02:00.0</span><br><span class="line">     logical name: eno1</span><br><span class="line">     serial: 11:22:33:44:55:66</span><br><span class="line">     capacity: 1Gbit/s</span><br><span class="line">     width: 32 bits</span><br><span class="line">     clock: 33MHz</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>logical name</code> 是网卡名称，例如 <code>eno1</code>。</li>
+<li><code>serial</code> 是网卡的 MAC 地址。</li>
+</ul>
+</li>
+</ol>
+<h1 id="修改源"><a href="#修改源" class="headerlink" title="修改源"></a>修改源</h1><p>打开<code>/etc/apt/sources.list</code>，并修改成以下内容</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware</span></span><br><span class="line"></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware</span></span><br><span class="line"></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 以下安全更新软件源包含了官方源与镜像站配置，如有需要可自行修改注释切换</span></span><br><span class="line">deb https://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware</span><br><span class="line"><span class="comment"># deb-src https://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="修改时区"><a href="#修改时区" class="headerlink" title="修改时区"></a>修改时区</h1><h3 id="方法-1：使用-timedatectl-修改时区"><a href="#方法-1：使用-timedatectl-修改时区" class="headerlink" title="方法 1：使用 timedatectl 修改时区"></a><strong>方法 1：使用 <code>timedatectl</code> 修改时区</strong></h3><ol>
+<li><p><strong>查看可用的时区列表</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timedatectl list-timezones</span><br></pre></td></tr></table></figure>
+
+<p>滚动查看或使用 <code>grep</code> 搜索，例如查找与上海相关的时区：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timedatectl list-timezones | grep Shanghai</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>设置新的时区</strong>： 假如要设置时区为 <code>Asia/Shanghai</code>，运行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> timedatectl set-timezone Asia/Shanghai</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>验证修改后的时区</strong>： 再次运行以下命令确认：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timedatectl</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="配置时间格式"><a href="#配置时间格式" class="headerlink" title="配置时间格式"></a>配置时间格式</h1><p>运行下列代码，或添加到 <code>~/.bashrc</code> 中</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> TIME_STYLE=<span class="string">&quot;+%Y-%m-%d %H:%M:%S&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>效果</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@debian:~# ll</span><br><span class="line">total 12092</span><br><span class="line">drwxr-xr-x 3 root root       4096 2024-09-23 14:05:25 devmem2</span><br><span class="line">drwxr-xr-x 2 1001 docker     4096 2024-09-13 10:39:29 frp_0.60.0_linux_amd64</span><br><span class="line">-rw-r--r-- 1 root root   12373547 2024-08-19 13:54:31 frp_0.60.0_linux_amd64.tar.gz</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="配置sudo权限"><a href="#配置sudo权限" class="headerlink" title="配置sudo权限"></a>配置sudo权限</h1><ol>
+<li>打开终端，安装sudo</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get install <span class="built_in">sudo</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>并以 root 或拥有 sudo 权限的用户身份执行以下命令以编辑 <code>/etc/sudoers</code> 文件：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> visudo</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>在打开的文件中，找到以下行：</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># User privilege specification</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>在这行的下面添加以下内容，其中 <code>wjl</code> 是你想要授予 sudo 权限的用户名：</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wjl    ALL=(ALL:ALL) ALL</span><br></pre></td></tr></table></figure>
+
+<p>这一行表示用户 wjl 在任何主机上以任何用户身份执行任何命令时都拥有 sudo 权限。</p>
+<ol start="5">
+<li><p>保存并退出编辑器。如果你使用的是 <code>visudo</code> 命令，只需按下 <code>Ctrl + X</code>，然后输入 <code>Y</code> 保存更改，最后按 <code>Enter</code> 退出。</p>
+</li>
+<li><p>现在，用户 wjl 应该已经具有 sudo 权限了。测试一下，在 wjl 用户的终端中尝试执行一个需要管理员权限的命令，如：</p>
+</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br></pre></td></tr></table></figure>
+
+<p>系统将要求输入密码，成功输入密码后即可执行该命令。</p>
+<h1 id="安装和配置ssh"><a href="#安装和配置ssh" class="headerlink" title="安装和配置ssh"></a>安装和配置ssh</h1><h3 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h3><ol>
+<li>安装ssh</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install openssh-server</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>手动启动</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start ssh.service</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>打开并修改&#x2F;etc&#x2F;ssh&#x2F;sshd_config文件：<ol>
+<li>将PermitRootLogin 设置为yes</li>
+<li>PasswordAuthentication设置为yes即可</li>
+</ol>
+</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/ssh/sshd_config</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>重启ssh服务</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/etc/init.d/ssh restart</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>在配置 SSH 免密登录时，使用 <code>ed25519</code> 算法可以提供更高的安全性和更快的性能。以下是基于 <code>ed25519</code> 的完整配置流程：</p>
+<h3 id="2-配置-SSH-免密登录"><a href="#2-配置-SSH-免密登录" class="headerlink" title="2. 配置 SSH 免密登录"></a>2. 配置 SSH 免密登录</h3><h4 id="1-1-生成-SSH-密钥"><a href="#1-1-生成-SSH-密钥" class="headerlink" title="1.1 生成 SSH 密钥"></a><strong>1.1 生成 SSH 密钥</strong></h4><p>在本地机器 A 上生成 <code>ed25519</code> 类型的 SSH 密钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t ed25519 -C <span class="string">&quot;1019547485@qq.com&quot;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>按提示操作：<ul>
+<li>默认保存路径为 <code>~/.ssh/id_ed25519</code>（直接回车）。</li>
+<li><strong>无需设置密码</strong>（直接回车，免密登录时不推荐设置密码）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="1-2-将公钥复制到目标机器-B"><a href="#1-2-将公钥复制到目标机器-B" class="headerlink" title="1.2 将公钥复制到目标机器 B"></a><strong>1.2 将公钥复制到目标机器 B</strong></h4><p>使用以下命令将公钥传输到目标机器 B：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-copy-id -i ~/.ssh/id_ed25519.pub user@192.168.2.20</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>系统会提示输入目标机器的密码，成功后公钥会被写入目标机器的 <code>~/.ssh/authorized_keys</code> 文件。</li>
+<li><strong>~&#x2F;.ssh&#x2F;authorized_keys 文件权限必须是600</strong></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chmod</span> 600 ~/.ssh/authorized_keys</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="1-3-验证免密登录"><a href="#1-3-验证免密登录" class="headerlink" title="1.3 验证免密登录"></a><strong>1.3 验证免密登录</strong></h4><p>在本地机器 A 上执行以下命令验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -i ~/.ssh/id_ed25519 user@192.168.2.20</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果无需输入密码即可登录，说明配置成功。</li>
+</ul>
+<hr>
+<h3 id="3-配置-rsync-文件传输"><a href="#3-配置-rsync-文件传输" class="headerlink" title="3. 配置 rsync 文件传输"></a>3. 配置 <code>rsync</code> 文件传输</h3><h4 id="3-1-使用-rsync-和指定密钥"><a href="#3-1-使用-rsync-和指定密钥" class="headerlink" title="3.1 使用 rsync 和指定密钥"></a><strong>3.1 使用 <code>rsync</code> 和指定密钥</strong></h4><p>在传输文件时，明确指定使用 <code>ed25519</code> 的私钥文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -e <span class="string">&quot;ssh -i ~/.ssh/id_ed25519&quot;</span> -avz /path/to/local/dir/ user@192.168.2.20:/path/to/remote/dir/</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-定义配置文件简化操作"><a href="#3-2-定义配置文件简化操作" class="headerlink" title="3.2 定义配置文件简化操作"></a><strong>3.2 定义配置文件简化操作</strong></h4><p>为了简化 <code>rsync</code> 和 <code>ssh</code> 的使用，可以在本地配置 <code>~/.ssh/config</code> 文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nano ~/.ssh/config</span><br></pre></td></tr></table></figure>
+
+<p>添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Host target_server</span><br><span class="line">    HostName 192.168.2.20</span><br><span class="line">    User user</span><br><span class="line">    IdentityFile ~/.ssh/id_ed25519</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数说明<ul>
+<li><code>Host</code>：自定义主机别名（如 <code>target_server</code>）。</li>
+<li><code>HostName</code>：目标机器的 IP 地址。</li>
+<li><code>User</code>：目标机器的用户名。</li>
+<li><code>IdentityFile</code>：指定使用的私钥文件。</li>
+</ul>
+</li>
+</ul>
+<p>保存后，直接使用别名连接：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh target_server</span><br></pre></td></tr></table></figure>
+
+<p><code>rsync</code> 命令也可以简化为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz /path/to/local/dir/ target_server:/path/to/remote/dir/</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-使用固定文件所有者"><a href="#3-3-使用固定文件所有者" class="headerlink" title="3.3 使用固定文件所有者"></a>3.3 使用固定文件所有者</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz --<span class="built_in">chown</span>=root:root  /path/to/local/dir/ target_server:/path/to/remote/dir/</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4-额外安全配置"><a href="#4-额外安全配置" class="headerlink" title="4. 额外安全配置"></a>4. 额外安全配置</h3><p>为了增强 SSH 的安全性，可以在目标机器 B 上修改 <code>/etc/ssh/sshd_config</code> 文件，确保启用了 <code>ed25519</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> nano /etc/ssh/sshd_config</span><br></pre></td></tr></table></figure>
+
+<p>检查并确保以下配置项正确：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PubkeyAuthentication <span class="built_in">yes</span></span><br><span class="line">AuthorizedKeysFile .ssh/authorized_keys</span><br><span class="line">HostKey /etc/ssh/ssh_host_ed25519_key</span><br><span class="line">PasswordAuthentication no</span><br></pre></td></tr></table></figure>
+
+<p>保存后，重启 SSH 服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl restart ssh</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="5-验证和测试"><a href="#5-验证和测试" class="headerlink" title="5. 验证和测试"></a>5. 验证和测试</h3><ul>
+<li>验证 <code>ssh</code> 是否完全使用 <code>ed25519</code>：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -v -i ~/.ssh/id_ed25519 user@192.168.2.20</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>验证 <code>rsync</code> 使用正常：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz /path/to/local/dir/ target_server:/path/to/remote/dir/</span><br></pre></td></tr></table></figure>
+
+<p>完成配置后，你已经成功使用 <code>ed25519</code> 实现了 SSH 免密登录和高效的 <code>rsync</code> 文件传输。如有其他问题，请随时咨询！</p>
+<h1 id="使用本地代理"><a href="#使用本地代理" class="headerlink" title="使用本地代理"></a>使用本地代理</h1><p>在<code>.bashrc</code>中添加以下代码：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> ftp_proxy=ftp://192.168.1.3:7890</span><br><span class="line"><span class="built_in">export</span> http_proxy=http://192.168.1.3:7890</span><br><span class="line"><span class="built_in">export</span> https_proxy=http://192.168.1.3:7890</span><br><span class="line"><span class="built_in">export</span> socks_proxy=http://192.168.1.3:7890</span><br></pre></td></tr></table></figure>
+
+<h1 id="安装python3-pandas"><a href="#安装python3-pandas" class="headerlink" title="安装python3-pandas"></a>安装python3-pandas</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get install python3-pandas</span><br></pre></td></tr></table></figure>
+
+<h1 id="安装-wol"><a href="#安装-wol" class="headerlink" title="安装 wol"></a>安装 wol</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get install wakeonlan</span><br></pre></td></tr></table></figure>
+
+<h1 id="安装-Docker-以及-Docker-Compose"><a href="#安装-Docker-以及-Docker-Compose" class="headerlink" title="安装 Docker 以及 Docker Compose"></a>安装 Docker 以及 Docker Compose</h1><h2 id="使用官方源安装-Docker"><a href="#使用官方源安装-Docker" class="headerlink" title="使用官方源安装 Docker"></a>使用官方源安装 Docker</h2><p>以下操作需要在 root 用户下完成，请使用 <code>sudo -i</code> 或 <code>su root</code> 切换到 root 用户进行操作。</p>
+<p>首先，安装一些必要的软件包：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt update</span><br><span class="line">apt upgrade -y</span><br><span class="line">apt install curl vim wget gnupg dpkg apt-transport-https lsb-release ca-certificates</span><br></pre></td></tr></table></figure>
+
+<p>然后加入 Docker 的 GPG 公钥和 apt 源：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -sSL https://download.docker.com/linux/debian/gpg | gpg --dearmor &gt; /usr/share/keyrings/docker-ce.gpg</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;deb [arch=<span class="subst">$(dpkg --print-architecture)</span> signed-by=/usr/share/keyrings/docker-ce.gpg] https://download.docker.com/linux/debian <span class="subst">$(lsb_release -sc)</span> stable&quot;</span> &gt; /etc/apt/sources.list.d/docker.list</span><br></pre></td></tr></table></figure>
+
+<p>国内机器可以用<a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/">清华 TUNA</a> 的国内源：</p>
+<p>Debian</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -sS https://download.docker.com/linux/debian/gpg | gpg --dearmor &gt; /usr/share/keyrings/docker-ce.gpg</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;deb [arch=<span class="subst">$(dpkg --print-architecture)</span> signed-by=/usr/share/keyrings/docker-ce.gpg] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian <span class="subst">$(lsb_release -sc)</span> stable&quot;</span> &gt; /etc/apt/sources.list.d/docker.list</span><br></pre></td></tr></table></figure>
+
+<p>然后更新系统后即可安装 Docker CE 和 Docker Compose 插件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt update</span><br><span class="line">apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin</span><br></pre></td></tr></table></figure>
+
+<p>此时可以使用 <code>docker version</code> 命令检查是否安装成功：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">root@debian ~ <span class="comment"># docker version</span></span><br><span class="line">Client: Docker Engine - Community</span><br><span class="line"> Version:           26.1.4</span><br><span class="line"> API version:       1.45</span><br><span class="line"> Go version:        go1.21.11</span><br><span class="line"> Git commit:        5650f9b</span><br><span class="line"> Built:             Wed Jun  5 11:29:22 2024</span><br><span class="line"> OS/Arch:           linux/amd64</span><br><span class="line"> Context:           default</span><br><span class="line"></span><br><span class="line">Server: Docker Engine - Community</span><br><span class="line"> Engine:</span><br><span class="line">  Version:          26.1.4</span><br><span class="line">  API version:      1.45 (minimum version 1.24)</span><br><span class="line">  Go version:       go1.21.11</span><br><span class="line">  Git commit:       de5c9cf</span><br><span class="line">  Built:            Wed Jun  5 11:29:22 2024</span><br><span class="line">  OS/Arch:          linux/amd64</span><br><span class="line">  Experimental:     <span class="literal">true</span></span><br><span class="line"> containerd:</span><br><span class="line">  Version:          1.6.33</span><br><span class="line">  GitCommit:        d2d58213f83a351ca8f528a95fbd145f5654e957</span><br><span class="line"> runc:</span><br><span class="line">  Version:          1.1.12</span><br><span class="line">  GitCommit:        v1.1.12-0-g51d5e94</span><br><span class="line"> docker-init:</span><br><span class="line">  Version:          0.19.0</span><br><span class="line">  GitCommit:        de40ad0</span><br></pre></td></tr></table></figure>
+
+<p>如果需要某个特定用户可以用 Docker <a target="_blank" rel="noopener" href="https://docs.docker.com/engine/security/rootless/">rootless</a> 模式运行 Docker，那么可以把这个用户也加入 docker 组，比如我们把 <code>www-data</code> 用户加进去：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt install docker-ce-rootless-extras</span><br><span class="line"><span class="built_in">sudo</span> usermod -aG docker www-data</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装-Docker-Compose"><a href="#安装-Docker-Compose" class="headerlink" title="安装 Docker Compose"></a>安装 Docker Compose</h2><p>因为我们已经安装了 <code>docker-compose-plugin</code>，所以 Docker 目前已经自带 <code>docker compose</code> 命令，基本上可以替代 <code>docker-compose</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@debian ~ <span class="comment"># docker compose version</span></span><br><span class="line">Docker Compose version v2.27.1</span><br></pre></td></tr></table></figure>
+
+<p>如果某些镜像或命令不兼容，则我们还可以单独安装 Docker Compose：</p>
+<p>我们可以使用 Docker 官方发布的 <a target="_blank" rel="noopener" href="https://github.com/docker/compose">Github</a> 直接安装最新版本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64 &gt; /usr/local/bin/docker-compose</span><br><span class="line"><span class="built_in">chmod</span> +x /usr/local/bin/docker-compose</span><br></pre></td></tr></table></figure>
+
+<p>此时可以使用 <code>docker-compose version</code> 命令检查是否安装成功：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@debian ~ <span class="comment"># docker-compose version</span></span><br><span class="line">Docker Compose version v2.27.1</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改-Docker-配置"><a href="#修改-Docker-配置" class="headerlink" title="修改 Docker 配置"></a>修改 Docker 配置</h2><p>以下配置会增加一段自定义内网 IPv6 地址，开启容器的 IPv6 功能，以及限制日志文件大小，防止 Docker 日志塞满硬盘 (泪的教训)：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> &gt; /etc/docker/daemon.json &lt;&lt; <span class="string">EOF</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">    &quot;log-driver&quot;: &quot;json-file&quot;,</span></span><br><span class="line"><span class="string">    &quot;log-opts&quot;: &#123;</span></span><br><span class="line"><span class="string">        &quot;max-size&quot;: &quot;20m&quot;,</span></span><br><span class="line"><span class="string">        &quot;max-file&quot;: &quot;3&quot;</span></span><br><span class="line"><span class="string">    &#125;,</span></span><br><span class="line"><span class="string">    &quot;ipv6&quot;: true,</span></span><br><span class="line"><span class="string">    &quot;fixed-cidr-v6&quot;: &quot;fd00:dead:beef:c0::/80&quot;,</span></span><br><span class="line"><span class="string">    &quot;experimental&quot;:true,</span></span><br><span class="line"><span class="string">    &quot;ip6tables&quot;:true</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
+
+<p>然后重启 Docker 服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart docker</span><br></pre></td></tr></table></figure>
+
+<p>好了，我们已经安装好了 Docker 和 Docker Compose，然后就可以开始愉快的安装各种软件，限于篇幅，我们不再赘述，今后慢慢介绍安装各种 Docker 软件的方法。</p>
+<h2 id="添加用户到-docker-组"><a href="#添加用户到-docker-组" class="headerlink" title="添加用户到 docker 组"></a><strong>添加用户到 docker 组</strong></h2><p>默认情况下，Docker 需要 root 权限才能运行。为了避免每次使用 Docker 时都需要输入 <code>sudo</code>，您可以将您的用户添加到 <code>docker</code> 组中。运行以下命令来完成此操作</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -aG docker <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，您需要退出当前会话并重新登录，或者重启您的系统，以使组更改生效</p>
+<h1 id="Docker-安装-homeassistans"><a href="#Docker-安装-homeassistans" class="headerlink" title="Docker 安装 homeassistans"></a>Docker 安装 homeassistans</h1><p>首先pull homeassistans 镜像</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull homeassistant/home-assistant</span><br></pre></td></tr></table></figure>
+
+<p>然后运行该容器</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name=<span class="string">&quot;homeassistants&quot;</span> -v /data/homeassistant:/config -p 8123:8123 homeassistant/home-assistant</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --restart always --name homeassistant  -v /data/homeassistant/config:/config -e TZ=Asia/Shanghai   -p 8123:8123    homeassistant</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="Docker-安装-immich"><a href="#Docker-安装-immich" class="headerlink" title="Docker 安装 immich"></a>Docker 安装 immich</h1><p>创建文件夹</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> immich-app</span><br></pre></td></tr></table></figure>
+
+<p>下载docker-compose.yml文件</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget -O docker-compose.yml https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml</span><br><span class="line">wget -O .<span class="built_in">env</span> https://github.com/immich-app/immich/releases/latest/download/example.env</span><br></pre></td></tr></table></figure>
+
+<p>运行</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker compose up -d</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h2><p>之前的脚本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">date_str=$(<span class="built_in">date</span> -d <span class="string">&quot;-<span class="variable">$days_ago</span> day&quot;</span> +<span class="string">&quot;%Y-%m-%d&quot;</span>)</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 基础路径和加密密钥文件</span></span><br><span class="line">base_dir=<span class="string">&quot;/home/wjl/docker/immich-app/library/library/admin&quot;</span></span><br><span class="line">backup_dir=<span class="string">&quot;/mnt/alist/kuake/backup/immich_bk&quot;</span></span><br><span class="line">key_file=<span class="string">&quot;<span class="variable">$HOME</span>/.ssh/aes.key&quot;</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># 获取前一天的日期和年份</span></span><br><span class="line">yesterday=$(<span class="built_in">date</span> -d <span class="string">&quot;yesterday&quot;</span> +<span class="string">&quot;%Y-%m-%d&quot;</span>)</span><br><span class="line">year=$(<span class="built_in">date</span> -d <span class="string">&quot;yesterday&quot;</span> +<span class="string">&quot;%Y&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 要备份的文件夹路径</span></span><br><span class="line">src_dir=<span class="string">&quot;<span class="variable">$base_dir</span>/<span class="variable">$year</span>/<span class="variable">$yesterday</span>&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果文件夹存在，打包并加密备份</span></span><br><span class="line"><span class="keyword">if</span> [ -d <span class="string">&quot;<span class="variable">$src_dir</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    archive_file=<span class="string">&quot;<span class="variable">$HOME</span>/<span class="variable">$&#123;yesterday&#125;</span>.tar.gz&quot;</span></span><br><span class="line">    tar -czf <span class="string">&quot;<span class="variable">$archive_file</span>&quot;</span> -C <span class="string">&quot;<span class="variable">$base_dir</span>/<span class="variable">$year</span>&quot;</span> <span class="string">&quot;<span class="variable">$yesterday</span>&quot;</span></span><br><span class="line">    openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 -<span class="keyword">in</span> <span class="string">&quot;<span class="variable">$archive_file</span>&quot;</span> -out <span class="string">&quot;<span class="variable">$&#123;archive_file&#125;</span>.enc&quot;</span> -kfile <span class="string">&quot;<span class="variable">$key_file</span>&quot;</span></span><br><span class="line">    <span class="built_in">mv</span> <span class="string">&quot;<span class="variable">$&#123;archive_file&#125;</span>.enc&quot;</span> <span class="string">&quot;<span class="variable">$backup_dir</span>/&quot;</span></span><br><span class="line">    <span class="built_in">rm</span> <span class="string">&quot;<span class="variable">$archive_file</span>&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>我来帮你将 <strong>备份脚本</strong> 配置为 <strong>定时任务（cron job）</strong>，并将 <strong>日志输出到指定文件</strong>，方便查看备份的执行情况。</p>
+<hr>
+<h3 id="🧩-脚本改进（含日志输出）："><a href="#🧩-脚本改进（含日志输出）：" class="headerlink" title="🧩 脚本改进（含日志输出）："></a>🧩 <strong>脚本改进</strong>（含日志输出）：</h3><ul>
+<li>将脚本的执行日志输出到 <code>/var/log/immich_backup.log</code>。</li>
+<li>包括 <strong>备份进度</strong> 和 <strong>错误信息</strong>。</li>
+</ul>
+<h3 id="📋-改进后的脚本（backup-sh）："><a href="#📋-改进后的脚本（backup-sh）：" class="headerlink" title="📋 改进后的脚本（backup.sh）："></a>📋 <strong>改进后的脚本（backup.sh）</strong>：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 基础路径和加密密钥文件</span></span><br><span class="line">base_dir=<span class="string">&quot;/home/wjl/docker/immich-app/library/library/admin&quot;</span></span><br><span class="line">backup_dir=<span class="string">&quot;/mnt/alist/kuake/backup/immich_bk&quot;</span></span><br><span class="line">key_file=<span class="string">&quot;<span class="variable">$HOME</span>/.ssh/aes.key&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 日志文件</span></span><br><span class="line">log_file=<span class="string">&quot;/var/log/immich_backup.log&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查密钥文件是否存在</span></span><br><span class="line"><span class="keyword">if</span> [ ! -f <span class="string">&quot;<span class="variable">$key_file</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [ERROR] 密钥文件 <span class="variable">$key_file</span> 不存在！&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取最近一个月的日期列表</span></span><br><span class="line"><span class="keyword">for</span> days_ago <span class="keyword">in</span> &#123;0..29&#125;; <span class="keyword">do</span></span><br><span class="line">    date_str=$(<span class="built_in">date</span> -d <span class="string">&quot;-<span class="variable">$days_ago</span> day&quot;</span> +<span class="string">&quot;%Y-%m-%d&quot;</span>)</span><br><span class="line">    src_dir=<span class="string">&quot;<span class="variable">$base_dir</span>/<span class="variable">$date_str</span>&quot;</span></span><br><span class="line">    tmp_file=<span class="string">&quot;/tmp/<span class="variable">$&#123;date_str&#125;</span>.tar.gz.enc&quot;</span></span><br><span class="line">    backup_file=<span class="string">&quot;<span class="variable">$backup_dir</span>/<span class="variable">$&#123;date_str&#125;</span>.tar.gz.enc&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 如果源目录存在</span></span><br><span class="line">    <span class="keyword">if</span> [ -d <span class="string">&quot;<span class="variable">$src_dir</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">        <span class="comment"># 获取源目录中最新修改文件的时间戳</span></span><br><span class="line">        latest_src_time=$(find <span class="string">&quot;<span class="variable">$src_dir</span>&quot;</span> -<span class="built_in">type</span> f -<span class="built_in">printf</span> <span class="string">&quot;%T@\n&quot;</span> | <span class="built_in">sort</span> -n | <span class="built_in">tail</span> -1)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 获取备份文件的时间戳</span></span><br><span class="line">        <span class="keyword">if</span> [ -f <span class="string">&quot;<span class="variable">$backup_file</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">            backup_time=$(<span class="built_in">stat</span> -c %Y <span class="string">&quot;<span class="variable">$backup_file</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            backup_time=0</span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 判断是否需要备份</span></span><br><span class="line">        <span class="keyword">if</span> (( $(echo &quot;<span class="variable">$latest_src_time</span> &gt; <span class="variable">$backup_time</span>&quot; | bc -l) )); <span class="keyword">then</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [INFO] 正在备份 <span class="variable">$date_str</span> ...&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">            archive_file=<span class="string">&quot;/tmp/<span class="variable">$&#123;date_str&#125;</span>.tar.gz&quot;</span></span><br><span class="line">            tar -czf <span class="string">&quot;<span class="variable">$archive_file</span>&quot;</span> -C <span class="string">&quot;<span class="variable">$base_dir</span>&quot;</span> <span class="string">&quot;<span class="variable">$date_str</span>&quot;</span></span><br><span class="line">            openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 -<span class="keyword">in</span> <span class="string">&quot;<span class="variable">$archive_file</span>&quot;</span> -out <span class="string">&quot;<span class="variable">$tmp_file</span>&quot;</span> -kfile <span class="string">&quot;<span class="variable">$key_file</span>&quot;</span></span><br><span class="line">            <span class="built_in">rm</span> <span class="string">&quot;<span class="variable">$archive_file</span>&quot;</span></span><br><span class="line"></span><br><span class="line">            <span class="comment"># 移动到最终的备份目录</span></span><br><span class="line">            <span class="built_in">mv</span> <span class="string">&quot;<span class="variable">$tmp_file</span>&quot;</span> <span class="string">&quot;<span class="variable">$backup_file</span>&quot;</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [INFO] 备份完成：<span class="variable">$backup_file</span>&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [INFO] 备份文件已存在且无更新，跳过 <span class="variable">$date_str</span>。&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [WARNING] 源文件夹 <span class="variable">$src_dir</span> 不存在，跳过。&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="使用rclone后的脚本"><a href="#使用rclone后的脚本" class="headerlink" title="使用rclone后的脚本"></a>使用rclone后的脚本</h3><p>由于mv配合alist备份不成功，使用rclone挂载alist webdav，然后在通过rclone命令上传</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 基础路径和加密密钥文件</span></span><br><span class="line">base_dir=<span class="string">&quot;/home/wjl/docker/immich-app/library/library/admin&quot;</span></span><br><span class="line">backup_dir=<span class="string">&quot;/mnt/alist/kuake/backup/immich_bk&quot;</span></span><br><span class="line">key_file=<span class="string">&quot;<span class="variable">$HOME</span>/.ssh/aes.key&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 日志文件</span></span><br><span class="line">log_file=<span class="string">&quot;/var/log/immich_backup.log&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查密钥文件是否存在</span></span><br><span class="line"><span class="keyword">if</span> [ ! -f <span class="string">&quot;<span class="variable">$key_file</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [ERROR] 密钥文件 <span class="variable">$key_file</span> 不存在！&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取最近一个月的日期列表</span></span><br><span class="line"><span class="keyword">for</span> days_ago <span class="keyword">in</span> &#123;0..29&#125;; <span class="keyword">do</span></span><br><span class="line">    date_str=$(<span class="built_in">date</span> -d <span class="string">&quot;-<span class="variable">$days_ago</span> day&quot;</span> +<span class="string">&quot;%Y-%m-%d&quot;</span>)</span><br><span class="line">    year=$(<span class="built_in">date</span> -d <span class="string">&quot;-<span class="variable">$days_ago</span> day&quot;</span> +<span class="string">&quot;%Y&quot;</span>)</span><br><span class="line">    src_dir=<span class="string">&quot;<span class="variable">$base_dir</span>/<span class="variable">$year</span>/<span class="variable">$date_str</span>&quot;</span></span><br><span class="line">    tmp_file=<span class="string">&quot;/tmp/<span class="variable">$&#123;date_str&#125;</span>.tar.gz.enc&quot;</span></span><br><span class="line">    backup_file=<span class="string">&quot;<span class="variable">$backup_dir</span>/<span class="variable">$&#123;year&#125;</span>/<span class="variable">$&#123;date_str&#125;</span>.tar.gz.enc&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 如果源目录存在</span></span><br><span class="line">    <span class="keyword">if</span> [ -d <span class="string">&quot;<span class="variable">$src_dir</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">        <span class="comment"># 创建年份目录（如果不存在）</span></span><br><span class="line">        <span class="built_in">mkdir</span> -p <span class="string">&quot;<span class="variable">$backup_dir</span>/<span class="variable">$year</span>&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 获取源目录中最新修改文件的时间戳</span></span><br><span class="line">        latest_src_time=$(find <span class="string">&quot;<span class="variable">$src_dir</span>&quot;</span> -<span class="built_in">type</span> f -<span class="built_in">printf</span> <span class="string">&quot;%T@\n&quot;</span> | <span class="built_in">sort</span> -n | <span class="built_in">tail</span> -1)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 获取备份文件的时间戳</span></span><br><span class="line">        <span class="keyword">if</span> [ -f <span class="string">&quot;<span class="variable">$backup_file</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">            backup_time=$(<span class="built_in">stat</span> -c %Y <span class="string">&quot;<span class="variable">$backup_file</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            backup_time=0</span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 判断是否需要备份</span></span><br><span class="line">        <span class="keyword">if</span> (( $(echo &quot;<span class="variable">$latest_src_time</span> &gt; <span class="variable">$backup_time</span>&quot; | bc -l) )); <span class="keyword">then</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [INFO] 正在备份 <span class="variable">$date_str</span> ...&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">            archive_file=<span class="string">&quot;/tmp/<span class="variable">$&#123;date_str&#125;</span>.tar.gz&quot;</span></span><br><span class="line">            tar -czf <span class="string">&quot;<span class="variable">$archive_file</span>&quot;</span> -C <span class="string">&quot;<span class="variable">$base_dir</span>/<span class="variable">$year</span>&quot;</span> <span class="string">&quot;<span class="variable">$date_str</span>&quot;</span></span><br><span class="line">            openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 -<span class="keyword">in</span> <span class="string">&quot;<span class="variable">$archive_file</span>&quot;</span> -out <span class="string">&quot;<span class="variable">$tmp_file</span>&quot;</span> -kfile <span class="string">&quot;<span class="variable">$key_file</span>&quot;</span></span><br><span class="line">            <span class="built_in">rm</span> <span class="string">&quot;<span class="variable">$archive_file</span>&quot;</span></span><br><span class="line"></span><br><span class="line">            <span class="comment"># 使用 rclone 上传到远程 WebDAV 服务器，显示上传进度</span></span><br><span class="line">            rclone copy <span class="string">&quot;<span class="variable">$tmp_file</span>&quot;</span> <span class="string">&quot;remote:kuake/backup/immich_bk/<span class="variable">$&#123;year&#125;</span>/&quot;</span> --progress | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">            <span class="built_in">rm</span> <span class="string">&quot;<span class="variable">$tmp_file</span>&quot;</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [INFO] 备份完成：<span class="variable">$backup_file</span>&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [INFO] 备份文件已存在且无更新，跳过 <span class="variable">$date_str</span>。&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">&quot;<span class="subst">$(date)</span> [WARNING] 源文件夹 <span class="variable">$src_dir</span> 不存在，跳过。&quot;</span> | <span class="built_in">tee</span> -a <span class="string">&quot;<span class="variable">$log_file</span>&quot;</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="🕒-设置定时任务："><a href="#🕒-设置定时任务：" class="headerlink" title="🕒 设置定时任务："></a>🕒 <strong>设置定时任务</strong>：</h3><p>使用 <code>cron</code> 定时执行脚本，并将日志写入 <code>/var/log/immich_backup.log</code>。</p>
+<h4 id="步骤1：编辑-cron-任务"><a href="#步骤1：编辑-cron-任务" class="headerlink" title="步骤1：编辑 cron 任务"></a><strong>步骤1：编辑 cron 任务</strong></h4><p>运行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crontab -e</span><br></pre></td></tr></table></figure>
+
+<h4 id="步骤2：添加以下-cron-任务"><a href="#步骤2：添加以下-cron-任务" class="headerlink" title="步骤2：添加以下 cron 任务"></a><strong>步骤2：添加以下 cron 任务</strong></h4><p>每天凌晨 2 点执行备份任务，并输出日志到 <code>/var/log/immich_backup.log</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">0 2 * * * /bin/bash /path/to/backup.sh &gt;&gt; /var/log/immich_backup.log 2&gt;&amp;1</span><br><span class="line"><span class="comment">#chatgpt给的</span></span><br><span class="line"></span><br><span class="line">0 1 * * *  /root/script/immich-backup.sh  2&gt;&amp;1 &gt; /dev/null</span><br><span class="line"><span class="comment">#实际用的，脚本里通过&#x27;| tee -a &quot;$log_file&quot;&#x27; 输出log，所以不通过&gt;&gt;输出到/var/log/immich_backup.log</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>注意</strong>：将 <code>/path/to/backup.sh</code> 替换为你的实际脚本路径。</p>
+</blockquote>
+<hr>
+<h3 id="🧹-日志清理建议："><a href="#🧹-日志清理建议：" class="headerlink" title="🧹 日志清理建议："></a>🧹 <strong>日志清理建议</strong>：</h3><p>为了防止日志文件过大，可以通过 <code>logrotate</code> 配置日志自动清理。</p>
+<h4 id="创建-logrotate-配置文件："><a href="#创建-logrotate-配置文件：" class="headerlink" title="创建 logrotate 配置文件："></a><strong>创建 logrotate 配置文件</strong>：</h4><p>创建文件 <code>/etc/logrotate.d/immich_backup</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/var/log/immich_backup.log &#123;</span><br><span class="line">    daily</span><br><span class="line">    rotate 7</span><br><span class="line">    compress</span><br><span class="line">    missingok</span><br><span class="line">    notifempty</span><br><span class="line">    create 644 root root</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="📊-执行效果示例："><a href="#📊-执行效果示例：" class="headerlink" title="📊 执行效果示例："></a>📊 <strong>执行效果示例</strong>：</h3><h4 id="✅-正常备份日志："><a href="#✅-正常备份日志：" class="headerlink" title="✅ 正常备份日志："></a>✅ <strong>正常备份日志</strong>：</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2025-01-03 02:00:01 [INFO] 正在备份 2024-12-28 ...</span><br><span class="line">2025-01-03 02:00:15 [INFO] 备份完成：/mnt/alist/kuake/backup/immich_bk/2024-12-28.tar.gz.enc</span><br></pre></td></tr></table></figure>
+
+<h4 id="⚠️-错误日志："><a href="#⚠️-错误日志：" class="headerlink" title="⚠️ 错误日志："></a>⚠️ <strong>错误日志</strong>：</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2025-01-03 02:00:01 [ERROR] 密钥文件 /home/wjl/.ssh/aes.key 不存在！</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>这样配置后，你的备份任务将自动运行，并生成详细的日志。如果有其他需求，可以继续告诉我！😊</p>
+<h1 id="安装zerotier-one"><a href="#安装zerotier-one" class="headerlink" title="安装zerotier-one"></a>安装zerotier-one</h1><h2 id="第一步-在云服务器上安装-zerotier-one"><a href="#第一步-在云服务器上安装-zerotier-one" class="headerlink" title="第一步 在云服务器上安装 zerotier-one"></a>第一步 在云服务器上安装 zerotier-one</h2><p><strong>方法一 更简单</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">curl -s https://install.zerotier.com | <span class="built_in">sudo</span> bash</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>方法二 更安全</strong></p>
+<blockquote>
+<p>要求系统中安装了 GPG</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">curl -s <span class="string">&#x27;https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg&#x27;</span> | gpg --import &amp;&amp; \</span></span><br><span class="line"><span class="language-bash"><span class="keyword">if</span> z=$(curl -s <span class="string">&#x27;https://install.zerotier.com/&#x27;</span> | gpg); <span class="keyword">then</span> <span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$z</span>&quot;</span> | <span class="built_in">sudo</span> bash; <span class="keyword">fi</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="第二步-云服务器加入虚拟网络"><a href="#第二步-云服务器加入虚拟网络" class="headerlink" title="第二步 云服务器加入虚拟网络"></a>第二步 云服务器加入虚拟网络</h2><p>执行命令，将云服务器加入到自己创建好的虚拟网络，将命令中的 <code>xxxxxxxx</code> 替换成实际的虚拟网络 ID。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">sudo</span> zerotier-cli <span class="built_in">join</span> 56374ac9a4c4a4b0</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="第三步-配置-Moon"><a href="#第三步-配置-Moon" class="headerlink" title="第三步 配置 Moon"></a>第三步 配置 Moon</h2><p>进入 zerotier-one 程序所在的目录，默认为 <code>/var/lib/zerotier-one</code>。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> /var/lib/zerotier-one</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>生成 moon.json 配置文件</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">sudo</span> zerotier-idtool initmoon identity.public &gt;&gt; moon.json</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>编辑 moon.json 配置文件</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo nano moon.json</span><br></pre></td></tr></table></figure>
+
+<p>将配置文件中的 <code>&quot;stableEndpoints&quot;: []</code> 修改成 <code>&quot;stableEndpoints&quot;: [&quot;ServerIP/9993&quot;]</code>，将 <code>ServerIP</code> 替换成云服务器的公网IP。</p>
+<p><strong>生成 .moon 文件</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">sudo</span> zerotier-idtool genmoon moon.json</span></span><br></pre></td></tr></table></figure>
+
+<p>将生成的 000000xxxxxxxxxx.moon 移动到 <code>moons.d</code> 目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> moons.d</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">sudo</span> <span class="built_in">mv</span> 000000xxxxxxxxxx.moon moons.d</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>.moon 配置文件的名一般为<code>10个前导零</code>+<code>本机的节点ID</code></p>
+</blockquote>
+<p><strong>重启 zerotier-one 服务</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">sudo</span> systemctl restart zerotier-one</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-Moon"><a href="#使用-Moon" class="headerlink" title="使用 Moon"></a>使用 Moon</h2><p>普通的 Zerotier 成员使用 Moon 有两种方法，第一种方法是使用 <code>zerotier-cli orbit</code> 命令直接添加 Moon 节点ID；第二种方法是在 zerotier-one 程序的根目录创建<code>moons.d</code>文件夹，将 <code>xxx.moon</code> 复制到该文件夹中，我们采用第一种方法：</p>
+<h3 id="Linux-系统下使用-Moon"><a href="#Linux-系统下使用-Moon" class="headerlink" title="Linux 系统下使用 Moon"></a>Linux 系统下使用 Moon</h3><p>将命令中的两组 <code>xxxxxxxxxx</code> 都替换成 moon 的节点ID。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">sudo</span> zerotier-cli orbit b90fcb383b b90fcb383b</span></span><br></pre></td></tr></table></figure>
+
+<p>检查是否添加成功</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">sudo</span> zerotier-cli listpeers</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Windows-系统下使用-Moon"><a href="#Windows-系统下使用-Moon" class="headerlink" title="Windows 系统下使用 Moon"></a>Windows 系统下使用 Moon</h3><p>以管理员身份打开 PowerShell，将命令中的两组 <code>xxxxxxxxxx</code> 都替换成 moon 的节点ID。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Windows\system32&gt; zerotier<span class="literal">-cli</span>.bat orbit b90fcb383b b90fcb383b</span><br></pre></td></tr></table></figure>
+
+<p>检查是否添加成功</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Windows\system32&gt; zerotier<span class="literal">-cli</span>.bat listpeers</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>提示</strong>：Windows 系统的默认程序目录位于 <code>C:\Program Files (x86)\ZeroTier\One</code>。</p>
+</blockquote>
+<h2 id="常见问题一：电脑添加了虚拟网络，但Zerotier管理列表中始终没有显示这台设备"><a href="#常见问题一：电脑添加了虚拟网络，但Zerotier管理列表中始终没有显示这台设备" class="headerlink" title="常见问题一：电脑添加了虚拟网络，但Zerotier管理列表中始终没有显示这台设备"></a>常见问题一：电脑添加了虚拟网络，但Zerotier管理列表中始终没有显示这台设备</h2><p>答：可以尝试在Zerotier管理界面中 <code>Advanced -&gt; Manually Add Member</code> 中手动添加电脑的节点ID。</p>
+<h1 id="配置frp"><a href="#配置frp" class="headerlink" title="配置frp"></a>配置frp</h1><p>注意事项：chrome内核的浏览器会屏蔽掉一些常用的端口，例如使用以下端口，访问会被浏览器直接拦截，报<code>ERR_UNSAFE_PORT</code>错误</p>
+<ul>
+<li>22</li>
+<li>6000</li>
+</ul>
+<p>等等</p>
+<h1 id="chown-命令变更文件关联组"><a href="#chown-命令变更文件关联组" class="headerlink" title="chown 命令变更文件关联组"></a>chown 命令变更文件关联组</h1><p>只有超级用户和属于组的文件所有者才能变更文件关联组。非超级用户如需要设置关联组可能需要使用 <a target="_blank" rel="noopener" href="https://www.runoob.com/linux/linux-comm-chgrp.html">chgrp</a> 命令。</p>
+<p><strong>使用权限</strong> : root</p>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown [-cfhvR] [--help] [--version] user[:group] file...</span><br></pre></td></tr></table></figure>
+
+<p><strong>参数</strong> :</p>
+<ul>
+<li>user : 新的文件拥有者的使用者 ID</li>
+<li>group : 新的文件拥有者的使用者组(group)</li>
+<li>-c : 显示更改的部分的信息</li>
+<li>-f : 忽略错误信息</li>
+<li>-h :修复符号链接</li>
+<li>-v : 显示详细的处理信息</li>
+<li>-R : 处理指定目录以及其子目录下的所有文件</li>
+<li>–help : 显示辅助说明</li>
+<li>–version : 显示版本</li>
+</ul>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><p>把 &#x2F;var&#x2F;run&#x2F;httpd.pid 的所有者设置 root：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chown</span> root /var/run/httpd.pid</span><br></pre></td></tr></table></figure>
+
+<p>将文件 file1.txt 的拥有者设为 runoob，群体的使用者 runoobgroup :</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chown</span> runoob:runoobgroup file1.txt</span><br></pre></td></tr></table></figure>
+
+<p>将当前前目录下的所有文件与子目录的拥有者皆设为 runoob，群体的使用者 runoobgroup:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chown</span> -R runoob:runoobgroup *</span><br></pre></td></tr></table></figure>
+
+<h1 id="crontab"><a href="#crontab" class="headerlink" title="crontab"></a>crontab</h1><p>crontab -e：编辑crontab的工作内容</p>
+<h2 id="打开日志"><a href="#打开日志" class="headerlink" title="打开日志"></a>打开日志</h2><p>首先我们把cron日志打开，如何打开，很简单，控制台输入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/rsyslog.d/50-default.conf</span><br></pre></td></tr></table></figure>
+
+<p>打开文件，在文件中找到cron.*，把前面的#去掉，保存退出，输入</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service rsyslog restart</span><br></pre></td></tr></table></figure>
+
+<p>重启系统日志，然后稍微等下应该就能在&#x2F;var&#x2F;log目录下看到cron.log，vi cron.log就可以查看cron运行日志了。</p>
+<p>当程序在你所指定的时间执行后，系统会发一封邮件给当前的用户，显示该程序执行的内容，若是你不希望收到这样的邮件，请在每一行空一格之后加上 <strong>&gt; &#x2F;dev&#x2F;null 2&gt;&amp;1</strong> 即可，如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">20 03 * * * . /etc/profile;/bin/sh /var/www/runoob/test.sh &gt; /dev/null 2&gt;&amp;1 </span><br></pre></td></tr></table></figure>
+
+<h2 id="重启-cron-服务"><a href="#重启-cron-服务" class="headerlink" title="重启 cron 服务"></a>重启 cron 服务</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service cron restart</span><br></pre></td></tr></table></figure>
+
+<h2 id="Debian12-root用户的cron文件路径"><a href="#Debian12-root用户的cron文件路径" class="headerlink" title="Debian12 root用户的cron文件路径"></a>Debian12 root用户的cron文件路径</h2><p>目录为</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/var/spool/cron/crontabs/root</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="挂载NTFS"><a href="#挂载NTFS" class="headerlink" title="挂载NTFS"></a>挂载NTFS</h1><p>1.安装软件:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install ntfs-3g</span><br></pre></td></tr></table></figure>
+
+<p>2.查看硬盘名字</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fdisk -l</span><br></pre></td></tr></table></figure>
+
+<p>找到要挂载的磁盘，记住他的设备名，例如<code>/dev/sda1</code></p>
+<p>3.挂载硬盘</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#创建挂载目录</span></span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> /mnt/hdd0</span><br><span class="line"><span class="comment">#挂载硬盘</span></span><br><span class="line"><span class="built_in">sudo</span> ntfs-3g /dev/sda1 /mnt/hdd0</span><br></pre></td></tr></table></figure>
+
+<p>4.开机自动挂载 打开<code>/etc/fstab</code>，添加如下内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dev/sda1 /mnt/hdd0 ntfs-3g defaults,locale=zh_CN.UTF-8 0 0</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/debian12/" rel="tag"># debian12</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/12/06/RISC-V_IOMMU_%E6%9E%B6%E6%9E%84%E8%A7%84%E8%8C%83/" rel="prev" title="RISC-V IOMMU 架构规范">
+                  <i class="fa fa-angle-left"></i> RISC-V IOMMU 架构规范
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/07/12/CentOS7-install-samba/" rel="next" title="CentOS7-install-samba">
+                  CentOS7-install-samba <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Wu JInlin</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"http://example.com/2024/07/12/Debian12/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+
+</body>
+</html>
